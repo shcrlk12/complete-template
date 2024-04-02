@@ -51,7 +51,7 @@ const Login = () => {
     let formData = new FormData(event.currentTarget);
 
     fetch("http://www.localhost:6789/login", {
-      mode: "cors",
+      // mode: "cors",
       method: "POST",
       credentials: "include",
       body: formData,
@@ -60,10 +60,10 @@ const Login = () => {
         console.log(res);
         console.log(res.status);
 
-        if (res.status === 200) {
-          dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: GENERAL_ROLE }));
-          // nav(Paths.availability.annually.path);
-        }
+        // if (res.status === 200) {
+        //   dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: GENERAL_ROLE }));
+        //   // nav(Paths.availability.annually.path);
+        // }
       })
       .catch((e) => console.warn(e));
   };

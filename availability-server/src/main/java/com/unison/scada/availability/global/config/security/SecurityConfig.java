@@ -74,7 +74,7 @@ public class SecurityConfig{
                                 .passwordParameter("password")
                                 .successHandler(appAuthenticationSuccessHandler())
                                 .failureHandler(appAuthenticationFailureHandler())
-                                .defaultSuccessUrl("/", false)
+//                                .defaultSuccessUrl("/", false)
                                 .permitAll()
                 )
                 .logout((logout) ->
