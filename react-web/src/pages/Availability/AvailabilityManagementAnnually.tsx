@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PowerCondition from "@components/PowerCondition";
 import AnnualTable from "@components/Table/AnnualTable/AnnualTable";
 import {
@@ -8,8 +8,16 @@ import {
   TableMetaContainer,
   WindfarmInfoList,
 } from "./Availability.styled";
+import { useDispatch } from "react-redux";
+import { resetLoading } from "@reducers/appAction";
 
 const AvailabilityManagementAnnually = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(resetLoading());
+  }, []);
+
   return (
     <MainSection>
       <TableMetaContainer>
