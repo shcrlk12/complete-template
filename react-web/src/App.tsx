@@ -8,12 +8,18 @@ import NewUser from "@pages/Users/NewUser";
 import ModifyUser from "@pages/Users/ModifyUser";
 import { Paths, headerNavList, projectVersion } from "./Config";
 import Header from "@components/Header/Header";
+import Loading from "@components/App/Loading";
+import { useSelector } from "react-redux";
+import { RootState } from "src";
 
 const App = () => {
+  const { isLoading } = useSelector((state: RootState) => state.appReducer);
+
   return (
     <Router>
       <GlobalStyles />
       <Header projectVersion={projectVersion} headerNavList={headerNavList} rightVisible={true} />
+      <Loading isLoading={isLoading} />
       <Routes>
         <Route path={Paths.login.path} element={<Login />} />
         <Route path={Paths.availability.annually.path} element={<AvailabilityManagementAnnually />} />

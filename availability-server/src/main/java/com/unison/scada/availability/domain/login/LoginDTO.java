@@ -12,6 +12,6 @@ public class LoginDTO {
         private String password;
     }
 
-    public record Response(String id, String name) {}
+    public record Response(String id, String name, String role) {}
 
 }

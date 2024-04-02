@@ -5,6 +5,7 @@ import com.unison.scada.availability.global.config.security.handler.AppAuthentic
 import com.unison.scada.availability.global.config.security.handler.AppAuthenticationSuccessHandler;
 import com.unison.scada.availability.global.config.security.handler.AppLogoutSuccessHandler;
 import com.unison.scada.availability.global.filter.CookieAttributeFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
 
@@ -56,7 +58,7 @@ public class SecurityConfig{
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));
-                    config.setMaxAge(3600L); //1시간
+                    config.setMaxAge(248461212L); //1시간
                     return config;
                 }))
                 .headers((headerConfig) ->
@@ -74,7 +76,6 @@ public class SecurityConfig{
                                 .passwordParameter("password")
                                 .successHandler(appAuthenticationSuccessHandler())
                                 .failureHandler(appAuthenticationFailureHandler())
-//                                .defaultSuccessUrl("/", false)
                                 .permitAll()
                 )
                 .logout((logout) ->

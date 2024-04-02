@@ -10,7 +10,7 @@ public class UsersMapper {
 
     public LoginDTO.Response toLoginDTO(Users users){
         return Optional.ofNullable(users)
-                .map(u -> new LoginDTO.Response(u.getId(), u.getName()))
-                .orElse(new LoginDTO.Response("", ""));
+                .map(u -> new LoginDTO.Response(u.getId(), u.getName(), u.getRole().name()))
+                .orElse(new LoginDTO.Response("", "", ""));
     }
 }

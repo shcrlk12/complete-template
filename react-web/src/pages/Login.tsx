@@ -8,6 +8,7 @@ import { loginSuccess } from "../reducers/userActions";
 import { useNavigate } from "react-router";
 import { Paths } from "../Config";
 import { GENERAL_ROLE } from "./../reducers/userActions";
+import { setLoading } from "@reducers/appAction";
 
 const Section = styled.div`
   display: flex;
@@ -57,13 +58,13 @@ const Login = () => {
       body: formData,
     })
       .then((res) => {
-        console.log(res);
-        console.log(res.status);
+        res.json().then((data) => console.log(data));
 
-        // if (res.status === 200) {
-        //   dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: GENERAL_ROLE }));
-        //   // nav(Paths.availability.annually.path);
-        // }
+        if (res.status === 200) {
+          dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: GENERAL_ROLE }));
+          dispatch(setLoading());
+          nav(Paths.availability.annually.path);
+        }
       })
       .catch((e) => console.warn(e));
   };

@@ -6,15 +6,19 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import App from "./App";
 import userReducer from "./reducers/userReducer";
+import appReducer from "./reducers/appReducer";
 
-const rootReducer = combineReducers({ userReducer });
+const rootReducer = combineReducers({ appReducer, userReducer });
 
 const store = configureStore({
   reducer: rootReducer,
   devTools: true,
 });
 
+export type RootState = ReturnType<typeof rootReducer>;
+
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+
 root.render(
   <React.StrictMode>
     <Provider store={store}>

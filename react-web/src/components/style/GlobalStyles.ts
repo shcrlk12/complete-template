@@ -56,7 +56,6 @@ a{
 
 *{
     box-sizing: border-box;
-	color: ${({ theme }) => theme.colors.black};
 	background-color: ${({ theme }) => theme.colors.bg};
 }
 

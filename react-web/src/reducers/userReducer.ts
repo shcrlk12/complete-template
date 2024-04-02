@@ -17,8 +17,6 @@ const initialState: UserState = {
 const userReducer = (state: UserState = initialState, action: UserAction) => {
   switch (action.type) {
     case LOGIN_SUCCESS:
-      console.log("LOGIN_SUCCESS");
-
       return {
         ...state,
         isAuthenticated: true,

@@ -13,6 +13,7 @@ export default defineConfig({
       "@images": path.resolve(__dirname, "src/assets/images"),
       "@style": path.resolve(__dirname, "src/style"),
       "@pages": path.resolve(__dirname, "src/pages"),
+      "@reducers": path.resolve(__dirname, "src/reducers"),
     },
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
