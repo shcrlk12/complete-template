@@ -5,7 +5,6 @@ import com.unison.scada.availability.global.config.security.handler.AppAuthentic
 import com.unison.scada.availability.global.config.security.handler.AppAuthenticationSuccessHandler;
 import com.unison.scada.availability.global.config.security.handler.AppLogoutSuccessHandler;
 import com.unison.scada.availability.global.filter.CookieAttributeFilter;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
 
@@ -72,6 +70,7 @@ public class SecurityConfig{
                                 ).hasAnyRole("USER", "MANAGER", "ADMIN")
                 ).formLogin((formLogin) ->
                         formLogin
+                                .loginPage("/login")
                                 .usernameParameter("username")
                                 .passwordParameter("password")
                                 .successHandler(appAuthenticationSuccessHandler())

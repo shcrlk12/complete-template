@@ -1,14 +1,13 @@
-import React, { FormEvent } from "react";
+import React, { FormEvent, useEffect } from "react";
 import Input from "../components/Input/Input";
 import styled from "styled-components";
 import RadioButton from "../components/CheckBox";
 import Button from "../components/Button/Button";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../reducers/userActions";
+import { loginSuccess, logout } from "../reducers/userActions";
 import { useNavigate } from "react-router";
 import { Paths } from "../Config";
-import { GENERAL_ROLE } from "./../reducers/userActions";
-import { setLoading } from "@reducers/appAction";
+import { resetLoading, setLoading } from "@reducers/appAction";
 
 const Section = styled.div`
   display: flex;
@@ -46,25 +45,32 @@ const Login = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
 
+  useEffect(() => {
+    dispatch(resetLoading());
+    dispatch(logout());
+  }, []);
+
   const loginSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     let formData = new FormData(event.currentTarget);
 
     fetch("http://www.localhost:6789/login", {
-      // mode: "cors",
+      mode: "cors",
       method: "POST",
       credentials: "include",
       body: formData,
     })
       .then((res) => {
-        res.json().then((data) => console.log(data));
-
-        if (res.status === 200) {
-          dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: GENERAL_ROLE }));
-          dispatch(setLoading());
-          nav(Paths.availability.annually.path);
-        }
+        res.json().then((data) => {
+          if (data.status === 200) {
+            dispatch(loginSuccess({ id: data.id, username: "jeongwon", role: data.role }));
+            dispatch(setLoading());
+            nav(Paths.availability.annually.path);
+          } else {
+            alert(data.message);
+          }
+        });
       })
       .catch((e) => console.warn(e));
   };
@@ -91,7 +97,7 @@ const Login = () => {
                 text="Log in"
                 width="100%"
                 // onClick={() => {
-                //   dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: GENERAL_ROLE }));
+                //   dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: ROLE_USER }));
                 //   nav(Paths.availability.annually.path);
                 // }}
               />

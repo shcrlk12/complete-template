@@ -29,8 +29,11 @@ public class AppAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucc
         Map<String, Object> data = new HashMap<>();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
+        String Role = userDetails.getAuthorities().toString();
+
+        data.put("status", HttpServletResponse.SC_OK);
         data.put("id",  userDetails.getUsername());
-        data.put("role",  userDetails.getAuthorities().toString());
+        data.put("role",  Role.substring(1, Role.length()-1));
         data.put("message", "로그인에 성공했습니다.");
 
         response.setContentType("application/json;charset=UTF-8");

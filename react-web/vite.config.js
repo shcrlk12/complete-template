@@ -14,6 +14,7 @@ export default defineConfig({
       "@style": path.resolve(__dirname, "src/style"),
       "@pages": path.resolve(__dirname, "src/pages"),
       "@reducers": path.resolve(__dirname, "src/reducers"),
+      "@src": path.resolve(__dirname, "src"),
     },
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },

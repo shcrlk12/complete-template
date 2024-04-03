@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class UserDetailImpl implements UserDetails {
 
@@ -26,12 +27,14 @@ public class UserDetailImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return users.getPw();
+
+        return Optional.ofNullable(users).map(Users::getPw).orElse("");
     }
 
     @Override
     public String getUsername() {
-        return users.getId();
+        return Optional.ofNullable(users).map(Users::getId).orElse("");
+
     }
 
     @Override

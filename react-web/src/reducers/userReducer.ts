@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGOUT, User, loginSuccess, logout } from "./userActions";
+import { LOGIN_SUCCESS, LOGOUT, ROLE_ANONYMOUS, User, loginSuccess, logout } from "./userActions";
 
 //Action Type
 type UserAction = ReturnType<typeof loginSuccess> | ReturnType<typeof logout>;
@@ -6,12 +6,16 @@ type UserAction = ReturnType<typeof loginSuccess> | ReturnType<typeof logout>;
 //State type
 type UserState = {
   isAuthenticated: boolean;
-  user: User | null;
+  user: User;
 };
 
 const initialState: UserState = {
   isAuthenticated: false,
-  user: null,
+  user: {
+    id: "",
+    username: "",
+    role: ROLE_ANONYMOUS,
+  },
 };
 
 const userReducer = (state: UserState = initialState, action: UserAction) => {
@@ -26,7 +30,11 @@ const userReducer = (state: UserState = initialState, action: UserAction) => {
       return {
         ...state,
         isAuthenticated: false,
-        user: null,
+        user: {
+          id: "",
+          username: "",
+          role: ROLE_ANONYMOUS,
+        },
       };
     default:
       return state;
