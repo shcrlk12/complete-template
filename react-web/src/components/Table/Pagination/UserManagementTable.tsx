@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -19,31 +19,15 @@ import styled from "styled-components";
 import TableHead from "@mui/material/TableHead";
 import { useNavigate } from "react-router";
 import { TablePaginationActionsProps } from "@mui/material/TablePagination/TablePaginationActions";
-
-const rows = [
-  createData({
-    id: "lillywilliams@gmail.com",
-    name: "Lilly Williams",
-    role: "Admin",
-    lastLogin: "14 days ago",
-  }),
-  createData({
-    id: "kjwon2@gmail.com",
-    name: "Lilly Williams",
-    role: "Admin",
-    lastLogin: "14 days ago",
-  }),
-  createData({
-    id: "kjwon3@gmail.com",
-    name: "Lilly Williams",
-    role: "Admin",
-    lastLogin: "14 days ago",
-  }),
-];
+import { User } from "@reducers/userActions";
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
+
+  console.log(count);
+  console.log(page);
+  console.log(rowsPerPage);
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onPageChange(event, 0);
@@ -63,6 +47,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   const handlePageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onPageChange(event, Number(event.currentTarget.innerHTML) - 1);
   };
+
   return (
     <Box sx={{ flex: "1 0 560px", ml: "40px" }}>
       <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page">
@@ -110,17 +95,6 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-type UserTableData = {
-  id: string;
-  name: string;
-  role: string;
-  lastLogin: string;
-};
-
-function createData(userTableData: UserTableData) {
-  return { ...userTableData };
-}
-
 const StyledTableCell = styled(TableCell)({
   [`&.${tableCellClasses.head}`]: {
     fontWeight: "bold",
@@ -132,11 +106,28 @@ const StyledTableCell = styled(TableCell)({
 
 export default function UserManagementTable() {
   const [page, setPage] = React.useState(0);
+  const [userList, setUserList] = React.useState<User[]>([]);
+
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const nav = useNavigate();
 
+  React.useEffect(() => {
+    fetch("http://www.localhost:6789/api/user/list", {
+      mode: "cors",
+      method: "GET",
+      credentials: "include",
+    })
+      .then((res) => {
+        res.json().then((data) => {
+          setUserList(data);
+          console.log(userList);
+        });
+      })
+      .catch((e) => console.warn(e));
+  }, []);
+
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userList.length) : 0;
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -161,35 +152,37 @@ export default function UserManagementTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {(rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : rows).map((row) => (
-            <TableRow key={row.id}>
-              <StyledTableCell style={{ width: 250 }} align="center" component="th" scope="row">
-                {row.id}
-              </StyledTableCell>
-              <StyledTableCell style={{ width: 150 }} align="center">
-                {row.name}
-              </StyledTableCell>
-              <StyledTableCell style={{ width: 100 }} align="center">
-                {row.role}
-              </StyledTableCell>
-              <StyledTableCell style={{ width: 100 }} align="center">
-                {row.lastLogin}
-              </StyledTableCell>
-              <StyledTableCell style={{ width: 122 }} align="center">
-                <Button isDangerous={true} width="100%" text="Delete" />
-              </StyledTableCell>
-              <StyledTableCell style={{ width: 122 }} align="center">
-                <Button
-                  isPrimary={false}
-                  text="Edit"
-                  width="100%"
-                  onClick={() => {
-                    nav("/users/modify");
-                  }}
-                />
-              </StyledTableCell>
-            </TableRow>
-          ))}
+          {(rowsPerPage > 0 ? userList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : userList).map(
+            (row) => (
+              <TableRow key={row.id}>
+                <StyledTableCell style={{ width: 250 }} align="center" component="th" scope="row">
+                  {row.id}
+                </StyledTableCell>
+                <StyledTableCell style={{ width: 150 }} align="center">
+                  {row.name}
+                </StyledTableCell>
+                <StyledTableCell style={{ width: 100 }} align="center">
+                  {row.role}
+                </StyledTableCell>
+                <StyledTableCell style={{ width: 100 }} align="center">
+                  {row.lastLoginTime}
+                </StyledTableCell>
+                <StyledTableCell style={{ width: 122 }} align="center">
+                  <Button isDangerous={true} width="100%" text="Delete" />
+                </StyledTableCell>
+                <StyledTableCell style={{ width: 122 }} align="center">
+                  <Button
+                    isPrimary={false}
+                    text="Edit"
+                    width="100%"
+                    onClick={() => {
+                      nav("/users/modify");
+                    }}
+                  />
+                </StyledTableCell>
+              </TableRow>
+            ),
+          )}
           {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
               <StyledTableCell colSpan={6} />
@@ -201,7 +194,7 @@ export default function UserManagementTable() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
               colSpan={6}
-              count={rows.length}
+              count={userList.length}
               rowsPerPage={rowsPerPage}
               page={page}
               labelRowsPerPage="Table Rows"

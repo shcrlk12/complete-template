@@ -19,10 +19,14 @@ export type RootState = ReturnType<typeof rootReducer>;
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
+const test = () => {
+  console.log("Load First");
+};
 root.render(
   <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
+        {test()}
         <App />
       </ThemeProvider>
     </Provider>

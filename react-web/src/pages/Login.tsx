@@ -64,7 +64,7 @@ const Login = () => {
       .then((res) => {
         res.json().then((data) => {
           if (data.status === 200) {
-            dispatch(loginSuccess({ id: data.id, username: "jeongwon", role: data.role }));
+            dispatch(loginSuccess({ id: data.id, name: "jeongwon", role: data.role }));
             dispatch(setLoading());
             nav(Paths.availability.annually.path);
           } else {

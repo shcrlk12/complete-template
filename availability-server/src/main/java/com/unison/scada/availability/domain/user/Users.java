@@ -2,7 +2,10 @@ package com.unison.scada.availability.domain.user;
 
 import com.unison.scada.availability.global.config.security.UserRole;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -11,7 +14,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-//@Table(name = "\"User\"")
+@Table(name = "Users")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Users {
     @Id
     private String id;
@@ -49,6 +55,4 @@ public class Users {
 
     @Column(nullable = true)
     private String updatedBy;
-
-
 }

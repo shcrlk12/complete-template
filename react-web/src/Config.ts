@@ -1,4 +1,5 @@
 import { HeaderNavList } from "@components/Header/Header";
+import { ROLE_ADMIN, ROLE_ANONYMOUS, ROLE_MANAGER, ROLE_USER } from "@reducers/userActions";
 
 //type settings
 export type PathDetail = {
@@ -59,53 +60,63 @@ export const headerNavList: HeaderNavList[] = [
   {
     GNBName: "Availability",
     allowVersion: TYPE1_VERSION,
+    userRole: ROLE_USER,
     LNBList: [
       {
         name: "연간 가동률 현황",
         link: Paths.availability.annually.path,
         allowVersion: TYPE1_VERSION,
+        userRole: ROLE_USER,
       },
       {
         name: "일간 가동률 현황",
         link: Paths.availability.daily.path,
         allowVersion: TYPE1_VERSION,
+        userRole: ROLE_MANAGER,
       },
       {
         name: "Settings",
         link: Paths.availability.settings.path,
         allowVersion: TYPE3_VERSION,
+        userRole: ROLE_MANAGER,
       },
       {
         name: "Logs",
         link: Paths.availability.logs.path,
         allowVersion: TYPE2_VERSION,
+        userRole: ROLE_MANAGER,
       },
     ],
   },
   {
     GNBName: "Reports",
     allowVersion: TYPE2_VERSION,
+    userRole: ROLE_USER,
     LNBList: [
       {
         name: "Static report",
         link: Paths.reports.static.path,
         allowVersion: TYPE2_VERSION,
+        userRole: ROLE_USER,
       },
       {
         name: "Memo report",
         link: Paths.reports.memo.path,
         allowVersion: TYPE2_VERSION,
+        userRole: ROLE_USER,
       },
     ],
   },
   {
     GNBName: "Users",
     allowVersion: TYPE1_VERSION,
+    userRole: ROLE_ADMIN,
     LNBList: [
       {
         name: "User Management",
         link: Paths.users.management.path,
         allowVersion: TYPE1_VERSION,
+        userRole: ROLE_ADMIN,
       },
     ],
   },

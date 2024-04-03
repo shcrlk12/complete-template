@@ -13,7 +13,7 @@ const initialState: UserState = {
   isAuthenticated: false,
   user: {
     id: "",
-    username: "",
+    name: "",
     role: ROLE_ANONYMOUS,
   },
 };

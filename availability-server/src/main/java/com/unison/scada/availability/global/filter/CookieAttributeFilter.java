@@ -30,7 +30,6 @@ public class CookieAttributeFilter implements Filter {
     }
 
     private void addSameSite(HttpServletResponse response, String sameSite) {
-        System.out.println("addSameSite");
         Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
         for (String header : headers) {
             response.setHeader(HttpHeaders.SET_COOKIE, String.format("%s; Secure; %s", header, "SameSite=" + sameSite));

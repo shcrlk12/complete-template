@@ -1,5 +1,5 @@
 import { flexCenter, flexSpaceBetween } from "@components/style/Common";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
 const CommonContainer = styled.div`
   ${flexCenter};
@@ -61,11 +61,4 @@ export const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-export {
-  CommonContainer,
-  CommonInner,
-  HeaderContainer,
-  UserSearchContainer,
-  UserTableContainer,
-  UserTable,
-};
+export { CommonContainer, CommonInner, HeaderContainer, UserSearchContainer, UserTableContainer, UserTable };

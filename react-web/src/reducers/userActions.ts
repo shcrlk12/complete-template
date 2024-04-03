@@ -1,14 +1,17 @@
 //types
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS" as const;
 export const LOGOUT = "LOGOUT" as const;
-export const GENERAL_ROLE = "GENERAL_ROLE" as const;
-export const MANAGER_ROLE = "MANAGER_ROLE" as const;
-export const ADMIN_ROLE = "ADMIN_ROLE" as const;
+export const ROLE_ANONYMOUS = "ROLE_ANONYMOUS" as const;
+export const ROLE_USER = "ROLE_USER" as const;
+export const ROLE_MANAGER = "ROLE_MANAGER" as const;
+export const ROLE_ADMIN = "ROLE_ADMIN" as const;
 
+export type UserRoleType = typeof ROLE_ANONYMOUS | typeof ROLE_USER | typeof ROLE_MANAGER | typeof ROLE_ADMIN;
 export type User = {
   id: string;
-  username: string;
-  role: typeof GENERAL_ROLE | typeof MANAGER_ROLE | typeof ADMIN_ROLE;
+  name: string;
+  role: UserRoleType;
+  lastLoginTime?: string | null;
 };
 
 // action 생성 함수

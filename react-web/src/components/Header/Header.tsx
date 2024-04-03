@@ -5,33 +5,37 @@ import { useLocation } from "react-router";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { logout } from "../../reducers/userActions";
+import { ROLE_ANONYMOUS, UserRoleType, logout } from "../../reducers/userActions";
 import GlobalNavigationBar from "./Navigation/GlobalNavigationBarList";
 import { PathDetail, PathType, Paths, ProjectVersion } from "../../Config";
 import { HeaderInner, LeftHeaderContainer, Logo, PageTitle, RightHeaderContainer, StyledHeader } from "./Header.styled";
+import { RootState } from "src";
+import { useSelector } from "react-redux";
 
 export type HeaderNavList = {
   GNBName: string;
   allowVersion: number;
+  userRole: UserRoleType;
   LNBList: {
     name: string;
     link: string;
     allowVersion: number;
+    userRole: UserRoleType;
   }[];
 };
 
 type HeaderProps = {
   headerNavList: HeaderNavList[];
   projectVersion: ProjectVersion;
-  rightVisible?: boolean;
 };
 
-const Header = ({ headerNavList, projectVersion, rightVisible = true }: HeaderProps) => {
+const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
   const [pageTitle, setPageTitle] = useState("");
 
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const user = useSelector((store: RootState) => store.userReducer);
 
   /**
    * Returns a title of current page, This is parsed on the current path.
@@ -76,7 +80,7 @@ const Header = ({ headerNavList, projectVersion, rightVisible = true }: HeaderPr
           />
           <PageTitle>{pageTitle}</PageTitle>
         </LeftHeaderContainer>
-        {rightVisible && (
+        {user.isAuthenticated && (
           <RightHeaderContainer>
             <GlobalNavigationBar headerNavList={headerNavList} projectVersion={projectVersion} />
             <Button
@@ -84,7 +88,16 @@ const Header = ({ headerNavList, projectVersion, rightVisible = true }: HeaderPr
               text="Logout"
               onClick={() => {
                 dispatch(logout());
-                navigate(Paths.logout.path);
+                navigate(Paths.login.path);
+                fetch("http://www.localhost:6789/logout", {
+                  mode: "cors",
+                  method: "POST",
+                  credentials: "include",
+                })
+                  .then((res) => {
+                    console.log(res);
+                  })
+                  .catch((e) => console.warn(e));
               }}
             />
           </RightHeaderContainer>
