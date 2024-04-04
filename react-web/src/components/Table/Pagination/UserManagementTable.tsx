@@ -20,6 +20,8 @@ import TableHead from "@mui/material/TableHead";
 import { useNavigate } from "react-router";
 import { TablePaginationActionsProps } from "@mui/material/TablePagination/TablePaginationActions";
 import { User } from "@reducers/userActions";
+import { Paths } from "@src/Config";
+import { useDispatch } from "react-redux";
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
@@ -63,6 +65,8 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
           i < Math.ceil(count / rowsPerPage) && i < Math.floor(page / 5) * 5 + 5;
           i++
         ) {
+          console.log(page + "  " + i);
+
           newArr.push(
             <IconButton
               key={i}
@@ -85,12 +89,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
         aria-label="next page">
         {theme.direction === "rtl" ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
       </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page">
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
+      <IconButton>{theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}</IconButton>
     </Box>
   );
 }
@@ -104,27 +103,15 @@ const StyledTableCell = styled(TableCell)({
   },
 });
 
-export default function UserManagementTable() {
+type UserManagementTableProps = {
+  userList: User[];
+};
+export default function UserManagementTable({ userList }: UserManagementTableProps) {
   const [page, setPage] = React.useState(0);
-  const [userList, setUserList] = React.useState<User[]>([]);
 
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const nav = useNavigate();
-
-  React.useEffect(() => {
-    fetch("http://www.localhost:6789/api/user/list", {
-      mode: "cors",
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => {
-        res.json().then((data) => {
-          setUserList(data);
-          console.log(userList);
-        });
-      })
-      .catch((e) => console.warn(e));
-  }, []);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userList.length) : 0;
@@ -155,7 +142,7 @@ export default function UserManagementTable() {
           {(rowsPerPage > 0 ? userList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : userList).map(
             (row) => (
               <TableRow key={row.id}>
-                <StyledTableCell style={{ width: 250 }} align="center" component="th" scope="row">
+                <StyledTableCell style={{ width: 250 }} align="center">
                   {row.id}
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 150 }} align="center">
@@ -176,7 +163,7 @@ export default function UserManagementTable() {
                     text="Edit"
                     width="100%"
                     onClick={() => {
-                      nav("/users/modify");
+                      navigate(Paths.users.modify.path);
                     }}
                   />
                 </StyledTableCell>

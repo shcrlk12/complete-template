@@ -10,12 +10,13 @@ import {
 } from "./Availability.styled";
 import { useDispatch } from "react-redux";
 import { resetLoading } from "@reducers/appAction";
+import { initPage } from "@src/App";
 
 const AvailabilityManagementAnnually = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(resetLoading());
+    initPage(dispatch);
   }, []);
 
   return (

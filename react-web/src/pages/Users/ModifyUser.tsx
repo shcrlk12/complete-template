@@ -1,9 +1,18 @@
 import UserDetail from "@components/Users/UserDetail";
 import { CommonContainer, CommonInner } from "@pages/Common.styled";
+import { initPage, routePage } from "@src/App";
+import { Paths } from "@src/Config";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 
 const ModifyUser = () => {
-  const nav = useNavigate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    initPage(dispatch);
+  }, []);
 
   return (
     <>
@@ -14,7 +23,7 @@ const ModifyUser = () => {
             saveButtonName="유저 수정"
             saveButtonOnClick={() => {}}
             cancelButtonOnClick={() => {
-              nav("/users/management");
+              navigate(Paths.users.management.path);
             }}
           />
         </CommonInner>

@@ -4,10 +4,11 @@ import styled from "styled-components";
 import RadioButton from "../components/CheckBox";
 import Button from "../components/Button/Button";
 import { useDispatch } from "react-redux";
-import { loginSuccess, logout } from "../reducers/userActions";
+import { loginSuccess } from "../reducers/userActions";
 import { useNavigate } from "react-router";
 import { Paths } from "../Config";
-import { resetLoading, setLoading } from "@reducers/appAction";
+import { setLoading } from "@reducers/appAction";
+import { initPage } from "@src/App";
 
 const Section = styled.div`
   display: flex;
@@ -43,11 +44,10 @@ const LoginButtonContainer = styled.div`
 
 const Login = () => {
   const dispatch = useDispatch();
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(resetLoading());
-    dispatch(logout());
+    initPage(dispatch);
   }, []);
 
   const loginSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -66,7 +66,7 @@ const Login = () => {
           if (data.status === 200) {
             dispatch(loginSuccess({ id: data.id, name: "jeongwon", role: data.role }));
             dispatch(setLoading());
-            nav(Paths.availability.annually.path);
+            navigate(Paths.availability.annually.path);
           } else {
             alert(data.message);
           }

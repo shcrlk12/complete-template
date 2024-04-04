@@ -9,6 +9,7 @@ export const ROLE_ADMIN = "ROLE_ADMIN" as const;
 export type UserRoleType = typeof ROLE_ANONYMOUS | typeof ROLE_USER | typeof ROLE_MANAGER | typeof ROLE_ADMIN;
 export type User = {
   id: string;
+  password?: string;
   name: string;
   role: UserRoleType;
   lastLoginTime?: string | null;

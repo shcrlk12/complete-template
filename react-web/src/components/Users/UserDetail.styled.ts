@@ -20,6 +20,19 @@ export const InputItem = styled.div`
   }
 `;
 
+export const Select = styled.select`
+  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.tertiary};
+  height: 36px;
+  width: 100%;
+  font-size: ${({ theme }) => theme.fontSize.text};
+  color: ${({ theme }) => theme.colors.secondary};
+  padding: 0 10px;
+
+  &:focus {
+    outline: 1px solid ${({ theme }) => theme.colors.primary};
+  }
+`;
 export const ButtonContainer = styled.div`
   margin-top: 20px;
   display: flex;

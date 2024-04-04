@@ -11,6 +11,7 @@ import { PathDetail, PathType, Paths, ProjectVersion } from "../../Config";
 import { HeaderInner, LeftHeaderContainer, Logo, PageTitle, RightHeaderContainer, StyledHeader } from "./Header.styled";
 import { RootState } from "src";
 import { useSelector } from "react-redux";
+import { routePage } from "@src/App";
 
 export type HeaderNavList = {
   GNBName: string;
@@ -32,8 +33,8 @@ type HeaderProps = {
 const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
   const [pageTitle, setPageTitle] = useState("");
 
-  const dispatch = useDispatch();
   const location = useLocation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store: RootState) => store.userReducer);
 

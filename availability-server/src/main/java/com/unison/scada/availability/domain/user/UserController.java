@@ -1,6 +1,7 @@
 package com.unison.scada.availability.domain.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,12 +13,20 @@ public class UserController {
 
     private final UserService userService;
     @PostMapping("/new")
-    public boolean createUser(@RequestBody UserDTO.Request request){
-        return userService.createUser(request);
+    public ResponseEntity<Boolean> createUser(@RequestBody UserDTO.Request request){
+
+        boolean result = userService.createUser(request);
+
+        return ResponseEntity.ok()
+                .body(result);
     }
 
     @GetMapping("/list")
-    public List<UserDTO.Response> createUser(){
-        return userService.findByAllUser();
+    public ResponseEntity<List<UserDTO.Response>> createUser(){
+
+        List<UserDTO.Response> result = userService.findByAllUser();
+
+        return ResponseEntity.ok()
+                .body(result);
     }
 }

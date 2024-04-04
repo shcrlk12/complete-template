@@ -19,6 +19,9 @@ import {
   StyledBodyRow,
 } from "./DailyTable.styled";
 import MemoInputItem from "./MemoInputItem";
+import { initPage } from "@src/App";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 const DailyTable = () => {
   const addHeaderList = () => {

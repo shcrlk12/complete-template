@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import App from "./App";
 import userReducer from "./reducers/userReducer";
 import appReducer from "./reducers/appReducer";
+import { BrowserRouter as Router } from "react-router-dom";
 
 const rootReducer = combineReducers({ appReducer, userReducer });
 
@@ -19,15 +20,13 @@ export type RootState = ReturnType<typeof rootReducer>;
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
-const test = () => {
-  console.log("Load First");
-};
 root.render(
   <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        {test()}
-        <App />
+        <Router>
+          <App />
+        </Router>
       </ThemeProvider>
     </Provider>
   </React.StrictMode>,

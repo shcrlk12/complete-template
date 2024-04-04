@@ -37,11 +37,6 @@ const appReducer = (state: AppState = initialState, action: AppAction) => {
         ...state,
         isLoading: false,
       };
-    case RESET_LOADING:
-      return {
-        ...state,
-        isLoading: false,
-      };
     default:
       return state;
   }

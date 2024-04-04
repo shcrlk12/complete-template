@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,18 +15,20 @@ public class UserService implements UserCreate, SelectUser{
     private final UsersMapper usersMapper;
     @Override
     public boolean createUser(UserDTO.Request request) {
-        Users users = Users.builder()
-                .id(request.getId())
-                .pw(request.getPassword())
-                .role(UserRole.getUserRole(request.getRole()))
-                .name(request.getName())
-                .createdAt(LocalDateTime.now())
-                .createdBy("jeong won")
-                .build();
+        if(usersRepository.findById(request.getId()).isEmpty()){
+            Users users = Users.builder()
+                    .id(request.getId())
+                    .pw(request.getPassword())
+                    .role(UserRole.getUserRole(request.getRole()))
+                    .name(request.getName())
+                    .createdAt(LocalDateTime.now())
+                    .createdBy("jeong won")
+                    .build();
+            usersRepository.save(users);
 
-        usersRepository.save(users);
-
-        return true;
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -11,7 +11,11 @@ import Header from "@components/Header/Header";
 import Loading from "@components/App/Loading";
 import { useSelector } from "react-redux";
 import { RootState } from "src";
-import { ROLE_ADMIN, ROLE_ANONYMOUS, ROLE_MANAGER, ROLE_USER, UserRoleType } from "@reducers/userActions";
+import { ROLE_ADMIN, ROLE_ANONYMOUS, ROLE_MANAGER, ROLE_USER, UserRoleType, loginSuccess } from "@reducers/userActions";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Dispatch, UnknownAction } from "redux";
+import { resetLoading, setLoading } from "@reducers/appAction";
 
 type PageRole = {
   path: string;
@@ -84,12 +88,44 @@ const getRouteByRole = (userRole: UserRoleType) => {
   return roleRoutes.map((route) => <Route key={route.path} path={route.path} element={route.component} />);
 };
 
+export const initPage = (dispatch: Dispatch<UnknownAction>) => {
+  dispatch(resetLoading());
+};
+
+export const routePage = (dispatch: Dispatch<UnknownAction>, navigate: NavigateFunction, path: string) => {
+  console.log("set loading");
+
+  dispatch(setLoading());
+  navigate(path);
+};
+
 const App = () => {
   const { isLoading } = useSelector((store: RootState) => store.appReducer);
   const userRole = useSelector((store: RootState) => store.userReducer.user.role);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  console.log("App Rendering");
+
+  useEffect(() => {
+    fetch("http://www.localhost:6789/auth", {
+      mode: "cors",
+      method: "GET",
+      credentials: "include",
+    })
+      .then((res) => {
+        res.json().then((data) => {
+          if (data.role === ROLE_USER || data.role === ROLE_MANAGER || data.role === ROLE_ADMIN) {
+            dispatch(loginSuccess({ id: data.id, name: data.name, role: data.role }));
+            navigate(Paths.availability.annually.path);
+          }
+        });
+      })
+      .catch((e) => {});
+  }, []);
 
   return (
-    <Router>
+    <>
       <GlobalStyles />
       <Header projectVersion={projectVersion} headerNavList={headerNavList} />
       <Loading isLoading={isLoading} />
@@ -97,7 +133,7 @@ const App = () => {
         {getRouteByRole(userRole)}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-    </Router>
+    </>
   );
 };
 

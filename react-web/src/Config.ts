@@ -1,5 +1,5 @@
 import { HeaderNavList } from "@components/Header/Header";
-import { ROLE_ADMIN, ROLE_ANONYMOUS, ROLE_MANAGER, ROLE_USER } from "@reducers/userActions";
+import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from "@reducers/userActions";
 
 //type settings
 export type PathDetail = {

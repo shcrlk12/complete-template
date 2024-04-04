@@ -1,3 +1,4 @@
+import { Body } from "@pages/Availability/Availability.styled";
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 
@@ -57,13 +58,14 @@ a{
 
 *{
     box-sizing: border-box;
-	background-color: ${({ theme }) => theme.colors.bg};
 }
 
 html,
 body {
     width: 100%;
     height: 100%;
+	background-color: ${({ theme }) => theme.colors.bg};
+
 }
 
 #root{

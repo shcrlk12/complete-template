@@ -20,6 +20,7 @@ export const LoadingInner = styled.div`
   transform: translate(-50%, -50%);
   border-radius: 6px;
   ${flexCenter}
+  background-color: ${({ theme }) => theme.colors.bg};
 
   .loading-icon {
     color: ${({ theme }) => theme.colors.secondary};
