@@ -11,7 +11,7 @@ import { PathDetail, PathType, Paths, ProjectVersion } from "../../Config";
 import { HeaderInner, LeftHeaderContainer, Logo, PageTitle, RightHeaderContainer, StyledHeader } from "./Header.styled";
 import { RootState } from "src";
 import { useSelector } from "react-redux";
-import { routePage } from "@src/App";
+import { expireSession, fetchData, statusOk } from "@src/util/fetch";
 
 export type HeaderNavList = {
   GNBName: string;
@@ -64,6 +64,18 @@ const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
     [],
   );
 
+  const logoutBtnClick = () => {
+    fetchData(dispatch, navigate, async () => {
+      await fetch("http://www.localhost:6789/logout", {
+        mode: "cors",
+        method: "POST",
+        credentials: "include",
+      });
+    });
+
+    expireSession(dispatch, navigate);
+  };
+
   useEffect(() => {
     setPageTitle(getCurrentPathTitle(Paths, location.pathname));
   }, [getCurrentPathTitle, location.pathname]);
@@ -84,23 +96,7 @@ const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
         {user.isAuthenticated && (
           <RightHeaderContainer>
             <GlobalNavigationBar headerNavList={headerNavList} projectVersion={projectVersion} />
-            <Button
-              isPrimary={true}
-              text="Logout"
-              onClick={() => {
-                dispatch(logout());
-                navigate(Paths.login.path);
-                fetch("http://www.localhost:6789/logout", {
-                  mode: "cors",
-                  method: "POST",
-                  credentials: "include",
-                })
-                  .then((res) => {
-                    console.log(res);
-                  })
-                  .catch((e) => console.warn(e));
-              }}
-            />
+            <Button isPrimary={true} text="Logout" onClick={logoutBtnClick} />
           </RightHeaderContainer>
         )}
       </HeaderInner>

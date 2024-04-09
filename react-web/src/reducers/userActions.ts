@@ -15,6 +15,8 @@ export type User = {
   lastLoginTime?: string | null;
 };
 
+export const userTypeInitialize: User = { id: "", name: "", role: ROLE_USER };
+
 // action 생성 함수
 export const loginSuccess = (user: User) => ({
   type: LOGIN_SUCCESS,

@@ -10,7 +10,6 @@
       "noEmit":false,
       "baseUrl": ".",
       "outDir": "./dist/",
-
       "paths": {
         "@components/*": ["src/components/*"],
         "@images/*": ["src/assets/images/*"],

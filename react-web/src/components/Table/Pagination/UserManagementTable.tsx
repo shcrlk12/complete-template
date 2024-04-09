@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -17,19 +17,19 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import Button from "../../Button/Button";
 import styled from "styled-components";
 import TableHead from "@mui/material/TableHead";
-import { useNavigate } from "react-router";
+import { NavigateFunction, useNavigate } from "react-router";
 import { TablePaginationActionsProps } from "@mui/material/TablePagination/TablePaginationActions";
 import { User } from "@reducers/userActions";
 import { Paths } from "@src/Config";
+import { resetLoading, setLoading } from "@reducers/appAction";
 import { useDispatch } from "react-redux";
+import { Dispatch, UnknownAction } from "redux";
+import { fetchData, statusOk } from "@src/util/fetch";
+import { ErrorWithCode } from "@src/error/ErrorWithCode";
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
-
-  console.log(count);
-  console.log(page);
-  console.log(rowsPerPage);
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onPageChange(event, 0);
@@ -47,16 +47,16 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
     onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
   };
   const handlePageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, Number(event.currentTarget.innerHTML) - 1);
+    onPageChange(event, Number(event.currentTarget.innerHTML.split("<")[0]) - 1);
   };
 
   return (
     <Box sx={{ flex: "1 0 560px", ml: "40px" }}>
       <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page">
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
+        <FirstPageIcon />
       </IconButton>
       <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
-        {theme.direction === "rtl" ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+        <KeyboardArrowLeft />
       </IconButton>
       {(() => {
         let newArr = [];
@@ -65,8 +65,6 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
           i < Math.ceil(count / rowsPerPage) && i < Math.floor(page / 5) * 5 + 5;
           i++
         ) {
-          console.log(page + "  " + i);
-
           newArr.push(
             <IconButton
               key={i}
@@ -87,9 +85,14 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
         aria-label="next page">
-        {theme.direction === "rtl" ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+        <KeyboardArrowRight />
       </IconButton>
-      <IconButton>{theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}</IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page">
+        <LastPageIcon />
+      </IconButton>
     </Box>
   );
 }
@@ -103,11 +106,9 @@ const StyledTableCell = styled(TableCell)({
   },
 });
 
-type UserManagementTableProps = {
-  userList: User[];
-};
-export default function UserManagementTable({ userList }: UserManagementTableProps) {
+export default function UserManagementTable() {
   const [page, setPage] = React.useState(0);
+  const [userList, setUserList] = React.useState<User[]>([]);
 
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const dispatch = useDispatch();
@@ -124,6 +125,48 @@ export default function UserManagementTable({ userList }: UserManagementTablePro
     setRowsPerPage(parseInt(event.target?.value, 10));
     setPage(0);
   };
+
+  useEffect(() => {
+    fetchData(dispatch, navigate, async () => {
+      const response = await fetch("http://www.localhost:6789/api/user/list", {
+        mode: "cors",
+        method: "GET",
+        credentials: "include",
+      });
+
+      await statusOk(response);
+
+      const data = await response.json();
+      setUserList(data);
+    });
+  }, []);
+
+  const deleteUser = async (userId: string) => {
+    fetchData(dispatch, navigate, async () => {
+      const response = await fetch("http://www.localhost:6789/api/user/" + userId, {
+        mode: "cors",
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      await statusOk(response);
+      const data = await response.json();
+
+      if (data) {
+        setUserList((state) => {
+          state.forEach((item, index) => {
+            if (item.id === userId) {
+              state.splice(index, 1);
+            }
+          });
+
+          return state;
+        });
+      }
+    });
+  };
+
+  console.log(userList);
 
   return (
     <TableContainer component={Paper}>
@@ -155,7 +198,17 @@ export default function UserManagementTable({ userList }: UserManagementTablePro
                   {row.lastLoginTime}
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 122 }} align="center">
-                  <Button isDangerous={true} width="100%" text="Delete" />
+                  <Button
+                    isDangerous={true}
+                    width="100%"
+                    text="Delete"
+                    onClick={async () => {
+                      if (window.confirm(`"${row.id}" 를 삭제 하시겠습니까?`)) {
+                        await deleteUser(row.id);
+                        console.log("삭제 완료.");
+                      }
+                    }}
+                  />
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 122 }} align="center">
                   <Button
@@ -163,7 +216,7 @@ export default function UserManagementTable({ userList }: UserManagementTablePro
                     text="Edit"
                     width="100%"
                     onClick={() => {
-                      navigate(Paths.users.modify.path);
+                      navigate(Paths.users.modify.path + "/" + row.id);
                     }}
                   />
                 </StyledTableCell>

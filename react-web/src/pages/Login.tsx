@@ -7,8 +7,8 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../reducers/userActions";
 import { useNavigate } from "react-router";
 import { Paths } from "../Config";
-import { setLoading } from "@reducers/appAction";
-import { initPage } from "@src/App";
+import { resetLoading, setLoading } from "@reducers/appAction";
+import { fetchData, statusOk } from "@src/util/fetch";
 
 const Section = styled.div`
   display: flex;
@@ -46,33 +46,32 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    initPage(dispatch);
-  }, []);
+  useEffect(() => {}, []);
 
   const loginSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    dispatch(setLoading());
 
     let formData = new FormData(event.currentTarget);
 
-    fetch("http://www.localhost:6789/login", {
-      mode: "cors",
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    })
-      .then((res) => {
-        res.json().then((data) => {
-          if (data.status === 200) {
-            dispatch(loginSuccess({ id: data.id, name: "jeongwon", role: data.role }));
-            dispatch(setLoading());
-            navigate(Paths.availability.annually.path);
-          } else {
-            alert(data.message);
-          }
-        });
-      })
-      .catch((e) => console.warn(e));
+    fetchData(dispatch, navigate, async () => {
+      const response = await fetch("http://www.localhost:6789/login", {
+        mode: "cors",
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      await statusOk(response);
+      const data = await response.json();
+
+      if (data.status === 200) {
+        dispatch(loginSuccess({ id: data.id, name: "jeongwon", role: data.role }));
+        navigate(Paths.availability.annually.path);
+      } else {
+        alert(data.message);
+      }
+    });
   };
 
   return (

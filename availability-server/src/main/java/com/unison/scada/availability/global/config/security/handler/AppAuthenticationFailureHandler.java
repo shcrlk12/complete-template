@@ -2,6 +2,7 @@ package com.unison.scada.availability.global.config.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unison.scada.availability.domain.login.LoginDTO;
+import com.unison.scada.availability.global.config.security.exception.SecurityExceptionCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,39 +28,27 @@ public class AppAuthenticationFailureHandler extends SimpleUrlAuthenticationFail
                           Authentication authentication) throws IOException, ServletException {
     }
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         Map<String, Object> data = new HashMap<>();
-        String errorMessage = getErrorMessage(e);
+        SecurityExceptionCode errorCode = getErrorMessage(authException);
 
-        data.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        data.put("error", true);
-        data.put("message", errorMessage);
-        System.out.println("Authentication failed: " + e.getMessage());
+        data.put("error", errorCode.getCode());
+        data.put("message", errorCode.getMessage());
 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
         response.getWriter().write(objectMapper.writeValueAsString(data));
     }
 
-    private static String getErrorMessage(AuthenticationException e) {
-        String errorMessage;
+    private static SecurityExceptionCode getErrorMessage(AuthenticationException authException) {
+        SecurityExceptionCode errorCode;
 
-        if(e instanceof BadCredentialsException){
-            errorMessage= "비밀번호 불일치";
+        if(authException instanceof BadCredentialsException) {
+            errorCode = SecurityExceptionCode.BAD_CREDENTIALS;
         }
-        else if(e instanceof InternalAuthenticationServiceException){
-            errorMessage= "Exception1";
+        else {
+            errorCode = SecurityExceptionCode.DEFAULT;
         }
-        else if(e instanceof DisabledException){
-            errorMessage= "Exception2";
-        }
-        else if(e instanceof CredentialsExpiredException){
-            errorMessage= "비밀번호 만료";
-        }
-        else{
-            errorMessage = "로그인에 실패 하였습니다";
-        }
-        return errorMessage;
+        return errorCode;
     }
 }

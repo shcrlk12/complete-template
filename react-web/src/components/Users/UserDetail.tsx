@@ -1,10 +1,18 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { BodyInputContainer, ButtonContainer, InputItem, Select } from "./UserDetail.styled";
 import CustomInput from "@components/Input/Input";
 import Button from "@components/Button/Button";
 import { HeaderContainer } from "@pages/Common.styled";
 import styled from "styled-components";
-import { ROLE_ADMIN, ROLE_ANONYMOUS, ROLE_MANAGER, ROLE_USER, User, UserRoleType } from "@reducers/userActions";
+import {
+  ROLE_ADMIN,
+  ROLE_ANONYMOUS,
+  ROLE_MANAGER,
+  ROLE_USER,
+  User,
+  UserRoleType,
+  userTypeInitialize,
+} from "@reducers/userActions";
 
 const BorderHeaderContainer = styled(HeaderContainer)`
   border-bottom: 1px solid ${({ theme }) => theme.colors.quaternary};
@@ -12,16 +20,33 @@ const BorderHeaderContainer = styled(HeaderContainer)`
 
 type UserDetailProps = {
   title: string;
+  isIdDisable?: boolean;
+  userDetail?: User;
   saveButtonName: string;
   saveButtonOnClick: (user: User) => void;
   cancelButtonOnClick: any;
 };
-const UserDetail = ({ title, saveButtonName, saveButtonOnClick, cancelButtonOnClick }: UserDetailProps) => {
+const UserDetail = ({
+  title,
+  isIdDisable,
+  userDetail = userTypeInitialize,
+  saveButtonName,
+  saveButtonOnClick,
+  cancelButtonOnClick,
+}: UserDetailProps) => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const roleRef = useRef<HTMLSelectElement>(null);
+
+  useEffect(() => {
+    if (emailRef.current && nameRef.current && roleRef.current) {
+      emailRef.current.value = userDetail.id;
+      nameRef.current.value = userDetail.name;
+      roleRef.current.value = userDetail.role;
+    }
+  }, [userDetail]);
 
   return (
     <>
@@ -31,7 +56,7 @@ const UserDetail = ({ title, saveButtonName, saveButtonOnClick, cancelButtonOnCl
       <BodyInputContainer>
         <InputItem>
           <div>User id</div>
-          <CustomInput type="email" placeholder="email" ref={emailRef} />
+          <CustomInput type="email" placeholder="email" ref={emailRef} disable={isIdDisable} />
         </InputItem>
         <InputItem>
           <div>Password</div>

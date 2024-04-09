@@ -1,5 +1,6 @@
 package com.unison.scada.availability.domain.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,11 +22,12 @@ public class UserDTO {
     @Getter
     @Setter
     @RequiredArgsConstructor
+    @AllArgsConstructor
     public static class Response{
         private final String id;
         private final String name;
         private final String role;
         private final LocalTime lastLoginTime;
-
+        private Error error;
     }
 }

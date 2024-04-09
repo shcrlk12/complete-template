@@ -16,6 +16,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch, UnknownAction } from "redux";
 import { resetLoading, setLoading } from "@reducers/appAction";
+import { fetchData, statusOk } from "./util/fetch";
 
 type PageRole = {
   path: string;
@@ -63,7 +64,7 @@ const getRouteByRole = (userRole: UserRoleType) => {
     ...managerRoleRoutes,
     { path: Paths.users.management.path, component: <UserManagement /> },
     { path: Paths.users.new.path, component: <NewUser /> },
-    { path: Paths.users.modify.path, component: <ModifyUser /> },
+    { path: `${Paths.users.modify.path}/:userId`, component: <ModifyUser /> },
   ];
 
   let roleRoutes: PageRole[];
@@ -88,19 +89,7 @@ const getRouteByRole = (userRole: UserRoleType) => {
   return roleRoutes.map((route) => <Route key={route.path} path={route.path} element={route.component} />);
 };
 
-export const initPage = (dispatch: Dispatch<UnknownAction>) => {
-  dispatch(resetLoading());
-};
-
-export const routePage = (dispatch: Dispatch<UnknownAction>, navigate: NavigateFunction, path: string) => {
-  console.log("set loading");
-
-  dispatch(setLoading());
-  navigate(path);
-};
-
 const App = () => {
-  const { isLoading } = useSelector((store: RootState) => store.appReducer);
   const userRole = useSelector((store: RootState) => store.userReducer.user.role);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -108,27 +97,27 @@ const App = () => {
   console.log("App Rendering");
 
   useEffect(() => {
-    fetch("http://www.localhost:6789/auth", {
-      mode: "cors",
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => {
-        res.json().then((data) => {
-          if (data.role === ROLE_USER || data.role === ROLE_MANAGER || data.role === ROLE_ADMIN) {
-            dispatch(loginSuccess({ id: data.id, name: data.name, role: data.role }));
-            navigate(Paths.availability.annually.path);
-          }
-        });
-      })
-      .catch((e) => {});
+    fetchData(dispatch, navigate, async () => {
+      const response = await fetch("http://www.localhost:6789/auth", {
+        mode: "cors",
+        method: "GET",
+        credentials: "include",
+      });
+
+      await statusOk(response);
+      const data = await response.json();
+      if (data.role === ROLE_USER || data.role === ROLE_MANAGER || data.role === ROLE_ADMIN) {
+        dispatch(loginSuccess({ id: data.id, name: data.name, role: data.role }));
+        navigate(Paths.availability.annually.path);
+      }
+    });
   }, []);
 
   return (
     <>
       <GlobalStyles />
       <Header projectVersion={projectVersion} headerNavList={headerNavList} />
-      <Loading isLoading={isLoading} />
+      <Loading />
       <Routes>
         {getRouteByRole(userRole)}
         <Route path="*" element={<Navigate to="/login" />} />

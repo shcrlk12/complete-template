@@ -6,32 +6,12 @@ import Button from "@components/Button/Button";
 import { useNavigate } from "react-router-dom";
 import { Paths } from "@src/Config";
 import { useDispatch } from "react-redux";
-import { initPage } from "@src/App";
 import { User } from "@reducers/userActions";
 import { setLoading } from "@reducers/appAction";
 
 const UserManagement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [userList, setUserList] = React.useState<User[]>([]);
-
-  useEffect(() => {
-    dispatch(setLoading());
-    fetch("http://www.localhost:6789/api/user/list", {
-      mode: "cors",
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => {
-        res.json().then((data) => {
-          setUserList(data);
-        });
-      })
-      .catch((e) => console.warn(e))
-      .finally(() => {
-        initPage(dispatch);
-      });
-  }, []);
 
   return (
     <>
@@ -51,7 +31,7 @@ const UserManagement = () => {
           <UserSearchContainer>
             <SearchInput height={40} text="Search users" />
           </UserSearchContainer>
-          <UserManagementTable userList={userList} />
+          <UserManagementTable />
         </CommonInner>
       </CommonContainer>
     </>

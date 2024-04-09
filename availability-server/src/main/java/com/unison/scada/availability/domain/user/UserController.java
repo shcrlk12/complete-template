@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -11,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
     @PostMapping("/new")
     public ResponseEntity<Boolean> createUser(@RequestBody UserDTO.Request request){
 
@@ -28,5 +29,28 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .body(result);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deleteUser(@PathVariable("id") String id){
+
+        return ResponseEntity.ok()
+                .body(userService.deleteUser(id));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO.Response> getUserDetail(@PathVariable("id") String id){
+
+        UserDTO.Response result = userService.findByUser(id);
+
+        return ResponseEntity.ok()
+                .body(result);
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<JSONResponse<UserDTO.Response, Error>> getUserDetail2()
+    {
+        System.out.println("test");
+        return null;
     }
 }

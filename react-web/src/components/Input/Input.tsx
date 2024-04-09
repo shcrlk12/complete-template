@@ -10,9 +10,10 @@ type InputProps = {
   text?: string;
   name?: string;
   ref?: RefObject<HTMLInputElement>;
+  disable?: boolean;
 };
 const CustomInput = forwardRef<HTMLInputElement, InputProps>(
-  ({ id, type = "text", placeholder, width = "100%", height = "36px", text, name }, ref) => {
+  ({ id, type = "text", placeholder, width = "100%", height = "36px", text, name, disable }, ref) => {
     return (
       <>
         <StyledInput
@@ -24,6 +25,7 @@ const CustomInput = forwardRef<HTMLInputElement, InputProps>(
           value={text}
           name={name}
           ref={ref}
+          disabled={disable}
         />
       </>
     );

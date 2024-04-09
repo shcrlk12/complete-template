@@ -1,12 +1,12 @@
 import React from "react";
 import { LoadingInner, Loadingbg } from "./App.styled";
 import { CircularProgress } from "@mui/material";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/index";
 
-type LoadingProps = {
-  isLoading: boolean;
-};
+const Loading = () => {
+  const { isLoading } = useSelector((store: RootState) => store.appReducer);
 
-const Loading = ({ isLoading }: LoadingProps) => {
   return (
     isLoading && (
       <Loadingbg>
