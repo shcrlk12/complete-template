@@ -10,7 +10,6 @@ import java.time.LocalTime;
 
 public class UserDTO {
     @Getter
-    @Setter
     @RequiredArgsConstructor
     public static class Request{
         private final String id;
@@ -20,7 +19,6 @@ public class UserDTO {
     }
 
     @Getter
-    @Setter
     @RequiredArgsConstructor
     @AllArgsConstructor
     public static class Response{

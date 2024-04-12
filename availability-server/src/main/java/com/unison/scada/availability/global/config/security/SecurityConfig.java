@@ -77,14 +77,20 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorizeRequest ->
                         authorizeRequest
                                 .requestMatchers(
-                                        AntPathRequestMatcher.antMatcher("/**")
+                                        AntPathRequestMatcher.antMatcher("/api/login/**")
                                 ).hasAnyRole("USER", "MANAGER", "ADMIN")
+                                .requestMatchers(
+                                        AntPathRequestMatcher.antMatcher("/api/wind-farm/**")
+                                ).hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/user/**")
                                 ).hasAnyRole("ADMIN")
+                                .requestMatchers(
+                                        AntPathRequestMatcher.antMatcher("/h2-console/**")
+                                ).permitAll()
                 ).formLogin((formLogin) ->
                         formLogin
-                                .loginPage("/login")
+                                .loginPage("/api/login")
                                 .usernameParameter("username")
                                 .passwordParameter("password")
                                 .successHandler(appAuthenticationSuccessHandler())

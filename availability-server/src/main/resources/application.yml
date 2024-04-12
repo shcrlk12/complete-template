@@ -38,3 +38,6 @@ logging:
 
 server:
   port: 6789
+
+wind-farm:
+  turbines-number: 5

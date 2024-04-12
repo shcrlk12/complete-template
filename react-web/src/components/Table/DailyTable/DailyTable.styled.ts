@@ -15,9 +15,9 @@ export const TableLeftInfo = styled.div`
   overflow: auto;
 `;
 export const StyledBodyRow = styled(TableRow)`
-  flex: 0 0 40px;
-  min-height: 40px;
-  height: 40px;
+  flex: 0 0 33px;
+  min-height: 33px;
+  height: 33px;
   display: flex;
 `;
 
@@ -28,7 +28,7 @@ export const StyledButton = styled(Button)`
 export const TableRightInfo = styled.div`
   position: sticky;
   right: 0;
-  flex: 1 0 250px;
+  flex: 1 0 350px;
   max-width: 400px;
 
   display: flex;

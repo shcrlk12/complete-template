@@ -55,7 +55,7 @@ const Login = () => {
     let formData = new FormData(event.currentTarget);
 
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://www.localhost:6789/login", {
+      const response = await fetch("http://www.localhost:6789/api/login", {
         mode: "cors",
         method: "POST",
         credentials: "include",

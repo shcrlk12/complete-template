@@ -19,13 +19,17 @@ import {
   StyledBodyRow,
 } from "./DailyTable.styled";
 import MemoInputItem from "./MemoInputItem";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 
-const DailyTable = () => {
+type DailyTableProps = {
+  turbineNumber: number;
+};
+const DailyTable = ({ turbineNumber = 1 }: DailyTableProps) => {
+  // const [selectedCell, setSelectedCell] = useState<Array<Array<boolean>>>(Array.from(Array(5), () => new Array(2)));
+
   const addHeaderList = () => {
     const newArr = [];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < turbineNumber; i++) {
       newArr.push(
         <TableCell key={i}>
           <div>WTGXX</div>
@@ -37,7 +41,7 @@ const DailyTable = () => {
   };
   const addStatus = () => {
     const newArr = [];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < turbineNumber; i++) {
       newArr.push(
         <TableCell key={i}>
           <Status></Status>

@@ -98,7 +98,7 @@ const App = () => {
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://www.localhost:6789/auth", {
+      const response = await fetch("http://www.localhost:6789/api/login/auth", {
         mode: "cors",
         method: "GET",
         credentials: "include",

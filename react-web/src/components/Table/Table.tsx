@@ -17,7 +17,9 @@ const StyledTable = styled.div`
   overflow: auto;
   border: 1px solid ${({ theme }) => theme.colors.tertiary};
   position: relative;
-
+  width: fit-content;
+  max-width: 100%;
+  margin: auto;
   & .${tableClassesName.header} .${tableClassesName.row} {
     height: 100%;
   }
@@ -34,9 +36,7 @@ type TableProps = {
 function Table({ className, children }: TableProps) {
   return (
     <StyledTable
-      className={
-        className === undefined ? tableClassesName.table : `${className}  ${tableClassesName.table}`
-      }>
+      className={className === undefined ? tableClassesName.table : `${className}  ${tableClassesName.table}`}>
       {children}
     </StyledTable>
   );
