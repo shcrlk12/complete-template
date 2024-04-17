@@ -1,7 +1,6 @@
 package com.unison.scada.availability.global.config.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unison.scada.availability.domain.user.Error;
 import com.unison.scada.availability.global.config.security.exception.SecurityExceptionCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

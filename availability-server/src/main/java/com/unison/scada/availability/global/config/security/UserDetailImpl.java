@@ -1,6 +1,6 @@
 package com.unison.scada.availability.global.config.security;
 
-import com.unison.scada.availability.domain.user.Users;
+import com.unison.scada.availability.api.user.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

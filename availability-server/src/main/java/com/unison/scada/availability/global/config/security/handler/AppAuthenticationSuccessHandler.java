@@ -1,19 +1,14 @@
 package com.unison.scada.availability.global.config.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unison.scada.availability.domain.user.Users;
-import com.unison.scada.availability.global.config.security.UserDetailImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 

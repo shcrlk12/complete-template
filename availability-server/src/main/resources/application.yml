@@ -40,4 +40,11 @@ server:
   port: 6789
 
 wind-farm:
-  turbines-number: 5
+  turbines-number: 1
+
+opc:
+  server-name: BACHMANN.OPCStandardServer
+  values:
+    active-power: U88_WGDC_sviTurW
+    wind-speed: U88_WNAC_sviWindSpeed1s
+  prefix-format: WindFarm.WTG%02d.

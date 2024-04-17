@@ -18,3 +18,30 @@ INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at
 INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 3, 'korean3', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name3');
 INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 4, 'korean4', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name4');
 INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 2, 'korean5', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name5');
+
+-- Variable Table
+--INSERT INTO variable (name, group_name, mapping_opc_id, is_opc_communicate, created_at) VALUES ('Full performance', 'Availability', '100');
+
+-- AvailabilityType Table
+SET @normal_uuid = UUID();
+SET @forced_uuid = UUID();
+SET @scheduled_uuid = UUID();
+SET @information_uuid = UUID();
+SET @requested_uuid = UUID();
+SET @etc_uuid = UUID();
+
+INSERT INTO availability_type (uuid, name, created_at) VALUES (@normal_uuid, 'normal status', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, created_at) VALUES (@forced_uuid, 'forced outage', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, created_at) VALUES (@scheduled_uuid, 'scheduled maintenance', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, created_at) VALUES (@information_uuid, 'information unavailable', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, created_at) VALUES (@requested_uuid, 'requested shutdown', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, created_at) VALUES (@etc_uuid, 'etc', CURRENT_TIMESTAMP());
+
+-- AvailabilityData Table
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES (CURRENT_TIMESTAMP(), 1,  UUID(), 2000, @normal_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES (CURRENT_TIMESTAMP(), 1,  UUID(), 450, @forced_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES (CURRENT_TIMESTAMP(), 1,  UUID(), 550, @scheduled_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES (CURRENT_TIMESTAMP(), 1,  UUID(), 100, @information_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES (CURRENT_TIMESTAMP(), 1,  UUID(), 300, @requested_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES (CURRENT_TIMESTAMP(), 1,  UUID(), 200, @etc_uuid, CURRENT_TIMESTAMP());
+

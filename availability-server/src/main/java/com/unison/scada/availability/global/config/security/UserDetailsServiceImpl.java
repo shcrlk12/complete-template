@@ -1,7 +1,7 @@
 package com.unison.scada.availability.global.config.security;
 
-import com.unison.scada.availability.domain.user.UsersRepository;
-import com.unison.scada.availability.domain.user.Users;
+import com.unison.scada.availability.api.user.UsersRepository;
+import com.unison.scada.availability.api.user.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
