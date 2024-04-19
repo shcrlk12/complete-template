@@ -11,16 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class OPCProperties {
-
     private String serverName;
-
-    private Values values;
     private String prefixFormat;
-
-    @Getter
-    @Setter
-    public static class Values {
-        private String activePower;
-        private String windSpeed;
-    }
 }

@@ -1,10 +1,7 @@
 package com.unison.scada.availability.api.availability;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class AvailabilityData {
 
     @EmbeddedId
@@ -45,6 +43,7 @@ public class AvailabilityData {
     @Embeddable
     @AllArgsConstructor
     @NoArgsConstructor
+    @Getter
     public static class AvailabilityDataId implements Serializable {
         @Column
         private LocalDateTime timestamp;

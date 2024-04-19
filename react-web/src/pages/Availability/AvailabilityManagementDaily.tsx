@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AvailabilityTableContainer, MainSection } from "./Availability.styled";
 import DailyTable from "@components/Table/DailyTable/DailyTable";
-import { useDispatch } from "react-redux";
 import useInits from "@src/hooks/useInits";
 import { fetchData, statusOk } from "@src/util/fetch";
 

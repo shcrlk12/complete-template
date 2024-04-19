@@ -34,8 +34,6 @@ public class AvailabilityScheduler {
 
             //위에서 가져온 데이터를 가지고 availability 계산 +2
             turbineDataUpdateService.updateTotalAvailability(windFarm.getTurbines());
-
-            System.out.println(LocalDateTime.now());
         }catch (OPCNotFoundException | OPCException e){
             logger.error(e.getMessage(), e);
             System.exit(-1);

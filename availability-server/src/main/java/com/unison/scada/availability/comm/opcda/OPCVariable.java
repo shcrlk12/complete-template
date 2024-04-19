@@ -7,9 +7,9 @@ import java.util.List;
 
 @Getter
 public enum OPCVariable {
-    WIND_SPEED(OPCGroupName.REAL_TIME, "U88_WNAC_sviWindSpeed1s"),
-    ACTIVE_POWER(OPCGroupName.REAL_TIME, "U88_WGDC_sviTurW"),
-    AVAILABILITY(OPCGroupName.AVAILABILITY, "U88_WTUR_sviTurOperationSt");
+    WIND_SPEED(OPCGroupName.REAL_TIME, "U136_WNAC_WindSpeed1s"),
+    ACTIVE_POWER(OPCGroupName.REAL_TIME, "U136_WGDC_TurW"),
+    AVAILABILITY(OPCGroupName.AVAILABILITY, "U136_WTUR_TurOperationSt");
 
     private final String groupName;
     private final String variableName;
