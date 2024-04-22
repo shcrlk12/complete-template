@@ -72,6 +72,24 @@ body {
     width: 100%;
     height: 100%;
 }
+
+.selected-cell{
+	animation-iteration-count: infinite;
+	animation-duration: 150ms;
+  	animation-name: selected;
+	opacity: 0.7;
+}
+
+@keyframes selected {
+  0% {
+	outline: ${({ theme }) => theme.colors.black} dashed 1px;
+
+  }
+
+  100% {
+	outline: ${({ theme }) => theme.colors.black} dotted 1px;
+  }
+}
 `;
 
 export default GlobalStyles;

@@ -7,7 +7,7 @@ export const StyledTableHeader = styled.div`
   position: sticky;
   top: 0;
   z-index: 20;
-  background-color: inherit;
+  background-color: ${({ theme }) => theme.colors.quaternary};
 `;
 
 type TableHeaderProps = {
@@ -18,11 +18,7 @@ type TableHeaderProps = {
 function TableHeader({ className, children }: TableHeaderProps) {
   return (
     <StyledTableHeader
-      className={
-        className === undefined
-          ? tableClassesName.header
-          : `${className}  ${tableClassesName.header}`
-      }>
+      className={className === undefined ? tableClassesName.header : `${className}  ${tableClassesName.header}`}>
       {children}
     </StyledTableHeader>
   );

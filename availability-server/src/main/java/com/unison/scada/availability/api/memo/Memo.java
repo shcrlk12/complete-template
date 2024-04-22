@@ -30,7 +30,7 @@ public class Memo {
     private String material;
 
     @Column(nullable = true)
-    private int quantity;
+    private Integer quantity;
 
     @Column(nullable = true)
     private String workType;
@@ -68,7 +68,7 @@ public class Memo {
     public static class MemoId implements Serializable{
 
         @Column
-        private LocalDateTime registerTime;
+        private LocalDateTime timestamp;
 
         @Column
         private int turbineId;

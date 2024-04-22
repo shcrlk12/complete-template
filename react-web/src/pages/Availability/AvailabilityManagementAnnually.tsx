@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PowerCondition from "@components/PowerCondition";
 import AnnualTable from "@components/Table/AnnualTable/AnnualTable";
 import {
@@ -10,11 +10,51 @@ import {
 } from "./Availability.styled";
 import { useDispatch } from "react-redux";
 import { resetLoading } from "@reducers/appAction";
+import useInits from "@src/hooks/useInits";
+import { fetchData, statusOk } from "@src/util/fetch";
+import { loginSuccess } from "@reducers/userActions";
+import { useParams } from "react-router";
+
+type DataOfDay = {
+  time: Date;
+  availability: number;
+};
+type AnnuallyTurbineData = {
+  turbineId: number;
+  availability: number;
+  data: DataOfDay[];
+};
+
+export type AnnuallyTableData = {
+  turbinesNumber: number;
+  yearsOfWarranty: number;
+  startTimeOfYears: string;
+  turbines: AnnuallyTurbineData[];
+};
 
 const AvailabilityManagementAnnually = () => {
-  const dispatch = useDispatch();
+  const { dispatch, navigate } = useInits();
+  const { year, month, day } = useParams();
 
-  useEffect(() => {}, []);
+  const [annuallyTableData, setAnnuallyTableData] = useState<AnnuallyTableData>();
+
+  useEffect(() => {
+    fetchData(dispatch, navigate, async () => {
+      const response = await fetch(`http://www.localhost:6789/api/wind-farm/annually/${year}/${month}/${day}`, {
+        mode: "cors",
+        method: "GET",
+        credentials: "include",
+      });
+
+      await statusOk(response);
+
+      const json = await response.json();
+      const data = json.data;
+
+      console.log(data);
+      setAnnuallyTableData(data);
+    });
+  }, []);
 
   return (
     <MainSection>
@@ -47,7 +87,7 @@ const AvailabilityManagementAnnually = () => {
         </PowerStatusList>
       </TableMetaContainer>
       <AvailabilityTableContainer>
-        <AnnualTable />
+        {annuallyTableData ? <AnnualTable annuallyTableData={annuallyTableData} /> : null}
       </AvailabilityTableContainer>
     </MainSection>
   );

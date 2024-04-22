@@ -2,10 +2,14 @@ import React from "react";
 
 import { StyledArrowButton } from "./ArrowButton.styled";
 
-const ArrowButton = ({ isLeft = true }) => {
+type ArrowButtonProps = {
+  isLeft: boolean;
+  onClick: any;
+};
+const ArrowButton = ({ isLeft = true, onClick }: ArrowButtonProps) => {
   return (
     <>
-      <StyledArrowButton isLeft={isLeft}></StyledArrowButton>
+      <StyledArrowButton isLeft={isLeft} onClick={onClick}></StyledArrowButton>
     </>
   );
 };

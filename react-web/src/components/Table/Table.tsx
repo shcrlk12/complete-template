@@ -23,6 +23,7 @@ const StyledTable = styled.div`
   & .${tableClassesName.header} .${tableClassesName.row} {
     height: 100%;
   }
+
   & .${tableClassesName.body} .${tableClassesName.row} {
     height: 15px;
   }

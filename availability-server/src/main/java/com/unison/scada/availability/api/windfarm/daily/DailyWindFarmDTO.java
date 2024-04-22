@@ -3,6 +3,7 @@ package com.unison.scada.availability.api.windfarm.daily;
 import com.unison.scada.availability.api.availability.AvailabilityDTO;
 import com.unison.scada.availability.api.memo.MemoDTO;
 import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -30,19 +31,25 @@ public class DailyWindFarmDTO {
 
         @Getter
         @Builder
-        public static class Data{
+        public static class Data implements Comparable<Data>{
             private final LocalDateTime time;
             private final Memo memo;
             private final List<Availability> availability;
+
+            @Override
+            public int compareTo(Data data) {
+                return time.compareTo(data.time);
+            }
         }
 
         @Getter
         @Builder
+        @AllArgsConstructor
         public static class Memo{
             private String engineerName;
             private LocalDateTime workTime;
             private String material;
-            private int quantity;
+            private Integer quantity;
             private String workType;
             private String inspection;
             private String etc;

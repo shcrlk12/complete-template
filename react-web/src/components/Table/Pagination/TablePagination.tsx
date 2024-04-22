@@ -13,12 +13,17 @@ const PaginationInner = styled.div`
   ${flexSpaceBetween};
 `;
 
-const TablePagination = () => {
+type TablePaginationProps = {
+  leftButtonClick: any;
+  rightButtonClick: any;
+};
+
+const TablePagination = ({ leftButtonClick, rightButtonClick }: TablePaginationProps) => {
   return (
     <TablePaginationContainer>
       <PaginationInner>
-        <ArrowButton isLeft={true} />
-        <ArrowButton isLeft={false} />
+        <ArrowButton isLeft={true} onClick={leftButtonClick} />
+        <ArrowButton isLeft={false} onClick={rightButtonClick} />
       </PaginationInner>
     </TablePaginationContainer>
   );

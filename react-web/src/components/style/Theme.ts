@@ -11,6 +11,10 @@ const colors = {
   bg: "#F2F5FA",
   dangerous: "#E55656",
   activeDangerous: "#D93333",
+  orange: "#D97733",
+  yellow: "#D9D633",
+  green: "#339D33",
+  red: "#D93333",
 };
 
 const fontSize = {

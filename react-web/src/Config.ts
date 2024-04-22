@@ -1,5 +1,6 @@
 import { HeaderNavList } from "@components/Header/Header";
 import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from "@reducers/userActions";
+import { parseyymmdd, parseyyyymmdd } from "./util/date";
 
 //type settings
 export type PathDetail = {
@@ -56,6 +57,9 @@ export const Paths: PathType = {
 
 export const projectVersion: ProjectVersion = TYPE1_VERSION;
 
+let now = new Date(Date.now());
+let { year, month, day } = parseyyyymmdd(now);
+
 export const headerNavList: HeaderNavList[] = [
   {
     GNBName: "Availability",
@@ -64,13 +68,13 @@ export const headerNavList: HeaderNavList[] = [
     LNBList: [
       {
         name: "연간 가동률 현황",
-        link: Paths.availability.annually.path,
+        link: `${Paths.availability.annually.path}/${year}/${month}/${day}`,
         allowVersion: TYPE1_VERSION,
         userRole: ROLE_USER,
       },
       {
         name: "일간 가동률 현황",
-        link: Paths.availability.daily.path,
+        link: `${Paths.availability.daily.path}/${year}/${month}/${day}`,
         allowVersion: TYPE1_VERSION,
         userRole: ROLE_MANAGER,
       },

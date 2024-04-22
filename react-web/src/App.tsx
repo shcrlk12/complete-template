@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import { Dispatch, UnknownAction } from "redux";
 import { resetLoading, setLoading } from "@reducers/appAction";
 import { fetchData, statusOk } from "./util/fetch";
+import { parseyyyymmdd } from "./util/date";
 
 type PageRole = {
   path: string;
@@ -52,12 +53,12 @@ const getRouteByRole = (userRole: UserRoleType) => {
 
   const userRoleRoutes: PageRole[] = [
     ...anonymousRoleRoutes,
-    { path: Paths.availability.annually.path, component: <AvailabilityManagementAnnually /> },
+    { path: `${Paths.availability.annually.path}/:year/:month/:day`, component: <AvailabilityManagementAnnually /> },
   ];
 
   const managerRoleRoutes: PageRole[] = [
     ...userRoleRoutes,
-    { path: Paths.availability.daily.path, component: <AvailabilityManagementDaily /> },
+    { path: `${Paths.availability.daily.path}/:year/:month/:day`, component: <AvailabilityManagementDaily /> },
   ];
 
   const adminRoleRoutes: PageRole[] = [
@@ -108,7 +109,10 @@ const App = () => {
       const data = await response.json();
       if (data.role === ROLE_USER || data.role === ROLE_MANAGER || data.role === ROLE_ADMIN) {
         dispatch(loginSuccess({ id: data.id, name: data.name, role: data.role }));
-        navigate(Paths.availability.annually.path);
+
+        let now = new Date(Date.now());
+        let { year, month, day } = parseyyyymmdd(now);
+        navigate(`${Paths.availability.annually.path}/${year}/${month}/${day}`);
       }
     });
   }, []);

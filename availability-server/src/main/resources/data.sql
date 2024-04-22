@@ -13,11 +13,15 @@ INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon11@unison.co.kr
 INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon12@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_ADMIN', 'kim won', CURRENT_TIMESTAMP());
 
 -- Memo Table
-INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 1, 'korean', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name');
-INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 2, 'korean2', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name2');
-INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 3, 'korean3', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name3');
-INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 4, 'korean4', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name4');
-INSERT INTO memo (register_time, turbine_id,engineer_name, work_time, created_at, created_by) VALUES (CURRENT_TIMESTAMP(), 2, 'korean5', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name5');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T16:00', 1, 'korean', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T15:00', 2, 'korean2', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name2');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T11:00', 3, 'korean3', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name3');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T19:00', 2, 'korean4', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name4');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T20:00', 2, 'korean5', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name5');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T08:00', 1, 'korean6', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name4');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T19:00', 3, 'korean7', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name5');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T22:00', 3, 'korean8', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name4');
+INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T10:00', 1, 'korean9', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name5');
 
 -- Variable Table
 --INSERT INTO variable (name, group_name, mapping_opc_id, is_opc_communicate, created_at) VALUES ('Full performance', 'Availability', '100');
@@ -35,6 +39,7 @@ INSERT INTO availability_type (uuid, name, created_at) VALUES (@forced_uuid, 'fo
 INSERT INTO availability_type (uuid, name, created_at) VALUES (@scheduled_uuid, 'scheduled maintenance', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, created_at) VALUES (@information_uuid, 'information unavailable', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, created_at) VALUES (@requested_uuid, 'requested shutdown', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, created_at) VALUES (@requested_uuid, 'out of environmental', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, created_at) VALUES (@etc_uuid, 'etc', CURRENT_TIMESTAMP());
 
 -- AvailabilityData Table
@@ -8545,8 +8550,8 @@ INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_t
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 1, 'b20b8fe1-cdb3-4ffb-a09a-16e665967a12', 88, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 1, '3dfc725d-61aa-400b-83f4-b2e28e2e01b6', 418, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 1, 'e616c0da-0cf9-4ef7-8b9f-a69082fb9092', 480, @etc_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 1, '6aeb8841-56bc-41b7-a292-b872861c91fd', 1755, @normal_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 1, 'a0fbac93-be7a-4646-b579-e030b0e50f69', 516, @forced_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 1, '6aeb8841-56bc-41b7-a292-b872861c91fd', 516, @normal_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 1, 'a0fbac93-be7a-4646-b579-e030b0e50f69', 1755, @forced_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 1, '54e084a3-e1f6-4841-bea2-eccdd3885679', 108, @scheduled_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 1, '0efdc747-dea3-4b00-90eb-8a804c1aa47f', 239, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 1, 'ed286dbb-8e1b-423f-9a4c-cac1aa62e26a', 461, @requested_uuid, CURRENT_TIMESTAMP());
@@ -8653,11 +8658,11 @@ INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_t
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T17:00', 1, 'fa4f4ba0-f68e-4c59-9a97-7fbdebfdae14', 362, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T17:00', 1, '19584f20-d361-4848-b244-becab3514aa2', 330, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T17:00', 1, '07abd2d7-7477-4e5d-b5ca-482da1be93e7', 535, @etc_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, '5994cbd5-1e0b-43e9-8e82-f91b879cae39', 1903, @normal_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, '5994cbd5-1e0b-43e9-8e82-f91b879cae39', 136, @normal_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, '5252b85a-4b6c-4c10-a4c3-938aa9056a1f', 400, @forced_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, '6fb33b17-2665-4b49-a610-aacdf3e5326a', 586, @scheduled_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, '00c02545-4360-4206-89e7-e584a48fe839', 329, @information_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, 'd9805491-e688-446e-9402-94f3b161d2e4', 136, @requested_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, 'd9805491-e688-446e-9402-94f3b161d2e4', 1903, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T18:00', 1, '7742d073-76db-4ae1-b38c-4ce8f0f1c7ce', 246, @etc_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T19:00', 1, '7950004d-fe57-498d-8918-8d79933a032c', 2075, @normal_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T19:00', 1, '8b5362ab-2d99-4839-8c97-f074457a5159', 186, @forced_uuid, CURRENT_TIMESTAMP());
@@ -8683,10 +8688,11 @@ INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_t
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T22:00', 1, '28e92805-ae05-4d4b-8877-c265500f2f47', 431, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T22:00', 1, '83f08d69-11a6-4220-a59f-2d52821d4ff6', 499, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T22:00', 1, '4ff18fcd-2ee3-42db-af65-7e72e41c1681', 519, @etc_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, '103409b1-0df5-4d4f-8a5d-0ab3fde743b5', 2091, @normal_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, '103409b1-0df5-4d4f-8a5d-0ab3fde743b5', 485
+, @normal_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, '3f35d022-4e34-46e2-acba-60b06c68f0d0', 407, @forced_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, 'a12823ea-5f60-4cfe-a213-92f1c61d651e', 251, @scheduled_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, 'd871d675-6b78-4ec5-b6bc-9734124677c7', 485, @information_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, 'd871d675-6b78-4ec5-b6bc-9734124677c7', 2091, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, '0dd7c2f3-5333-41b9-b8f8-5073559ee35a', 344, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T23:00', 1, 'ffd053fc-26b5-4921-8450-531a7c1361ed', 22, @etc_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-17T00:00', 1, '3b83cb79-929a-40b8-b917-1e25071870f5', 2085, @normal_uuid, CURRENT_TIMESTAMP());
@@ -12955,8 +12961,8 @@ INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_t
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T20:00', 2, '1e481fd8-d460-4b21-87cf-595f44305d40', 467, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T20:00', 2, 'e886a199-adea-4908-9ed2-9b007c4f6722', 524, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T20:00', 2, '7aaed2ee-f617-4c9e-aa80-5e8db3065c0d', 1, @etc_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T21:00', 2, 'f1a510bf-b251-4e71-8f22-6b34d5dd2324', 2275, @normal_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T21:00', 2, 'e9765a42-20e5-4c17-8026-aa9f7cfdf74a', 343, @forced_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T21:00', 2, 'f1a510bf-b251-4e71-8f22-6b34d5dd2324', 343, @normal_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T21:00', 2, 'e9765a42-20e5-4c17-8026-aa9f7cfdf74a', 2275, @forced_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T21:00', 2, '42f57cbc-2190-4e82-bdd1-c5b3b6d061ad', 512, @scheduled_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T21:00', 2, '72a67897-ae2c-408a-9bc8-dc60b6f756c3', 156, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T21:00', 2, 'ff623a41-65cb-4c5a-b004-73a05ef71f7e', 271, @requested_uuid, CURRENT_TIMESTAMP());
@@ -12967,10 +12973,10 @@ INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_t
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T22:00', 2, 'c0ad0b65-6105-45ce-a131-3e56be00df34', 500, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T22:00', 2, '66269406-3920-481b-96fa-0b85e5d9600c', 43, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T22:00', 2, '39e5ba61-65e3-4dde-ae6f-ae52e39c5cb9', 418, @etc_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, '8cb5b0cd-6115-468f-a4fd-4858086c967c', 1499, @normal_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, '8cb5b0cd-6115-468f-a4fd-4858086c967c', 591, @normal_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, 'c5011ba7-be29-4051-8f8f-f20ce1416d62', 280, @forced_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, 'eb0e3592-da3b-4d6c-82a2-d60672921acd', 92, @scheduled_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, '7c04681b-1286-406c-8c11-3408db56c6af', 591, @information_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, '7c04681b-1286-406c-8c11-3408db56c6af', 1499, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, 'ebae9039-e0a0-4a71-8698-43154c9a759a', 559, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-15T23:00', 2, '7b9f4575-e345-4c6b-bccd-befab7f91ff7', 579, @etc_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T00:00', 2, '59348030-91ab-4c6f-8896-02006140a830', 1667, @normal_uuid, CURRENT_TIMESTAMP());
@@ -13003,8 +13009,8 @@ INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_t
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T04:00', 2, '48d23f17-6f77-4cc1-85db-4ce7b862ac21', 564, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T04:00', 2, '040b545e-e849-4432-a822-d983b044d2ab', 270, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T04:00', 2, '4b1eb8de-409c-4a87-9d82-b417fea310fa', 321, @etc_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T05:00', 2, '7f841fa4-61d4-41ab-8f0b-ba7462b8ce80', 2320, @normal_uuid, CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T05:00', 2, '8a6cf388-d602-4e90-a2b9-3da237f8a0cd', 459, @forced_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T05:00', 2, '7f841fa4-61d4-41ab-8f0b-ba7462b8ce80', 459, @normal_uuid, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T05:00', 2, '8a6cf388-d602-4e90-a2b9-3da237f8a0cd', 2320, @forced_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T05:00', 2, '4b420e25-775a-4131-9498-fcfe40725673', 402, @scheduled_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T05:00', 2, '58248958-4340-4242-a921-1743282a4215', 86, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-16T05:00', 2, '70ab4281-fc9d-4c60-8717-14828c34d26c', 146, @requested_uuid, CURRENT_TIMESTAMP());

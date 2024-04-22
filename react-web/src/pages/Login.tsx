@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import { Paths } from "../Config";
 import { resetLoading, setLoading } from "@reducers/appAction";
 import { fetchData, statusOk } from "@src/util/fetch";
+import { parseyymmdd, parseyyyymmdd } from "@src/util/date";
 
 const Section = styled.div`
   display: flex;
@@ -66,8 +67,11 @@ const Login = () => {
       const data = await response.json();
 
       if (data.status === 200) {
+        let now = new Date(Date.now());
+        let { year, month, day } = parseyyyymmdd(now);
+
         dispatch(loginSuccess({ id: data.id, name: "jeongwon", role: data.role }));
-        navigate(Paths.availability.annually.path);
+        navigate(`${Paths.availability.annually.path}/${year}/${month}/${day}`);
       } else {
         alert(data.message);
       }
@@ -90,16 +94,7 @@ const Login = () => {
             </InputContainer>
             <RadioButton />
             <LoginButtonContainer>
-              <Button
-                type="submit"
-                isPrimary={true}
-                text="Log in"
-                width="100%"
-                // onClick={() => {
-                //   dispatch(loginSuccess({ id: "kjwon", username: "jeongwon", role: ROLE_USER }));
-                //   nav(Paths.availability.annually.path);
-                // }}
-              />
+              <Button type="submit" isPrimary={true} text="Log in" width="100%" />
             </LoginButtonContainer>
           </form>
         </LoginContainer>

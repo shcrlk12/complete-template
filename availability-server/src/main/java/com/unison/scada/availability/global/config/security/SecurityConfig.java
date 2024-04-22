@@ -83,6 +83,9 @@ public class SecurityConfig{
                                         AntPathRequestMatcher.antMatcher("/api/wind-farm/**")
                                 ).hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(
+                                        AntPathRequestMatcher.antMatcher("/api/memo/**")
+                                ).hasAnyRole("MANAGER", "ADMIN")
+                                .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/user/**")
                                 ).hasAnyRole("ADMIN")
                                 .requestMatchers(
