@@ -88,16 +88,11 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
 
   useEffect(() => {
     console.log(getStatusColor(dailyTableData.turbines[0].data[0].availability));
-
     let map1 = new Map<string, MapTypes>();
-    map1.set("normal status", { time: 0, color: "#339D33" });
-    map1.set("forced outage", { time: 0, color: "#D93333" });
-    map1.set("scheduled maintenance", { time: 0, color: "#D9D633" });
-    map1.set("information unavailable", { time: 0, color: "#C4D8F0" });
-    map1.set("requested shutdown", { time: 0, color: "#33A1DE" });
-    map1.set("etc", { time: 0, color: "#C4D8F0" });
-    map1.set("environmental stop", { time: 0, color: "#D97733" });
 
+    dailyTableData.statusList.forEach((item) => {
+      map1.set(item.name, { time: 0, color: item.color });
+    });
     setMap(map1);
   }, []);
 
@@ -115,7 +110,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     let statusTime = 0;
     let statusColor = "";
 
-    availability.forEach((element) => {
+    availability?.forEach((element) => {
       if (Number(element.time) > statusTime) {
         statusColor = map.get(element.name)?.color as string;
         statusTime = element.time;
@@ -130,34 +125,65 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
       newArr.push(
         <TableCell key={i}>
           <div>WTG{String(i + 1).padStart(2, "0")}</div>
-          <div>({dailyTableData.turbines[i].availability.toFixed(1)} %)</div>
+          <div>({dailyTableData.turbines[i]?.availability.toFixed(1)} %)</div>
         </TableCell>,
       );
     }
     return newArr;
   };
+  var rowIndexArray = new Array(dailyTableData.turbinesNumber).fill(0);
+
   const addStatus = (rowIndex: number) => {
     const newArr = [];
     for (let i = 0; i < dailyTableData.turbinesNumber; i++) {
-      newArr.push(
-        <TableCell key={i}>
-          <DailyStatus
-            id={`cell_${i}_${rowIndex}`}
-            color={getStatusColor(dailyTableData.turbines[i].data[rowIndex].availability)}></DailyStatus>
-        </TableCell>,
-      );
+      let turbineTime = new Date(dailyTableData.turbines[i].data[rowIndexArray[i]].time);
+
+      let baseTime = new Date(dailyTableData.date); // 사용 안함
+      let columnTime = new Date(baseTime);
+      columnTime.setHours(baseTime.getHours() + rowIndex);
+
+      if (turbineTime.getTime() === columnTime.getTime()) {
+        newArr.push(
+          <TableCell key={i}>
+            <DailyStatus
+              id={`cell_${i}_${rowIndex}`}
+              color={getStatusColor(dailyTableData?.turbines[i]?.data[rowIndexArray[i]]?.availability)}></DailyStatus>
+          </TableCell>,
+        );
+        rowIndexArray[i]++;
+      } else {
+        newArr.push(
+          <TableCell key={i}>
+            <DailyStatus id={`cell_${i}_${rowIndex}`} color="#000"></DailyStatus>
+          </TableCell>,
+        );
+      }
     }
     return newArr;
   };
   const addBody = () => {
     const newArr = [];
-    for (let i = 0; i < 24; i++) {
+    let now = new Date(Date.now());
+    let date = new Date(dailyTableData.date);
+    let index = 0;
+    let endTime;
+
+    if (date.setDate(date.getDate() + 1) < Date.now()) endTime = date;
+    else endTime = now;
+
+    let endDate = new Date(endTime);
+    let startDate = new Date(date.setDate(date.getDate() - 1));
+
+    while (startDate < endDate) {
       newArr.push(
-        <StyledBodyRow key={i}>
-          <TableCell>{i % 2 === 0 && i !== 0 ? `${i}:00` : null}</TableCell>
-          {addStatus(i)}
+        <StyledBodyRow key={index}>
+          <TableCell>{`${index}:00`}</TableCell>
+          {addStatus(index)}
         </StyledBodyRow>,
       );
+
+      index++;
+      startDate.setHours(startDate.getHours() + 1);
     }
     return newArr;
   };
@@ -172,6 +198,15 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
 
     if (turbineId !== undefined && row !== undefined) {
       let newMap = new Map<string, MapTypes>();
+
+      for (var key of map.keys()) {
+        let value: MapTypes = map.get(key) as MapTypes;
+
+        newMap.set(key, {
+          ...value,
+          time: 0,
+        });
+      }
 
       let avail = dailyTableData.turbines[turbineId].data[row].availability;
 
@@ -238,7 +273,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           <TableRightInfo>
             <WindFarmAvailContainer>
               <span>단지 가동률 </span>
-              <strong>{dailyTableData.availability.toFixed(1)}</strong>
+              <strong>{dailyTableData.availability?.toFixed(1)}</strong>
               <span> %</span>
             </WindFarmAvailContainer>
             <MemoItemsContainer>
@@ -288,7 +323,11 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           let date = new Date(dailyTableData.date);
           date.setDate(date.getDate() + 1);
 
-          navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
+          let now = new Date(Date.now());
+
+          if (date.getTime() < now.getTime()) {
+            navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
+          }
         }}
       />
     </>

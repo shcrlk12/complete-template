@@ -10,7 +10,7 @@ public enum AvailabilityStatus{
     FULL_PERFORMANCE(10, AvailabilityStatus.NORMAL_STATUS),
     PARTIAL_PERFORMANCE(20, AvailabilityStatus.NORMAL_STATUS),
     TECHNICAL_STANDBY(30, AvailabilityStatus.NORMAL_STATUS),
-    OUT_OF_ENVIRONMENTAL(40, AvailabilityStatus.OUT_OF_ENVIRONMENTAL_STATUS),
+    OUT_OF_ENVIRONMENTAL(40, AvailabilityStatus.NORMAL_STATUS),
     REQUESTED_SHUTDOWN(50, AvailabilityStatus.REQUESTED_SHUTDOWN_STATUS),
     OUT_OF_ELECTRICAL_SPECIFICATION(60, AvailabilityStatus.NONE_STATUS),
     SCHEDULED_MAINTENANCE(70, AvailabilityStatus.SCHEDULED_MAINTENANCE_STATUS),
@@ -23,7 +23,7 @@ public enum AvailabilityStatus{
     public static final String NORMAL_STATUS = "normal status";
     public static final String REQUESTED_SHUTDOWN_STATUS = "requested shutdown";
     public static final String FORCED_OUTAGE_STATUS = "forced outage";
-    public static final String OUT_OF_ENVIRONMENTAL_STATUS = "out of environmental";
+//    public static final String OUT_OF_ENVIRONMENTAL_STATUS = "out of environmental";
     public static final String SCHEDULED_MAINTENANCE_STATUS = "scheduled maintenance";
     public static final String INFORMATION_UNAVAILABLE_STATUS = "information unavailable";
     public static final String NONE_STATUS = "";

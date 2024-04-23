@@ -34,13 +34,13 @@ SET @information_uuid = UUID();
 SET @requested_uuid = UUID();
 SET @etc_uuid = UUID();
 
-INSERT INTO availability_type (uuid, name, created_at) VALUES (@normal_uuid, 'normal status', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, created_at) VALUES (@forced_uuid, 'forced outage', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, created_at) VALUES (@scheduled_uuid, 'scheduled maintenance', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, created_at) VALUES (@information_uuid, 'information unavailable', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, created_at) VALUES (@requested_uuid, 'requested shutdown', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, created_at) VALUES (@requested_uuid, 'out of environmental', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, created_at) VALUES (@etc_uuid, 'etc', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@normal_uuid, 'normal status', '#339D33', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@forced_uuid, 'forced outage', '#D93333', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@scheduled_uuid, 'scheduled maintenance', '#D9D633', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@information_uuid, 'information unavailable', '#C4D8F0', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@requested_uuid, 'requested shutdown', '#33A1DE', CURRENT_TIMESTAMP());
+--INSERT INTO availability_type (uuid, name, created_at) VALUES (@requested_uuid, 'out of environmental', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@etc_uuid, 'etc', '#D97733', CURRENT_TIMESTAMP());
 
 -- AvailabilityData Table
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 1, '0a5dc96f-70a3-49cd-87f5-1beac1119b8d', 140, @requested_uuid, CURRENT_TIMESTAMP());

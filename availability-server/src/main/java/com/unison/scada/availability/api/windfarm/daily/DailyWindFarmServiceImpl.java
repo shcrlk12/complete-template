@@ -1,8 +1,6 @@
 package com.unison.scada.availability.api.windfarm.daily;
 
-import com.unison.scada.availability.api.availability.AnnuallyWindFarmServiceImpl;
-import com.unison.scada.availability.api.availability.AvailabilityData;
-import com.unison.scada.availability.api.availability.AvailabilityDataRepository;
+import com.unison.scada.availability.api.availability.*;
 import com.unison.scada.availability.api.memo.Memo;
 import com.unison.scada.availability.api.memo.MemoRepository;
 import com.unison.scada.availability.api.windfarm.WindFarmProperties;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +19,7 @@ public class DailyWindFarmServiceImpl implements DailyWindFarmService {
 
     private final WindFarmProperties windFarmProperties;
     private final AvailabilityDataRepository availabilityDataRepository;
+    private final AvailabilityTypeRepository availabilityTypeRepository;
     private final MemoRepository memoRepository;
 
 
@@ -100,11 +100,25 @@ public class DailyWindFarmServiceImpl implements DailyWindFarmService {
                     .build());
         }
 
+        //get availability type list
+        List<AvailabilityType> availabilityTypes = availabilityTypeRepository.findByActive(true);
+
+        List<DailyWindFarmDTO.Response.AvailabilityStatus> availabilityStatus = new ArrayList<>();
+
+        for(AvailabilityType availabilityType : availabilityTypes){
+            availabilityStatus.add(DailyWindFarmDTO.Response.AvailabilityStatus.builder()
+                            .name(availabilityType.getName())
+                            .color(availabilityType.getColor())
+                            .build());
+        }
+
+
         return DailyWindFarmDTO.Response.builder()
                 .turbinesNumber(turbinesNumber)
                 .date(searchTime)
                 .availability(AnnuallyWindFarmServiceImpl.Avail.calcFormula(numerator, denominator, etcTime))
                 .turbines(turbineList)
+                .statusList(availabilityStatus)
                 .build();
     }
 
@@ -115,30 +129,109 @@ public class DailyWindFarmServiceImpl implements DailyWindFarmService {
                 .collect(Collectors.groupingBy((data) -> data.getAvailabilityDataId().getTurbineId()));
 
         List<Map<LocalDateTime, List<AvailabilityData>>> turbines = new ArrayList<>();
+        int turbinesNumber = windFarmProperties.getTurbinesNumber();
 
-        for(Integer turbineId : listMap.keySet())
+        Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS);
+        for(int turbineId = 1; turbineId <= turbinesNumber; turbineId++)
         {
             Map<LocalDateTime, List<AvailabilityData>> data = new HashMap<>();
-            List<AvailabilityData> availabilityDataList1 = listMap.get(turbineId);
 
-            for(AvailabilityData availabilityData : availabilityDataList1)
-            {
-                LocalDateTime hour = availabilityData.getAvailabilityDataId().getTimestamp();
+            if(listMap.containsKey(turbineId)) {
+                List<AvailabilityData> availabilityDataList1 = listMap.get(turbineId);
 
-                if(!data.containsKey(hour)){
-                    List<AvailabilityData> availabilityDataList2 = new ArrayList<>();
-                    availabilityDataList2.add(availabilityData);
+                for(AvailabilityData availabilityData : availabilityDataList1)
+                {
+                    LocalDateTime hour = availabilityData.getAvailabilityDataId().getTimestamp();
 
-                    data.put(hour, availabilityDataList2);
+                    if(!data.containsKey(hour)){
+                        List<AvailabilityData> availabilityDataList2 = new ArrayList<>();
+                        availabilityDataList2.add(availabilityData);
+
+                        data.put(hour, availabilityDataList2);
+                    }
+                    else {
+                        List<AvailabilityData> availabilityDataList2 = data.get(hour);
+                        availabilityDataList2.add(availabilityData);
+                    }
                 }
-                else {
-                    List<AvailabilityData> availabilityDataList2 = data.get(hour);
-                    availabilityDataList2.add(availabilityData);
+            }else {
+                List<AvailabilityData> availabilityDataList1 = new ArrayList<>();
+                LocalDateTime clonedDateTime = LocalDateTime.of(startTime.getYear(),
+                        startTime.getMonth(),
+                        startTime.getDayOfMonth(),
+                        startTime.getHour(),
+                        startTime.getMinute(),
+                        startTime.getSecond());
+
+                LocalDateTime endTime;
+
+                if(clonedDateTime.plusDays(1).isBefore(LocalDateTime.now()))
+                    endTime = clonedDateTime.plusDays(1);
+                else
+                    endTime = LocalDateTime.now();
+
+                while(clonedDateTime.isBefore(endTime)){
+                    availabilityDataList1.add(
+                            AvailabilityData.builder()
+                                    .availabilityDataId(new AvailabilityData.AvailabilityDataId(startTime, turbineId, null))
+                                    .time(3600)
+                                    .availabilityType(informationUnavailableType.orElse(
+                                            AvailabilityType.builder()
+                                                    .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS)
+                                                    .description("")
+                                                    .color("#C4D8F0")
+                                                    .build()
+                                    ))
+                                    .build()
+                    );
+                    data.put(clonedDateTime, availabilityDataList1);
+
+                    clonedDateTime = clonedDateTime.plusHours(1);
                 }
+            }
+
+            //fill empty data of timestamp
+            LocalDateTime clonedDateTime = LocalDateTime.of(startTime.getYear(),
+                    startTime.getMonth(),
+                    startTime.getDayOfMonth(),
+                    startTime.getHour(),
+                    startTime.getMinute(),
+                    startTime.getSecond());
+
+            LocalDateTime endTime;
+
+            if(clonedDateTime.plusDays(1).isBefore(LocalDateTime.now()))
+                endTime = clonedDateTime.plusDays(1);
+            else
+                endTime = LocalDateTime.now();
+
+            while(clonedDateTime.isBefore(endTime)){
+                if(!data.containsKey(clonedDateTime))
+                {
+                    LocalDateTime finalClonedDateTime = clonedDateTime;
+                    int finalTurbineId = turbineId;
+
+                    List<AvailabilityData> tempData = IntStream.range(0, 1)
+                            .mapToObj((i) -> returnInformationUnavailable(finalClonedDateTime, finalTurbineId))
+                            .collect(Collectors.toList());
+
+                    data.put(clonedDateTime, tempData);
+                }
+                clonedDateTime = clonedDateTime.plusHours(1);
             }
             turbines.add(data);
         }
-
         return turbines;
+    }
+    private AvailabilityData returnInformationUnavailable(LocalDateTime timestamp, int turbineId){
+        return AvailabilityData.builder()
+                .availabilityDataId(new AvailabilityData.AvailabilityDataId(timestamp, turbineId, null))
+                .time(3600)
+                .availabilityType(AvailabilityType.builder()
+                        .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS)
+                        .description("")
+                        .color("#C4D8F0")
+                        .build())
+                .build();
     }
 }

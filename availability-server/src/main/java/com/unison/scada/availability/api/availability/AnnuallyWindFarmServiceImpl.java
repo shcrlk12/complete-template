@@ -107,12 +107,10 @@ public class AnnuallyWindFarmServiceImpl implements AnnuallyWindFarmService{
             else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_STATUS))
             {
                 numerator += availabilityData.getTime();
-
             }
             else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_STATUS))
             {
                 denominator += availabilityData.getTime();
-
             }
             else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_STATUS))
             {

@@ -1,7 +1,10 @@
 package com.unison.scada.availability.api.availability;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,6 +15,9 @@ import java.util.UUID;
 @Entity
 @Table(name="availability_type")
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AvailabilityType {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -22,6 +28,10 @@ public class AvailabilityType {
 
     @Column(nullable = true)
     private String description;
+
+    @Column(nullable = false, length = 7)
+    private String color;
+
 
     @Column(nullable = false)
     @ColumnDefault("true")

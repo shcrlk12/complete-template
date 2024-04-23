@@ -20,6 +20,7 @@ public class DailyWindFarmDTO {
         private final LocalDateTime date;
         private final double availability;
         private final List<Turbine> turbines;
+        private final List<AvailabilityStatus> statusList;
 
         @Getter
         @Builder
@@ -61,6 +62,13 @@ public class DailyWindFarmDTO {
         public static class Availability{
             private final String name;
             private final int time;
+        }
+
+        @Getter
+        @Builder
+        public static class AvailabilityStatus{
+            private final String name;
+            private final String color;
         }
     }
 }

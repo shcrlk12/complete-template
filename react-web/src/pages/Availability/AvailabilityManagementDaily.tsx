@@ -6,6 +6,11 @@ import { fetchData, statusOk } from "@src/util/fetch";
 import { useParams } from "react-router";
 import { Dayjs } from "dayjs";
 
+type AvailabilityStatus = {
+  name: string;
+  color: string;
+};
+
 export type MemoType = {
   engineerName: string;
   workTime: Dayjs | null;
@@ -38,6 +43,7 @@ export type DailyTableData = {
   date: string;
   turbinesNumber: number;
   turbines: DailyTurbineData[];
+  statusList: AvailabilityStatus[];
 };
 
 const AvailabilityManagementDaily = () => {
@@ -45,8 +51,6 @@ const AvailabilityManagementDaily = () => {
   const [dailyTableData, setDailyTableData] = useState<DailyTableData>();
   const { year, month, day } = useParams();
   console.log(dailyTableData);
-
-  console.log("kjwon test2");
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
@@ -58,10 +62,22 @@ const AvailabilityManagementDaily = () => {
 
       await statusOk(response);
       const data = await response.json();
-      const json = data.data;
-      console.log("daily test");
+      const json: DailyTableData = data.data;
 
-      console.log(json);
+      //exception
+      // if (json.availability == null) {
+      //   json.availability = 0;
+      // }
+      // if(json.turbines == null){
+      //   json.turbines = [];
+      //   for(let i =0; i < json.turbinesNumber; i++){
+      //     json.turbines.push({
+      //       turbineId: i+1,
+
+      //     })
+
+      //   }
+      // }
 
       setDailyTableData(json);
     });
