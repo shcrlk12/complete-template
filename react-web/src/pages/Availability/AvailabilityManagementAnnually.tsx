@@ -29,18 +29,19 @@ export type AnnuallyTableData = {
   turbinesNumber: number;
   yearsOfWarranty: number;
   startTimeOfYears: string;
+  date: string;
   turbines: AnnuallyTurbineData[];
 };
 
 const AvailabilityManagementAnnually = () => {
   const { dispatch, navigate } = useInits();
-  const { year, month, day } = useParams();
+  const { year } = useParams();
 
   const [annuallyTableData, setAnnuallyTableData] = useState<AnnuallyTableData>();
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch(`http://www.localhost:6789/api/wind-farm/annually/${year}/${month}/${day}`, {
+      const response = await fetch(`http://www.localhost:6789/api/wind-farm/annually/${year}`, {
         mode: "cors",
         method: "GET",
         credentials: "include",
@@ -54,7 +55,7 @@ const AvailabilityManagementAnnually = () => {
       console.log(data);
       setAnnuallyTableData(data);
     });
-  }, []);
+  }, [year]);
 
   return (
     <MainSection>

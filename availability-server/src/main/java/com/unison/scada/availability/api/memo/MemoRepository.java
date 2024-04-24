@@ -1,6 +1,5 @@
 package com.unison.scada.availability.api.memo;
 
-import com.unison.scada.availability.api.availability.AvailabilityData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

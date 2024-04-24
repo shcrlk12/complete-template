@@ -63,8 +63,6 @@ const AnnualTable = ({ annuallyTableData }: { annuallyTableData: AnnuallyTableDa
 
   let endDate = now < aYearLaterDate ? now : aYearLaterDate;
 
-  startDate.getFullYear();
-
   const onClickCell = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickDate = yymmddToDate(event.currentTarget.textContent as string);
 
@@ -72,11 +70,12 @@ const AnnualTable = ({ annuallyTableData }: { annuallyTableData: AnnuallyTableDa
 
     navigate(`${Paths.availability.daily.path}/${year}/${month}/${day}`);
   };
+
   const addBody = () => {
     const newArr = [];
     let rowIndex = 0;
 
-    while (startDate <= endDate) {
+    while (startDate < endDate) {
       dateToyymmdd(startDate);
 
       let dateTime = dateToyymmdd(startDate);
@@ -107,7 +106,24 @@ const AnnualTable = ({ annuallyTableData }: { annuallyTableData: AnnuallyTableDa
         </TableHeader>
         <TableBody>{addBody()}</TableBody>
       </Table>
-      <TablePagination />
+      <TablePagination
+        leftButtonClick={() => {
+          let date = new Date(annuallyTableData.date);
+          date.setFullYear(date.getFullYear() - 1);
+
+          navigate(Paths.availability.annually.path + `/${date.getFullYear()}`);
+        }}
+        rightButtonClick={() => {
+          let date = new Date(annuallyTableData.date);
+          date.setDate(date.getDate() + 1);
+
+          let now = new Date(Date.now());
+
+          if (date.getTime() < now.getTime()) {
+            navigate(Paths.availability.daily.path + `/${date.getFullYear()}`);
+          }
+        }}
+      />
     </>
   );
 };

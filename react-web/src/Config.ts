@@ -68,7 +68,7 @@ export const headerNavList: HeaderNavList[] = [
     LNBList: [
       {
         name: "연간 가동률 현황",
-        link: `${Paths.availability.annually.path}/${year}/${month}/${day}`,
+        link: `${Paths.availability.annually.path}/${year}`,
         allowVersion: TYPE1_VERSION,
         userRole: ROLE_USER,
       },

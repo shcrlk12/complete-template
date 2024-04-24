@@ -4,5 +4,5 @@ import java.time.LocalDateTime;
 
 public interface DailyWindFarmService {
 
-    DailyWindFarmDTO.Response getWindFarmGeneralInfo(LocalDateTime searchTime);
+    DailyWindFarmDTO.Response getDailyWindFarmGeneralInfo(LocalDateTime searchTime);
 }

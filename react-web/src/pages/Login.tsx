@@ -68,10 +68,10 @@ const Login = () => {
 
       if (data.status === 200) {
         let now = new Date(Date.now());
-        let { year, month, day } = parseyyyymmdd(now);
+        let { year } = parseyyyymmdd(now);
 
         dispatch(loginSuccess({ id: data.id, name: "jeongwon", role: data.role }));
-        navigate(`${Paths.availability.annually.path}/${year}/${month}/${day}`);
+        navigate(`${Paths.availability.annually.path}/${year}`);
       } else {
         alert(data.message);
       }

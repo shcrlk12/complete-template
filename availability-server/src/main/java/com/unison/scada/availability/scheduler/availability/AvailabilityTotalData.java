@@ -10,9 +10,11 @@ import java.util.*;
 public class AvailabilityTotalData {
     private final List<Map<String, Integer>> availabilityStatusMaps = new ArrayList<Map<String, Integer>>();
     private final WindFarmProperties windFarmProperties;
+    private int elapsedTotalTime;
 
     AvailabilityTotalData(WindFarmProperties windFarmProperties){
         this.windFarmProperties = windFarmProperties;
+        this.elapsedTotalTime = 0;
         for(int i = 0; i < windFarmProperties.getTurbinesNumber(); i ++)
         {
             availabilityStatusMaps.add(new HashMap<String, Integer>());
@@ -50,6 +52,7 @@ public class AvailabilityTotalData {
         for(int i = 0; i < turbinesNumber; i++){
             availabilityStatusMaps.get(i).replaceAll((k, v) -> 0);
         }
+        elapsedTotalTime = 0;
     }
 
     private void checkContainsKey(Map<String, Integer> availabilityStatusMap, String key) throws Exception {
@@ -61,5 +64,26 @@ public class AvailabilityTotalData {
     public Map<String, Integer> getTotalTimeByTurbineId(int turbineId) {
 
         return availabilityStatusMaps.get(turbineId - 1);
+    }
+
+    public Map<String, Integer> getAHourAvailabilityTimeByTurbineId(int turbineId){
+
+        Map<String, Integer> result = new HashMap<>();
+
+        Map<String, Integer> AvailabilityTotalTime = availabilityStatusMaps.get(turbineId - 1);
+
+        for(String availabilityName : AvailabilityTotalTime.keySet())
+        {
+            int totalTimeByName = AvailabilityTotalTime.get(availabilityName);
+
+            if(availabilityName.equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS))
+            {
+                result.put(availabilityName, totalTimeByName + elapsedTotalTime);
+            }
+            else{
+                result.put(availabilityName, totalTimeByName);
+            }
+        }
+        return result;
     }
 }

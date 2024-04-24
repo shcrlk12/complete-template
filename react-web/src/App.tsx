@@ -53,7 +53,7 @@ const getRouteByRole = (userRole: UserRoleType) => {
 
   const userRoleRoutes: PageRole[] = [
     ...anonymousRoleRoutes,
-    { path: `${Paths.availability.annually.path}/:year/:month/:day`, component: <AvailabilityManagementAnnually /> },
+    { path: `${Paths.availability.annually.path}/:year`, component: <AvailabilityManagementAnnually /> },
   ];
 
   const managerRoleRoutes: PageRole[] = [
@@ -111,8 +111,8 @@ const App = () => {
         dispatch(loginSuccess({ id: data.id, name: data.name, role: data.role }));
 
         let now = new Date(Date.now());
-        let { year, month, day } = parseyyyymmdd(now);
-        navigate(`${Paths.availability.annually.path}/${year}/${month}/${day}`);
+        let { year } = parseyyyymmdd(now);
+        navigate(`${Paths.availability.annually.path}/${year}`);
       }
     });
   }, []);

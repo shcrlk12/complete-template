@@ -107,15 +107,29 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
   };
 
   const getStatusColor = (availability: Availability[]): string => {
-    let statusTime = 0;
-    let statusColor = "";
+    // availability 속성이 하나만 있으면 gradiention 을 사용 하지 못함.
+    if (availability.length === 1) {
+      return map.get(availability[0].name)?.color || "";
+    }
 
-    availability?.forEach((element) => {
-      if (Number(element.time) > statusTime) {
-        statusColor = map.get(element.name)?.color as string;
-        statusTime = element.time;
+    // availability 속성이 2개 이상일 때 실행
+    let statusColor = `linear-gradient(to right `;
+    let beforePositoin = 0;
+
+    availability?.forEach((element, index) => {
+      let currentPosition = Number(((element.time / 3600) * 100).toFixed(1));
+
+      if (index === 0) {
+        statusColor += `, ${map.get(element.name)?.color} ${currentPosition}%`;
+        beforePositoin = Number(((element.time / 3600) * 100).toFixed(1));
+      } else {
+        statusColor += `, ${map.get(element.name)?.color} ${beforePositoin}%`;
+        statusColor += `, ${map.get(element.name)?.color} ${beforePositoin + currentPosition}%`;
+        beforePositoin = beforePositoin + currentPosition;
       }
     });
+
+    statusColor += " );";
     return statusColor;
   };
 

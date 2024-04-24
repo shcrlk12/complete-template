@@ -1,16 +1,15 @@
 package com.unison.scada.availability.scheduler.availability;
 
-import com.unison.scada.availability.api.availability.AvailabilityData;
-import com.unison.scada.availability.api.availability.AvailabilityDataRepository;
-import com.unison.scada.availability.api.availability.AvailabilityType;
-import com.unison.scada.availability.api.availability.AvailabilityTypeRepository;
+import com.unison.scada.availability.api.availability.entity.AvailabilityData;
+import com.unison.scada.availability.api.availability.repository.AvailabilityDataRepository;
+import com.unison.scada.availability.api.availability.entity.AvailabilityType;
+import com.unison.scada.availability.api.availability.repository.AvailabilityTypeRepository;
 import com.unison.scada.availability.api.windfarm.WindFarmProperties;
 import com.unison.scada.availability.comm.opcda.*;
 import com.unison.scada.availability.scheduler.availability.model.AvailabilityStatus;
 import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -177,6 +176,9 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
         availabilityTotalData.cleanAllTime(turbinesNumber);
     }
 
+    private List<AvailabilityData> test1(List<AvailabilityType> availabilityTypes){
+
+    }
     private AvailabilityType findAvailabilityTypeByName(String name, List<AvailabilityType> availabilityTypes){
         for(AvailabilityType availabilityType : availabilityTypes) {
             if(availabilityType.getName().equalsIgnoreCase(name))
