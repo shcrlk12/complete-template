@@ -176,9 +176,6 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
         availabilityTotalData.cleanAllTime(turbinesNumber);
     }
 
-    private List<AvailabilityData> test1(List<AvailabilityType> availabilityTypes){
-
-    }
     private AvailabilityType findAvailabilityTypeByName(String name, List<AvailabilityType> availabilityTypes){
         for(AvailabilityType availabilityType : availabilityTypes) {
             if(availabilityType.getName().equalsIgnoreCase(name))
@@ -189,35 +186,7 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
     @Override
     public void updateTotalAvailability(List<Turbine> turbines) throws Exception {
         for (Turbine turbine : turbines){
-
-            int turbineId = turbine.getTurbineId();
-            AvailabilityStatus availabilityStatus = turbine.getAvailabilityStatus();
-
-            if(availabilityStatus.getGroupName().equalsIgnoreCase(AvailabilityStatus.NORMAL_STATUS))
-            {
-                int time = availabilityTotalData.getAvailabilityTime(turbineId, AvailabilityStatus.NORMAL_STATUS);
-                availabilityTotalData.setAvailabilityTime(turbineId, AvailabilityStatus.NORMAL_STATUS, time + 2);
-            }
-            else if(availabilityStatus.getGroupName().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_STATUS))
-            {
-                int time = availabilityTotalData.getAvailabilityTime(turbineId, AvailabilityStatus.FORCED_OUTAGE_STATUS);
-                availabilityTotalData.setAvailabilityTime(turbineId, AvailabilityStatus.FORCED_OUTAGE_STATUS, time + 2);
-            }
-            else if(availabilityStatus.getGroupName().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_STATUS))
-            {
-                int time = availabilityTotalData.getAvailabilityTime(turbineId, AvailabilityStatus.REQUESTED_SHUTDOWN_STATUS);
-                availabilityTotalData.setAvailabilityTime(turbineId, AvailabilityStatus.REQUESTED_SHUTDOWN_STATUS, time + 2);
-            }
-            else if(availabilityStatus.getGroupName().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_STATUS))
-            {
-                int time = availabilityTotalData.getAvailabilityTime(turbineId, AvailabilityStatus.SCHEDULED_MAINTENANCE_STATUS);
-                availabilityTotalData.setAvailabilityTime(turbineId, AvailabilityStatus.SCHEDULED_MAINTENANCE_STATUS, time + 2);
-            }
-            else
-            {
-                int time = availabilityTotalData.getAvailabilityTime(turbineId, AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS);
-                availabilityTotalData.setAvailabilityTime(turbineId, AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS, time + 2);
-            }
+            availabilityTotalData.setAvailabilityTime(turbine);
         }
     }
 }
