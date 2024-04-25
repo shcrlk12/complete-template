@@ -385,10 +385,12 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             if(listMap.containsKey(turbineId)) {
                 List<AvailabilityData> availabilityDataList1 = listMap.get(turbineId);
 
+                int index= 0;
                 for (AvailabilityData availabilityData : availabilityDataList1) {
                     LocalDateTime day = availabilityData.getAvailabilityDataId().getTimestamp().withHour(0).withMinute(0).withSecond(0);
 
                     if (!data.containsKey(day)) {
+                        System.out.println(index++);
                         Avail a = new Avail();
                         a.calcAvailability(availabilityData);
 

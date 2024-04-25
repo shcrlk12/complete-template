@@ -32,6 +32,7 @@ SET @forced_uuid = UUID();
 SET @scheduled_uuid = UUID();
 SET @information_uuid = UUID();
 SET @requested_uuid = UUID();
+SET @low_uuid = UUID();
 SET @etc_uuid = UUID();
 
 INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@normal_uuid, 'normal status', '#339D33', CURRENT_TIMESTAMP());
@@ -39,7 +40,7 @@ INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@forced_uu
 INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@scheduled_uuid, 'scheduled maintenance', '#D9D633', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@information_uuid, 'information unavailable', '#C4D8F0', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@requested_uuid, 'requested shutdown', '#33A1DE', CURRENT_TIMESTAMP());
---INSERT INTO availability_type (uuid, name, created_at) VALUES (@requested_uuid, 'out of environmental', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color,created_at) VALUES (@low_uuid, 'low temperature', '#33A1AA', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@etc_uuid, 'etc', '#D97733', CURRENT_TIMESTAMP());
 
 -- AvailabilityData Table
