@@ -31,6 +31,8 @@ import useInits from "@src/hooks/useInits";
 import { Paths } from "@src/Config";
 import { JSX } from "react/jsx-runtime";
 import styled from "styled-components";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/index";
 
 type ColorType = {
   name: string;
@@ -85,6 +87,8 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
   const [map, setMap] = useState<Map<string, MapTypes>>(new Map());
   const [memo, setMemo] = useState<MemoType>(initMemo());
   const [seleectedCell, setSeleectedCell] = useState<any[]>([]);
+
+  const { startOfWarrantyDate } = useSelector((store: RootState) => store.appReducer);
 
   useEffect(() => {
     console.log(getStatusColor(dailyTableData.turbines[0].data[0].availability));
@@ -331,15 +335,15 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           let date = new Date(dailyTableData.date);
           date.setDate(date.getDate() - 1);
 
-          navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
+          if (startOfWarrantyDate.getTime() <= date.getTime()) {
+            navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
+          }
         }}
         rightButtonClick={() => {
           let date = new Date(dailyTableData.date);
           date.setDate(date.getDate() + 1);
 
-          let now = new Date(Date.now());
-
-          if (date.getTime() < now.getTime()) {
+          if (date.getTime() < new Date(Date.now()).getTime()) {
             navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
           }
         }}

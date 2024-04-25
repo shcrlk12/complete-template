@@ -48,7 +48,7 @@ const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
     (configuredPaths: PathType | PathDetail | any, changingPath: string): string => {
       for (const key in configuredPaths) {
         if (typeof configuredPaths[key] === "object") {
-          if (configuredPaths[key].path?.includes(changingPath)) {
+          if (changingPath.includes(configuredPaths[key].path)) {
             return configuredPaths[key].title;
           } else {
             let title = getCurrentPathTitle(configuredPaths[key], changingPath);
