@@ -8,9 +8,11 @@ import { Status } from "../Table.styled";
 import { AnnuallyTableData } from "@pages/Availability/AvailabilityManagementAnnually";
 import { dateToyymmdd, parseyyyymmdd, yymmddToDate } from "@src/util/date";
 import theme from "@components/style/Theme";
-import { useNavigate } from "react-router";
 import useInits from "@src/hooks/useInits";
 import { Paths } from "@src/Config";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/index";
+import { useParams } from "react-router";
 
 const AnnualTable = ({ annuallyTableData }: { annuallyTableData: AnnuallyTableData }) => {
   const { dispatch, navigate } = useInits();
@@ -108,19 +110,23 @@ const AnnualTable = ({ annuallyTableData }: { annuallyTableData: AnnuallyTableDa
       </Table>
       <TablePagination
         leftButtonClick={() => {
+          let startDate = new Date(annuallyTableData.startTimeOfYears);
+          let years = annuallyTableData.yearsOfWarranty;
           let date = new Date(annuallyTableData.date);
-          date.setFullYear(date.getFullYear() - 1);
 
-          navigate(Paths.availability.annually.path + `/${date.getFullYear()}`);
+          if (startDate.getFullYear() - (years - 1) < date.getFullYear()) {
+            date.setFullYear(date.getFullYear() - 1);
+            navigate(Paths.availability.annually.path + `/${date.getFullYear()}`);
+          }
         }}
         rightButtonClick={() => {
-          let date = new Date(annuallyTableData.date);
-          date.setDate(date.getDate() + 1);
-
+          let startDate = new Date(annuallyTableData.startTimeOfYears);
           let now = new Date(Date.now());
 
-          if (date.getTime() < now.getTime()) {
-            navigate(Paths.availability.daily.path + `/${date.getFullYear()}`);
+          startDate.setFullYear(startDate.getFullYear() + 1);
+
+          if (startDate.getTime() < now.getTime()) {
+            navigate(Paths.availability.annually.path + `/${startDate.getFullYear()}`);
           }
         }}
       />

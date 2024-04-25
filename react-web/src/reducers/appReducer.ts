@@ -5,15 +5,22 @@ import {
   setLoading,
   headerTiemVisible,
   HeaderTiemVisible,
+  setStartOfWarrantyDate,
+  SET_WARRANTY_DATE,
 } from "./appAction";
 
 //Action Type
-type AppAction = ReturnType<typeof setLoading> | ReturnType<typeof resetLoading> | ReturnType<typeof headerTiemVisible>;
+type AppAction =
+  | ReturnType<typeof setLoading>
+  | ReturnType<typeof resetLoading>
+  | ReturnType<typeof headerTiemVisible>
+  | ReturnType<typeof setStartOfWarrantyDate>;
 
 //State type
 type AppState = {
   headerTiemVisible: HeaderTiemVisible;
   isLoading: boolean;
+  startOfWarrantyDate: Date;
 };
 
 const initialState: AppState = {
@@ -23,6 +30,7 @@ const initialState: AppState = {
     logoutBtn: true,
   },
   isLoading: false,
+  startOfWarrantyDate: new Date(),
 };
 
 const appReducer = (state: AppState = initialState, action: AppAction) => {
@@ -36,6 +44,11 @@ const appReducer = (state: AppState = initialState, action: AppAction) => {
       return {
         ...state,
         isLoading: false,
+      };
+    case SET_WARRANTY_DATE:
+      return {
+        ...state,
+        startOfWarrantyDate: action.payload,
       };
     default:
       return state;

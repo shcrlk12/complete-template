@@ -9,7 +9,7 @@ import {
   WindfarmInfoList,
 } from "./Availability.styled";
 import { useDispatch } from "react-redux";
-import { resetLoading } from "@reducers/appAction";
+import { resetLoading, setStartOfWarrantyDate } from "@reducers/appAction";
 import useInits from "@src/hooks/useInits";
 import { fetchData, statusOk } from "@src/util/fetch";
 import { loginSuccess } from "@reducers/userActions";
@@ -53,6 +53,12 @@ const AvailabilityManagementAnnually = () => {
       const data = json.data;
 
       console.log(data);
+
+      let startDate = new Date(data.startTimeOfYears);
+      startDate.setFullYear(startDate.getFullYear() - (data.yearsOfWarranty - 1));
+
+      dispatch(setStartOfWarrantyDate(startDate));
+
       setAnnuallyTableData(data);
     });
   }, [year]);
