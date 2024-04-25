@@ -113,7 +113,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     }
 
     // availability 속성이 2개 이상일 때 실행
-    let statusColor = `linear-gradient(to right `;
+    let statusColor = `linear-gradient(to bottom `;
     let beforePositoin = 0;
 
     availability?.forEach((element, index) => {
