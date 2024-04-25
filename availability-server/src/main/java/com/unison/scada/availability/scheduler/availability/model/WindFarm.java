@@ -3,7 +3,7 @@ package com.unison.scada.availability.scheduler.availability.model;
 import com.unison.scada.availability.api.windfarm.WindFarmProperties;
 import com.unison.scada.availability.comm.opcda.OPCException;
 import com.unison.scada.availability.comm.opcda.OPCNotFoundException;
-import com.unison.scada.availability.scheduler.availability.TurbineDataUpdateService;
+import com.unison.scada.availability.scheduler.availability.update.TurbineDataUpdateService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class WindFarm {
         int turbinesNumber = windFarmProperties.getTurbinesNumber();
 
         turbines = IntStream.range(0, turbinesNumber)
-                .mapToObj(i -> new Turbine(i + 1))
+                .mapToObj(Turbine::new)
                 .collect(Collectors.toList());
     }
 

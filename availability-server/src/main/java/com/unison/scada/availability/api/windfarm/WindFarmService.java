@@ -43,7 +43,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         Map<Integer, List<Memo>> memoMap = memos.stream().collect(Collectors.groupingBy((data) -> data.getMemoId().getTurbineId()));
         List<Map<LocalDateTime, Memo>> data22 = new ArrayList<>();
 
-        for(int turbineId = 1; turbineId <= windFarmProperties.getTurbinesNumber(); turbineId++) {
+        for(int turbineId = 0; turbineId < windFarmProperties.getTurbinesNumber(); turbineId++) {
             Map<LocalDateTime, Memo> data = new HashMap<>();
             Optional<List<Memo>> optionalAvailabilityDataList = Optional.ofNullable(memoMap.get(turbineId));
 
@@ -143,8 +143,8 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         List<Map<LocalDateTime, List<AvailabilityData>>> turbines = new ArrayList<>();
         int turbinesNumber = windFarmProperties.getTurbinesNumber();
 
-        Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS);
-        for(int turbineId = 1; turbineId <= turbinesNumber; turbineId++)
+        Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE);
+        for(int turbineId = 0; turbineId < turbinesNumber; turbineId++)
         {
             Map<LocalDateTime, List<AvailabilityData>> data = new HashMap<>();
 
@@ -189,7 +189,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                                     .time(3600)
                                     .availabilityType(informationUnavailableType.orElse(
                                             AvailabilityType.builder()
-                                                    .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS)
+                                                    .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
                                                     .description("")
                                                     .color("#C4D8F0")
                                                     .build()
@@ -235,7 +235,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 .availabilityDataId(new AvailabilityData.AvailabilityDataId(timestamp, turbineId, null))
                 .time(3600)
                 .availabilityType(AvailabilityType.builder()
-                        .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS)
+                        .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
                         .description("")
                         .color("#C4D8F0")
                         .build())
@@ -347,21 +347,21 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
         public void calcAvailability(AvailabilityData availabilityData){
 
-            if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.NORMAL_STATUS)){
+            if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.NORMAL_TYPE)){
             }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_STATUS))
+            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE))
             {
                 numerator += availabilityData.getTime();
             }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_STATUS))
+            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE))
             {
                 denominator += availabilityData.getTime();
             }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_STATUS))
+            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE))
             {
 
             }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_STATUS))
+            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
             {
             }
             else
@@ -379,7 +379,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
         List<Map<LocalDateTime, Avail>> turbines = new ArrayList<>();
 
-        for(int turbineId = 1; turbineId <= windFarmProperties.getTurbinesNumber(); turbineId++)
+        for(int turbineId = 0; turbineId < windFarmProperties.getTurbinesNumber(); turbineId++)
         {
             Map<LocalDateTime, Avail> data = new HashMap<>();
             if(listMap.containsKey(turbineId)) {

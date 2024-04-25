@@ -5,6 +5,9 @@ import com.unison.scada.availability.comm.opcda.OPCNotFoundException;
 import com.unison.scada.availability.comm.opcda.OPCServer;
 import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import com.unison.scada.availability.scheduler.availability.model.WindFarm;
+import com.unison.scada.availability.scheduler.availability.save.AvailabilitySaveService;
+import com.unison.scada.availability.scheduler.availability.update.TurbineDataUpdateByOPCService;
+import com.unison.scada.availability.scheduler.availability.update.TurbineDataUpdateService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +25,7 @@ public class AvailabilityScheduler {
     Logger logger = LoggerFactory.getLogger(AvailabilityScheduler.class);
 
     private final TurbineDataUpdateService turbineDataUpdateService;
+    private final AvailabilitySaveService availabilitySaveService;
     private final WindFarm windFarm;
     private final SchedulerProperties schedulerProperties;
 
@@ -46,7 +50,7 @@ public class AvailabilityScheduler {
     //save availability data by every hour
     @Scheduled(cron = "0 0 * * * *")
     public void oneHourScheduler(){
-        turbineDataUpdateService.saveAHourAvailability(windFarm.getTurbines().size());
+        availabilitySaveService.save1HourAvailabilityTotalTime(windFarm.getTurbines().size());
 
     }
 }
