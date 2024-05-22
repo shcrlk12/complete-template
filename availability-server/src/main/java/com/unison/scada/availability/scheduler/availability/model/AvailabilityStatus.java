@@ -20,14 +20,14 @@ public enum AvailabilityStatus{
     FORCED_OUTAGE(90, AvailabilityStatus.FORCED_OUTAGE_TYPE),
     SUSPENDED(100, AvailabilityStatus.NONE_TYPE),
     FORCE_MAJEURE(110, AvailabilityStatus.NONE_TYPE),
-    INFORMATION_UNAVAILABLE(120, AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE);
+    INFORMATION_UNAVAILABLE(120, AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE);
 
     public static final String NORMAL_TYPE = "normal status";
     public static final String REQUESTED_SHUTDOWN_TYPE = "requested shutdown";
     public static final String FORCED_OUTAGE_TYPE = "forced outage";
 //    public static final String OUT_OF_ENVIRONMENTAL_TYPE = "out of environmental";
     public static final String SCHEDULED_MAINTENANCE_TYPE = "scheduled maintenance";
-    public static final String INFORMATION_UNAVAILABLE_TYPE = "information unavailable";
+    public static final String INFOMATION_UNAVAILABLE_TYPE = "information unavailable";
     public static final String NONE_TYPE = "";
 
     @Getter

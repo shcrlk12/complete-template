@@ -1,23 +1,30 @@
 package com.unison.scada.availability.api.windfarm;
 
+import com.unison.scada.availability.api.BasicDTO;
 import com.unison.scada.availability.api.windfarm.annually.AnnuallyWindFarmDTO;
 import com.unison.scada.availability.api.windfarm.realtime.RealTimeDTO;
 import com.unison.scada.availability.api.user.Error;
 import com.unison.scada.availability.api.user.JSONResponse;
 import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmDTO;
+import com.unison.scada.availability.scheduler.availability.update.TurbineDataUpdateByOPCService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/wind-farm")
 public class WindFarmController {
+    Logger logger = LoggerFactory.getLogger(WindFarmController.class);
 
     private final WindFarmService windFarmService;
 
@@ -53,6 +60,28 @@ public class WindFarmController {
                                     .build()
                         );
 
+    }
+
+    @PostMapping("/daily/register")
+    public ResponseEntity<JSONResponse<BasicDTO.Response, Error>> registerDailyInfo(
+            Principal principal,
+            @RequestBody DailyWindFarmDTO.Request request
+    ){
+        try{
+            windFarmService.registerDailyInfo(principal, request);
+            return ResponseEntity.ok()
+                    .body(JSONResponse.<BasicDTO.Response, Error>builder()
+                            .data(new BasicDTO.Response(true, "test"))
+                            .build());
+        }
+        catch(Exception e)
+        {
+            logger.error("error registering daily info", e);
+            return ResponseEntity.internalServerError()
+                    .body(JSONResponse.<BasicDTO.Response, Error>builder()
+                                    .error(new Error(500, e.getMessage()))
+                                    .build());
+        }
     }
 
     @GetMapping("/realtime")

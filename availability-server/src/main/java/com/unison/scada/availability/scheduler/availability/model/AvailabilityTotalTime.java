@@ -1,8 +1,6 @@
 package com.unison.scada.availability.scheduler.availability.model;
 
 import com.unison.scada.availability.api.windfarm.WindFarmProperties;
-import com.unison.scada.availability.scheduler.availability.model.AvailabilityStatus;
-import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -92,7 +90,7 @@ public class AvailabilityTotalTime {
         {
             int totalTime = availabilityTypeAndTimeMapOfATurbine.get(availabilityType);
 
-            if(availabilityType.equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
+            if(availabilityType.equalsIgnoreCase(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE))
             {
                 result.put(availabilityType, totalTime + (elapsedTotalTime / availabilityTypeAndTimeMapOfAllTurbine.size()));
             }

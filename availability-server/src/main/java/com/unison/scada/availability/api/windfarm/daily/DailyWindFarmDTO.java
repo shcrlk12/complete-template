@@ -1,11 +1,9 @@
 package com.unison.scada.availability.api.windfarm.daily;
 
-import com.unison.scada.availability.api.availability.AvailabilityDTO;
-import com.unison.scada.availability.api.memo.MemoDTO;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +11,20 @@ import java.util.List;
 
 public class DailyWindFarmDTO {
 
+    @Getter
+    @Setter
+    public static class Request{
+        private List<Turbine> timestamps;
+        private Memo memo;
+        private List<Availability> availability;
+
+        @Getter
+        @Setter
+        public static class Turbine{
+            private int turbineId; //여러개 가능
+            private LocalDateTime timestamp; // 여러개 가능
+        }
+    }
     @Getter
     @Builder
     public static class Response{
@@ -34,8 +46,9 @@ public class DailyWindFarmDTO {
         @Builder
         public static class Data implements Comparable<Data>{
             private final LocalDateTime time;
-            private final Memo memo;
-            private final List<Availability> availability;
+            private final DailyWindFarmDTO.Memo memo;
+            private final List<DailyWindFarmDTO.Availability> availability;
+            private final boolean changed;
 
             @Override
             public int compareTo(Data data) {
@@ -45,30 +58,30 @@ public class DailyWindFarmDTO {
 
         @Getter
         @Builder
-        @AllArgsConstructor
-        public static class Memo{
-            private String engineerName;
-            private LocalDateTime workTime;
-            private String material;
-            private Integer quantity;
-            private String workType;
-            private String inspection;
-            private String etc;
-
-        }
-
-        @Getter
-        @Builder
-        public static class Availability{
-            private final String name;
-            private final int time;
-        }
-
-        @Getter
-        @Builder
         public static class AvailabilityStatus{
             private final String name;
             private final String color;
         }
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class Memo {
+        private String engineerName;
+        private LocalDateTime workTime;
+        private String material;
+        private Integer quantity;
+        private String workType;
+        private String inspection;
+        private String etc;
+
+    }
+
+    @Getter
+    @Builder
+    public static class Availability {
+        private final String name;
+        private final int time;
     }
 }

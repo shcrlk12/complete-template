@@ -20,6 +20,7 @@ import com.unison.scada.availability.scheduler.availability.model.WindFarm;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -74,29 +75,33 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             List<DailyWindFarmDTO.Response.Data> dataList = new ArrayList<>();
 
             for(LocalDateTime key : listMap2.keySet()) {
+                boolean isChanged = false;
                 List<AvailabilityData> availabilityDatas = listMap2.get(key);
 
-                List<DailyWindFarmDTO.Response.Availability> availabilities = new ArrayList<>();
+                List<DailyWindFarmDTO.Availability> availabilities = new ArrayList<>();
 
                 for(AvailabilityData availabilityData : availabilityDatas) {
+                    if(availabilityData.getUpdatedAt() != null)
+                        isChanged = true;
                     avail.calcAvailability(availabilityData);
 
-                    availabilities.add(DailyWindFarmDTO.Response.Availability.builder()
+                    availabilities.add(DailyWindFarmDTO.Availability.builder()
                             .name(availabilityData.getAvailabilityType().getName())
                             .time(availabilityData.getTime())
                             .build());
                 }
-                DailyWindFarmDTO.Response.Memo memo = null;
+                DailyWindFarmDTO.Memo memo = null;
                 Optional<Memo> optionalMemo = Optional.ofNullable(data22.get(i).get(key));
 
                 if (optionalMemo.isPresent()) {
                     Memo memo1 = optionalMemo.get();
-                    memo = new DailyWindFarmDTO.Response.Memo(memo1.getEngineerName(), memo1.getWorkTime(), memo1.getMaterial(), memo1.getQuantity(), memo1.getWorkType(), memo1.getInspection(), memo1.getEtc());
+                    memo = new DailyWindFarmDTO.Memo(memo1.getEngineerName(), memo1.getWorkTime(), memo1.getMaterial(), memo1.getQuantity(), memo1.getWorkType(), memo1.getInspection(), memo1.getEtc());
                 }
                 dataList.add(DailyWindFarmDTO.Response.Data.builder()
                         .time(key)
                         .memo(memo)
                         .availability(availabilities)
+                        .changed(isChanged)
                         .build());
             }
             numerator += avail.getNumerator();
@@ -106,7 +111,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             Collections.sort(dataList);
 
             turbineList.add(DailyWindFarmDTO.Response.Turbine.builder()
-                    .turbineId(i + 1)
+                    .turbineId(i)
                     .availability(avail.getAvail())
                     .data(dataList)
                     .build());
@@ -134,6 +139,76 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 .build();
     }
 
+    @Override
+    public void registerDailyInfo(Principal principal, DailyWindFarmDTO.Request request) throws Exception{
+        List<Memo> memoList = new ArrayList<>();
+
+        for(int i = 0; i < request.getTimestamps().size(); i++){
+            DailyWindFarmDTO.Request.Turbine turbine = request.getTimestamps().get(i);
+            DailyWindFarmDTO.Memo memo = request.getMemo();
+            List<DailyWindFarmDTO.Availability> availabilityList = request.getAvailability();
+
+            memoRepository.save(Memo.builder().memoId(
+                            Memo.MemoId.builder()
+                                    .timestamp(turbine.getTimestamp().plusHours(9))
+                                    .turbineId(turbine.getTurbineId())
+                                    .build())
+                            .engineerName(memo.getEngineerName())
+                            .workTime(memo.getWorkTime())
+                            .material(memo.getMaterial())
+                            .quantity(memo.getQuantity())
+                            .workType(memo.getWorkType())
+                            .inspection(memo.getInspection())
+                            .etc(memo.getEtc())
+                            .isActive(true)
+                            .isDelete(false)
+                            .createdAt(LocalDateTime.now())
+                            .createdBy(principal.getName())
+                            .build());
+
+
+            //find
+            List<AvailabilityData> availabilityDataList = availabilityDataRepository.findByIdWithoutUUID(turbine.getTimestamp().plusHours(9), turbine.getTurbineId());
+            List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByActive(true);
+
+            for(DailyWindFarmDTO.Availability availability : availabilityList){
+
+                Optional<AvailabilityData> optionalAvailabilityData = availabilityDataList.stream()
+                        .filter(data -> data.getAvailabilityType().getName().equalsIgnoreCase(availability.getName()))
+                        .findFirst();
+
+                if(optionalAvailabilityData.isPresent())
+                {
+                    AvailabilityData availabilityData = optionalAvailabilityData.get();
+                    availabilityData.setTime(availability.getTime());
+                    availabilityData.setUpdatedAt(LocalDateTime.now());
+                    availabilityData.setUpdatedBy(principal.getName());
+                }
+                //기존 저장되어 있는 데이터가 없을때
+                else{
+                    Optional<AvailabilityType> optionalAvailabilityType  = availabilityTypeList.stream()
+                            .filter(data -> data.getName().equalsIgnoreCase(availability.getName()))
+                            .findFirst();
+
+                    if(optionalAvailabilityType.isPresent()){
+                        AvailabilityType availabilityType = optionalAvailabilityType.get();
+
+                        availabilityDataList.add(
+                                AvailabilityData.builder()
+                                        .availabilityDataId(new AvailabilityData.AvailabilityDataId(turbine.getTimestamp().plusHours(9), turbine.getTurbineId(), UUID.randomUUID()))
+                                        .availabilityType(availabilityType)
+                                        .time(availability.getTime())
+                                        .createdAt(LocalDateTime.now())
+                                        .build()
+                        );
+                    }
+                }
+            }
+
+            availabilityDataRepository.saveAll(availabilityDataList);
+        }
+    }
+
     private List<Map<LocalDateTime, List<AvailabilityData>>> getDailyMap(LocalDateTime startTime){
         List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, startTime.plusHours(23).plusMinutes(59));
 
@@ -143,7 +218,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         List<Map<LocalDateTime, List<AvailabilityData>>> turbines = new ArrayList<>();
         int turbinesNumber = windFarmProperties.getTurbinesNumber();
 
-        Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE);
+        Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE);
         for(int turbineId = 0; turbineId < turbinesNumber; turbineId++)
         {
             Map<LocalDateTime, List<AvailabilityData>> data = new HashMap<>();
@@ -167,7 +242,6 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                     }
                 }
             }else {
-                List<AvailabilityData> availabilityDataList1 = new ArrayList<>();
                 LocalDateTime clonedDateTime = LocalDateTime.of(startTime.getYear(),
                         startTime.getMonth(),
                         startTime.getDayOfMonth(),
@@ -183,13 +257,15 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                     endTime = LocalDateTime.now();
 
                 while(clonedDateTime.isBefore(endTime)){
+                    List<AvailabilityData> availabilityDataList1 = new ArrayList<>();
+
                     availabilityDataList1.add(
                             AvailabilityData.builder()
                                     .availabilityDataId(new AvailabilityData.AvailabilityDataId(startTime, turbineId, null))
                                     .time(3600)
                                     .availabilityType(informationUnavailableType.orElse(
                                             AvailabilityType.builder()
-                                                    .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
+                                                    .name(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE)
                                                     .description("")
                                                     .color("#C4D8F0")
                                                     .build()
@@ -235,7 +311,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 .availabilityDataId(new AvailabilityData.AvailabilityDataId(timestamp, turbineId, null))
                 .time(3600)
                 .availabilityType(AvailabilityType.builder()
-                        .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
+                        .name(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE)
                         .description("")
                         .color("#C4D8F0")
                         .build())
@@ -361,7 +437,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             {
 
             }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
+            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE))
             {
             }
             else

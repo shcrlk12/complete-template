@@ -34,14 +34,16 @@ SET @information_uuid = UUID();
 SET @requested_uuid = UUID();
 SET @low_uuid = UUID();
 SET @etc_uuid = UUID();
+SET @export_power = UUID();
 
-INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@normal_uuid, 'normal status', '#339D33', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@forced_uuid, 'forced outage', '#D93333', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@scheduled_uuid, 'scheduled maintenance', '#D9D633', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@information_uuid, 'information unavailable', '#C4D8F0', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@requested_uuid, 'requested shutdown', '#33A1DE', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, color,created_at) VALUES (@low_uuid, 'low temperature', '#33A1AA', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, color, created_at) VALUES (@etc_uuid, 'etc', '#D97733', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@normal_uuid, 'normal status', 1, '#339D33', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@forced_uuid, 'forced outage', 1, '#D93333', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@scheduled_uuid, 'scheduled maintenance', 1, '#D9D633', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@information_uuid, 'information unavailable', 1, '#C4D8F0', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@requested_uuid, 'requested shutdown', 1, '#33A1DE', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, color,created_at) VALUES (@low_uuid, 'low temperature', 1, '#33A1AA', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@etc_uuid, 'etc', 1, '#D97733', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, created_at) VALUES (@export_power, 'export power', 2, CURRENT_TIMESTAMP());
 
 -- AvailabilityData Table
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 0, '0a5dc96f-70a3-49cd-87f5-1beac1119b8d', 140, @requested_uuid, CURRENT_TIMESTAMP());

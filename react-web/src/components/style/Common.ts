@@ -18,3 +18,9 @@ export const flexSpaceBetween: FlattenInterpolation<any> = css`
   justify-content: space-between;
   align-items: center;
 `;
+
+export const flexRowReverse: FlattenInterpolation<any> = css`
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+`;

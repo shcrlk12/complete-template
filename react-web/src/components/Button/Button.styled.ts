@@ -17,11 +17,10 @@ const StyledButton = styled.button<{
   height: 40px;
   width: ${(props) => props.width};
   color: ${(props) =>
-    props.isPrimary || props.isDangerous
-      ? props.theme.colors.textOnPrimary
-      : props.theme.colors.black};
+    props.isPrimary || props.isDangerous ? props.theme.colors.textOnPrimary : props.theme.colors.black};
   font-size: 14px;
   padding: 5px 20px;
+  box-shadow: 1px 1px 5px ${({ theme }) => theme.colors.secondary};
 
   cursor: pointer;
   font-weight: ${(props) => props.fontWeight};

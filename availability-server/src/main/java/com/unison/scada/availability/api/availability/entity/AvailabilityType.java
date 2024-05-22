@@ -29,9 +29,13 @@ public class AvailabilityType {
     @Column(nullable = true)
     private String description;
 
-    @Column(nullable = false, length = 7)
+    @Column(nullable = true, length = 7)
     private String color;
 
+    //1: availability variable
+    //2: normal variable
+    @Column(nullable = false)
+    private int variableType;
 
     @Column(nullable = false)
     @ColumnDefault("true")

@@ -9,13 +9,22 @@ type MemoInputItemProps = {
   isInput?: boolean;
   isTextarea?: boolean;
   text?: string;
+  onChange?: any;
 };
-const MemoInputItem = ({ id, title, height, isInput = false, isTextarea = false, text }: MemoInputItemProps) => {
+const MemoInputItem = ({
+  id,
+  title,
+  height,
+  isInput = false,
+  isTextarea = false,
+  text,
+  onChange,
+}: MemoInputItemProps) => {
   return (
     <MemoItem>
       <MemoItemLabel htmlFor={id}>{title}</MemoItemLabel>
-      {isInput && <Input id={id} height={height} text={text} />}
-      {isTextarea && <TextArea id={id} height={height} text={text} />}
+      {isInput && <Input id={id} height={height} text={text} onChange={onChange} />}
+      {isTextarea && <TextArea id={id} height={height} text={text} onChange={onChange} />}
     </MemoItem>
   );
 };

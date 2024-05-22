@@ -9,9 +9,19 @@ type TextAreaProps = {
   height?: string;
   resize?: "vertical" | "horizontal" | "both" | "none";
   text?: string;
+  onChange?: any;
 };
 
-const TextArea = ({ id, cols = 50, rows = 1, borderWidth = 2, height, resize = "vertical", text }: TextAreaProps) => {
+const TextArea = ({
+  id,
+  cols = 50,
+  rows = 1,
+  borderWidth = 2,
+  height,
+  resize = "vertical",
+  text,
+  onChange,
+}: TextAreaProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   return (
@@ -27,7 +37,8 @@ const TextArea = ({ id, cols = 50, rows = 1, borderWidth = 2, height, resize = "
       borderWidth={borderWidth}
       cols={cols}
       rows={rows}
-      value={text}></StyledTextArea>
+      value={text}
+      onChange={onChange}></StyledTextArea>
   );
 };
 

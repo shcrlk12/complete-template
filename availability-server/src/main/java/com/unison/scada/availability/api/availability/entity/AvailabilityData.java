@@ -20,6 +20,7 @@ public class AvailabilityData {
     @EmbeddedId
     private AvailabilityDataId availabilityDataId;
 
+    @Setter
     @Column(nullable = false)
     private int time;
 
@@ -30,12 +31,13 @@ public class AvailabilityData {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-
     @UpdateTimestamp
     @Column(nullable = true)
+    @Setter
     private LocalDateTime updatedAt;
 
     @Column(nullable = true)
+    @Setter
     private String updatedBy;
 
     @Data

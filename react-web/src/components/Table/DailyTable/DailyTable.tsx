@@ -1,4 +1,8 @@
-import AvailStatusItem from "@components/Table/DailyTable/AvailStatusItem";
+import AvailStatusItem, {
+  MINUS_BUTTON,
+  PLUS_BUTTON,
+  STATUS_CLASS_NAME,
+} from "@components/Table/DailyTable/AvailStatusItem";
 import TableCell from "../TableCell";
 import Table from "../Table";
 import TableHeader from "../TableHeader";
@@ -10,7 +14,7 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 import {
   AvailStatusListContainer,
@@ -25,7 +29,7 @@ import {
 } from "./DailyTable.styled";
 import MemoInputItem from "./MemoInputItem";
 import { Availability, DailyTableData, MemoType } from "@pages/Availability/AvailabilityManagementDaily";
-import { MouseEvent, useEffect, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import useInits from "@src/hooks/useInits";
 import { Paths } from "@src/Config";
@@ -33,6 +37,9 @@ import { JSX } from "react/jsx-runtime";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/index";
+import { flexCenter, flexRowReverse } from "@components/style/Common";
+import theme from "@components/style/Theme";
+import { fetchData, statusOk } from "@src/util/fetch";
 
 type ColorType = {
   name: string;
@@ -77,34 +84,83 @@ const StyledTimePicker = styled(TimePicker)`
 `;
 
 type SelectedCellType = {
+  event: any;
   row: number;
   column: number;
 };
+
+const TotalTimeContainer = styled.div`
+  ${flexRowReverse}
+  padding: 5px 20px;
+
+  & div:first-child {
+    margin-right: 10px;
+    width: 40px;
+    height: 100%;
+    font-size: ${({ theme }) => theme.fontSize.subTitle};
+    color: ${({ theme }) => theme.colors.black};
+    ${flexCenter}
+  }
+  & div:last-child {
+  }
+`;
 
 const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
   const { year, month, day } = useParams();
   const { dispatch, navigate } = useInits();
   const [map, setMap] = useState<Map<string, MapTypes>>(new Map());
   const [memo, setMemo] = useState<MemoType>(initMemo());
-  const [seleectedCell, setSeleectedCell] = useState<any[]>([]);
+  const [seleectedCell, setSeleectedCell] = useState<SelectedCellType[]>([]);
+  const [tableData, setTableData] = useState(dailyTableData);
 
   const { startOfWarrantyDate } = useSelector((store: RootState) => store.appReducer);
 
   useEffect(() => {
-    console.log(getStatusColor(dailyTableData.turbines[0].data[0].availability));
-    let map1 = new Map<string, MapTypes>();
+    console.log(getStatusColor(tableData.turbines[0].data[0].availability));
+    initAvailabilityMap();
+    setTableData(dailyTableData);
+  }, [dailyTableData]);
 
-    dailyTableData.statusList.forEach((item) => {
-      map1.set(item.name, { time: 0, color: item.color });
-    });
-    setMap(map1);
-  }, []);
+  const getTotalTime = (map: Map<string, MapTypes>): number => {
+    let result = 0;
+    for (let value of map.values()) {
+      result += value.time;
+    }
+    return result;
+  };
 
   const getItems = (map: Map<string, MapTypes>) => {
     const newArr: JSX.Element[] = [];
 
     map.forEach((value, key) => {
-      newArr.push(<AvailStatusItem status={key} color={value.color} time={value.time} />);
+      newArr.push(
+        <AvailStatusItem
+          status={key}
+          color={value.color}
+          time={value.time}
+          onClick={(event: MouseEvent<HTMLDivElement>) => {
+            let statusName = event.currentTarget.querySelector("." + STATUS_CLASS_NAME)?.innerHTML;
+
+            const target = event.target as HTMLInputElement;
+            let buttonType = target.innerHTML;
+
+            if (statusName === undefined) return;
+            let newMap = cloneMap(map);
+            let mapTypes = newMap.get(statusName);
+
+            if (mapTypes === undefined) return;
+
+            if (buttonType === PLUS_BUTTON) {
+              let totalTime = getTotalTime(map);
+              mapTypes.time = totalTime + 5 > 60 ? 60 - totalTime + mapTypes.time : mapTypes.time + 5;
+            } else if (buttonType === MINUS_BUTTON) {
+              mapTypes.time = mapTypes.time - 5 < 0 ? 0 : mapTypes.time - 5;
+            }
+
+            setMap(newMap);
+          }}
+        />,
+      );
     });
 
     return newArr;
@@ -139,40 +195,43 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
 
   const addHeaderList = () => {
     const newArr = [];
-    for (let i = 0; i < dailyTableData.turbinesNumber; i++) {
+    for (let i = 0; i < tableData.turbinesNumber; i++) {
       newArr.push(
         <TableCell key={i}>
           <div>WTG{String(i + 1).padStart(2, "0")}</div>
-          <div>({dailyTableData.turbines[i]?.availability.toFixed(1)} %)</div>
+          <div>({tableData.turbines[i]?.availability.toFixed(1)} %)</div>
         </TableCell>,
       );
     }
     return newArr;
   };
-  var rowIndexArray = new Array(dailyTableData.turbinesNumber).fill(0);
+  var rowIndexArray = new Array(tableData.turbinesNumber).fill(0);
 
   const addStatus = (rowIndex: number) => {
     const newArr = [];
-    for (let i = 0; i < dailyTableData.turbinesNumber; i++) {
-      let turbineTime = new Date(dailyTableData.turbines[i].data[rowIndexArray[i]].time);
+    for (let i = 0; i < tableData.turbinesNumber; i++) {
+      let turbineTime = new Date(tableData.turbines[i].data[rowIndexArray[i]].time);
 
-      let baseTime = new Date(dailyTableData.date); // 사용 안함
+      let baseTime = new Date(tableData.date); // 사용 안함
       let columnTime = new Date(baseTime);
       columnTime.setHours(baseTime.getHours() + rowIndex);
+
+      let className = tableData?.turbines[i]?.data[rowIndexArray[i]]?.changed ? "is-memo" : "";
 
       if (turbineTime.getTime() === columnTime.getTime()) {
         newArr.push(
           <TableCell key={i}>
             <DailyStatus
               id={`cell_${i}_${rowIndex}`}
-              color={getStatusColor(dailyTableData?.turbines[i]?.data[rowIndexArray[i]]?.availability)}></DailyStatus>
+              color={getStatusColor(tableData?.turbines[i]?.data[rowIndexArray[i]]?.availability)}
+              className={className}></DailyStatus>
           </TableCell>,
         );
         rowIndexArray[i]++;
       } else {
         newArr.push(
           <TableCell key={i}>
-            <DailyStatus id={`cell_${i}_${rowIndex}`} color="#000"></DailyStatus>
+            <DailyStatus id={`cell_${i}_${rowIndex}`} color="#000" className={className}></DailyStatus>
           </TableCell>,
         );
       }
@@ -182,7 +241,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
   const addBody = () => {
     const newArr = [];
     let now = new Date(Date.now());
-    let date = new Date(dailyTableData.date);
+    let date = new Date(tableData.date);
     let index = 0;
     let endTime;
 
@@ -195,7 +254,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     while (startDate < endDate) {
       newArr.push(
         <StyledBodyRow key={index}>
-          <TableCell>{`${index}:00`}</TableCell>
+          <TableCell className="no-dragable" id={`cell_-1_${index}`}>{`${index}:00`}</TableCell>
           {addStatus(index)}
         </StyledBodyRow>,
       );
@@ -206,27 +265,39 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     return newArr;
   };
 
+  const initAvailabilityMap = () => {
+    let newMap = new Map<string, MapTypes>();
+
+    tableData.statusList.forEach((item) => {
+      newMap.set(item.name, { time: 0, color: item.color });
+    });
+    setMap(newMap);
+  };
+
+  const cloneMap = (map: any) => {
+    let newMap = new Map<string, MapTypes>();
+
+    for (var key of map.keys()) {
+      let value: MapTypes = map.get(key) as MapTypes;
+
+      newMap.set(key, {
+        ...value,
+      });
+    }
+
+    return newMap;
+  };
   // Click Cell
   const clickTableStatus = (event: MouseEvent<HTMLElement>) => {
-    let cellId = (event.target as any).id;
-    let split = cellId.split("_");
+    let { turbineId, time } = parseRowColumn(event);
 
-    let turbineId = split[1];
-    let row = split[2];
+    console.log(turbineId);
 
-    if (turbineId !== undefined && row !== undefined) {
-      let newMap = new Map<string, MapTypes>();
+    // click cell
+    if (turbineId !== undefined && turbineId != -1 && time !== undefined) {
+      let newMap = cloneMap(map);
 
-      for (var key of map.keys()) {
-        let value: MapTypes = map.get(key) as MapTypes;
-
-        newMap.set(key, {
-          ...value,
-          time: 0,
-        });
-      }
-
-      let avail = dailyTableData.turbines[turbineId].data[row].availability;
+      let avail = tableData.turbines[turbineId].data[time].availability;
 
       avail.forEach((item) => {
         let value = map.get(item.name);
@@ -241,7 +312,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
       setMap(newMap);
 
       //set Memo
-      let memo = dailyTableData.turbines[turbineId].data[row].memo;
+      let memo = tableData.turbines[turbineId].data[time].memo;
 
       if (memo) {
         console.log(memo);
@@ -260,18 +331,191 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
       }
 
       //Set selected cell
-      (event.target as any).className += " selected-cell";
+      let newArr: SelectedCellType[] = [...seleectedCell];
+      if (event.ctrlKey) {
+        if (event !== null) {
+          if (!(event.target as any).className.includes("selected-cell")) {
+            (event.target as any).className += " selected-cell";
+            newArr.push({ event: event.target, row: time, column: turbineId });
+          }
+        }
+      } else if (event.shiftKey) {
+        let lastRow = seleectedCell[seleectedCell.length - 1].row;
+        if (Number(lastRow) < Number(time)) {
+          for (let j = ++lastRow; j <= time; j++) {
+            let event2 = event.currentTarget.querySelector(`#cell_${turbineId}_${j}`);
 
-      seleectedCell.forEach((target) => {
-        target.className = (target.className as string).replace("selected-cell", " ");
-      });
+            if (event2 !== null) {
+              if (!event2.className.includes("selected-cell")) {
+                event2.className += " selected-cell";
+                newArr.push({ event: event2, row: j, column: turbineId });
+              }
+            }
+          }
+        } else if (Number(lastRow) > Number(time)) {
+          console.log("왱나돼");
 
-      let newArr = [];
-      newArr.push(event.target);
+          for (let j = --lastRow; j >= time; j--) {
+            console.log(j);
+
+            let event2 = event.currentTarget.querySelector(`#cell_${turbineId}_${j}`);
+
+            if (event2 !== null) {
+              if (!event2.className.includes("selected-cell")) {
+                event2.className += " selected-cell";
+                newArr.push({ event: event2, row: j, column: turbineId });
+              }
+            }
+          }
+        }
+      } else {
+        removeAllSelectedCell(seleectedCell);
+        newArr = [];
+        if (event !== null) {
+          if (!(event.target as any).className.includes("selected-cell")) {
+            (event.target as any).className += " selected-cell";
+            newArr.push({ event: event.target, row: time, column: turbineId });
+          }
+        }
+      }
       setSeleectedCell(newArr);
+      console.log(newArr);
+    }
+    // click row header
+    else if (turbineId == -1 && time !== undefined) {
+      let newArr: SelectedCellType[] = [...seleectedCell];
+
+      // ctrl click logic
+      if (event.ctrlKey) {
+        console.log("ctrl");
+
+        for (let i = 0; i < tableData.turbinesNumber; i++) {
+          let event2 = event.currentTarget.querySelector(`#cell_${i}_${time}`);
+
+          if (event2 !== null) {
+            if (!event2.className.includes("selected-cell")) {
+              event2.className += " selected-cell";
+              newArr.push({ event: event2, row: time, column: i });
+            }
+          }
+        }
+        setSeleectedCell(newArr);
+      }
+
+      // shift click logic
+      else if (event.shiftKey) {
+        let lastRow = seleectedCell[seleectedCell.length - 1].row;
+        console.log(lastRow);
+        console.log(time);
+
+        if (Number(lastRow) < Number(time)) {
+          console.log("뭐야");
+
+          for (let j = ++lastRow; j <= time; j++) {
+            for (let i = 0; i < tableData.turbinesNumber; i++) {
+              let event2 = event.currentTarget.querySelector(`#cell_${i}_${j}`);
+
+              if (event2 !== null) {
+                if (!event2.className.includes("selected-cell")) {
+                  event2.className += " selected-cell";
+                  newArr.push({ event: event2, row: j, column: i });
+                }
+              }
+            }
+          }
+        } else if (Number(lastRow) > Number(time)) {
+          console.log("왱나돼");
+
+          for (let j = --lastRow; j >= time; j--) {
+            for (let i = 0; i < tableData.turbinesNumber; i++) {
+              console.log(j);
+
+              let event2 = event.currentTarget.querySelector(`#cell_${i}_${j}`);
+
+              if (event2 !== null) {
+                if (!event2.className.includes("selected-cell")) {
+                  event2.className += " selected-cell";
+                  newArr.push({ event: event2, row: j, column: i });
+                }
+              }
+            }
+          }
+        }
+        setSeleectedCell(newArr);
+      }
+      // normal click logic
+      else {
+        removeAllSelectedCell(seleectedCell);
+        newArr = [];
+
+        for (let i = 0; i < tableData.turbinesNumber; i++) {
+          let event2 = event.currentTarget.querySelector(`#cell_${i}_${time}`);
+
+          if (event2 !== null) {
+            event2.className += " selected-cell";
+          }
+
+          newArr.push({ event: event2, row: time, column: i });
+        }
+        setSeleectedCell(newArr);
+      }
+      console.log(newArr);
     }
   };
 
+  const removeAllSelectedCell = (cellList: SelectedCellType[]) => {
+    cellList.forEach((cell) => {
+      cell.event.className = (cell.event.className as string).replace("selected-cell", " ");
+    });
+  };
+
+  const addSelectedCell = (event: MouseEvent<HTMLElement>) => {
+    (event.target as any).className += " selected-cell";
+  };
+
+  const parseRowColumn = (event: MouseEvent<HTMLElement>) => {
+    let cellId = (event.target as any).id;
+    let split = cellId.split("_");
+
+    return { turbineId: split[1] as number, time: split[2] as number };
+  };
+
+  const changeInput = (event: ChangeEvent<HTMLInputElement>, variableName: string) => {
+    let value = event.target.value;
+    const newMemo = {
+      ...memo,
+      [variableName]: value,
+    };
+
+    setMemo(newMemo);
+  };
+
+  const makeAvailabilityObject = (map: Map<string, MapTypes>) => {
+    let availability: Availability[] = [];
+
+    map.forEach((value, key) => {
+      availability.push({ time: value.time * 60, name: key });
+    });
+
+    return availability;
+  };
+
+  const getTimestamps = (seleectedCell: SelectedCellType[]) => {
+    let result: any[] = [];
+
+    seleectedCell.forEach((value) => {
+      let timestamp = new Date(tableData.date);
+
+      timestamp.setHours(value.row); // GMT + 9 시간 적용
+
+      result.push({
+        turbineId: value.column,
+        timestamp: timestamp,
+      });
+    });
+
+    return result;
+  };
   return (
     <>
       <Table>
@@ -291,7 +535,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           <TableRightInfo>
             <WindFarmAvailContainer>
               <span>단지 가동률 </span>
-              <strong>{dailyTableData.availability?.toFixed(1)}</strong>
+              <strong>{tableData.availability?.toFixed(1)}</strong>
               <span> %</span>
             </WindFarmAvailContainer>
             <MemoItemsContainer>
@@ -301,6 +545,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
                 isInput={true}
                 height="25px"
                 text={memo.engineerName}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => changeInput(event, "engineerName")}
               />
               <div>시간</div>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -316,23 +561,105 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
                   />
                 </DemoContainer>
               </LocalizationProvider>
-              <MemoInputItem id="memo-input-material" title="자재" isInput={true} height="25px" text={memo.material} />
-              <MemoInputItem id="memo-input-quantity" title="수량" isInput={true} height="25px" text={memo.quantity} />
-              <MemoInputItem id="memo-input-type" title="작업 유형" isTextarea={true} text={memo.workType} />
-              <MemoInputItem id="memo-input-history" title="점검 내역" isTextarea={true} text={memo.inspection} />
-              <MemoInputItem id="memo-input-etc" title="기타(비고)" isTextarea={true} text={memo.etc} />
+              <MemoInputItem
+                id="memo-input-material"
+                title="자재"
+                isInput={true}
+                height="25px"
+                text={memo.material}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => changeInput(event, "material")}
+              />
+              <MemoInputItem
+                id="memo-input-quantity"
+                title="수량"
+                isInput={true}
+                height="25px"
+                text={memo.quantity}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => changeInput(event, "quantity")}
+              />
+              <MemoInputItem
+                id="memo-input-type"
+                title="작업 유형"
+                isTextarea={true}
+                text={memo.workType}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => changeInput(event, "workType")}
+              />
+              <MemoInputItem
+                id="memo-input-history"
+                title="점검 내역"
+                isTextarea={true}
+                text={memo.inspection}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => changeInput(event, "inspection")}
+              />
+              <MemoInputItem
+                id="memo-input-etc"
+                title="기타(비고)"
+                isTextarea={true}
+                text={memo.etc}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => changeInput(event, "etc")}
+              />
             </MemoItemsContainer>
-            <AvailStatusListContainer>{getItems(map)}</AvailStatusListContainer>
+            <AvailStatusListContainer>
+              {getItems(map)}
+              <TotalTimeContainer>
+                <div>{getTotalTime(map)}</div>
+                <div>합계 </div>
+              </TotalTimeContainer>
+            </AvailStatusListContainer>
             <ButtonContainer>
-              <StyledButton text="저장" />
-              <StyledButton text="취소" />
+              <StyledButton
+                text="저장"
+                onClick={() => {
+                  console.log(seleectedCell);
+
+                  fetchData(dispatch, navigate, async () => {
+                    const response = await fetch(`http://www.localhost:6789/api/wind-farm/daily/register`, {
+                      mode: "cors",
+                      method: "POST",
+                      credentials: "include",
+                      headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        timestamps: getTimestamps(seleectedCell),
+                        memo: memo,
+                        availability: makeAvailabilityObject(map),
+                      }),
+                    });
+
+                    await statusOk(response);
+
+                    const json = await response.json();
+                    const data = json.data;
+
+                    console.log(data);
+                  });
+
+                  let newTableData = { ...tableData };
+
+                  seleectedCell.forEach((data) => {
+                    newTableData.turbines[data.column].data[data.row].changed = true;
+                    newTableData.turbines[data.column].data[data.row].memo = memo;
+                    newTableData.turbines[data.column].data[data.row].availability = makeAvailabilityObject(map);
+                  });
+
+                  setTableData(newTableData);
+                }}
+              />
+              <StyledButton
+                text="시간 초기화"
+                onClick={() => {
+                  initAvailabilityMap();
+                }}
+              />
             </ButtonContainer>
           </TableRightInfo>
         </TableContentInner>
       </Table>
       <TablePagination
         leftButtonClick={() => {
-          let date = new Date(dailyTableData.date);
+          let date = new Date(tableData.date);
           date.setDate(date.getDate() - 1);
 
           if (startOfWarrantyDate.getTime() <= date.getTime()) {
@@ -340,7 +667,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           }
         }}
         rightButtonClick={() => {
-          let date = new Date(dailyTableData.date);
+          let date = new Date(tableData.date);
           date.setDate(date.getDate() + 1);
 
           if (date.getTime() < new Date(Date.now()).getTime()) {

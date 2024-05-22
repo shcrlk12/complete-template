@@ -20,10 +20,10 @@ public class Memo {
     @EmbeddedId
     private MemoId memoId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String engineerName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime workTime;
 
     @Column(nullable = true)
@@ -65,6 +65,9 @@ public class Memo {
 
     @Data
     @Embeddable
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MemoId implements Serializable{
 
         @Column

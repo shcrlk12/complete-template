@@ -15,4 +15,12 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
             "WHERE " +
             "ad.availabilityDataId.timestamp BETWEEN :startTime AND :endTime")
     List<AvailabilityData> findAllDataByTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+
+    @Query("SELECT ad " +
+            "FROM AvailabilityData ad " +
+            "LEFT JOIN ad.availabilityType at " +
+            "WHERE " +
+            "ad.availabilityDataId.timestamp = :timestamp " +
+            "AND ad.availabilityDataId.turbineId = :turbineId")
+    List<AvailabilityData> findByIdWithoutUUID(@Param("timestamp") LocalDateTime timestamp, @Param("turbineId") int turbineId);
 }

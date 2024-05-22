@@ -30,6 +30,7 @@ type DetailData = {
   availability: Availability[];
   memo: MemoType;
   time: string;
+  changed: boolean;
 };
 
 type DailyTurbineData = {
@@ -64,20 +65,7 @@ const AvailabilityManagementDaily = () => {
       const data = await response.json();
       const json: DailyTableData = data.data;
 
-      //exception
-      // if (json.availability == null) {
-      //   json.availability = 0;
-      // }
-      // if(json.turbines == null){
-      //   json.turbines = [];
-      //   for(let i =0; i < json.turbinesNumber; i++){
-      //     json.turbines.push({
-      //       turbineId: i+1,
-
-      //     })
-
-      //   }
-      // }
+      console.log(json);
 
       setDailyTableData(json);
     });
