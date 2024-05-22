@@ -10,7 +10,7 @@ const MainSection = styled.div`
   flex-direction: column;
 `;
 const TableMetaContainer = styled.div`
-  padding: 0 40px;
+  padding: 0 20px;
   margin-top: 10px;
   flex: 0 0 44px;
   max-height: 44px;

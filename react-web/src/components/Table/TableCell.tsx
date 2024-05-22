@@ -23,15 +23,17 @@ const StyledTableCell = styled.div`
 `;
 
 type TableCellProps = {
+  id?: string;
   className?: string;
   children: ReactNode;
   onClick?: any;
 };
 
-const TableCell = ({ className, children, onClick }: TableCellProps) => {
+const TableCell = ({ id, className, children, onClick }: TableCellProps) => {
   return (
     <StyledTableCell
       onClick={onClick}
+      id={id}
       className={className === undefined ? tableClassesName.cell : `${className}  ${tableClassesName.cell}`}>
       {children}
     </StyledTableCell>

@@ -77,17 +77,24 @@ body {
 	animation-iteration-count: infinite;
 	animation-duration: 150ms;
   	animation-name: selected;
-	opacity: 0.7;
+	opacity: 0.5;
+}
+
+.no-dragable{
+	user-select: none;
+}
+.is-memo{
+	box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.black} inset;
 }
 
 @keyframes selected {
   0% {
-	outline: ${({ theme }) => theme.colors.black} dashed 1px;
+	outline: ${({ theme }) => theme.colors.black} dashed 2px;
 
   }
 
   100% {
-	outline: ${({ theme }) => theme.colors.black} dotted 1px;
+	outline: ${({ theme }) => theme.colors.black} dotted 2px;
   }
 }
 `;

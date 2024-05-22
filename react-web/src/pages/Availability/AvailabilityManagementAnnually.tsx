@@ -27,8 +27,11 @@ type AnnuallyTurbineData = {
 
 export type AnnuallyTableData = {
   turbinesNumber: number;
+  availability: number;
+  capacityFactor: number;
+  windSpeed: number;
   yearsOfWarranty: number;
-  startTimeOfYears: string;
+  startTimeOfYears: Date;
   date: string;
   turbines: AnnuallyTurbineData[];
 };
@@ -63,26 +66,43 @@ const AvailabilityManagementAnnually = () => {
     });
   }, [year]);
 
+  const getPeriod = (date: Date): string => {
+    let startDate = new Date(date);
+    let endDate = new Date(startDate); //1년후 시간.
+
+    endDate.setFullYear(endDate.getFullYear() + 1);
+    endDate.setDate(endDate.getDate() - 1);
+    if (endDate.getTime() > Date.now()) {
+      endDate = new Date(Date.now());
+    }
+    return `${startDate.getFullYear()}.${startDate.getMonth() + 1}.${startDate.getDate()} - ${endDate.getFullYear()}.${endDate.getMonth() + 1}.${endDate.getDate()}`;
+  };
   return (
     <MainSection>
       <TableMetaContainer>
         <WindfarmInfoList>
           <li>
-            <strong>20XX년 가동률</strong>
+            <strong>기간</strong>
+            <div>
+              <strong> {annuallyTableData && getPeriod(annuallyTableData.startTimeOfYears)}</strong>
+            </div>
+          </li>
+          <li>
+            <strong>가동률</strong>
             <div>
               <strong>99.8</strong> %
             </div>
           </li>
           <li>
-            <strong>Wind speed</strong>
+            <strong>이용률</strong>
             <div>
-              <strong>15.8</strong> m/s
+              <strong>30</strong> %
             </div>
           </li>
           <li>
-            <strong>Active power</strong>
+            <strong>풍속</strong>
             <div>
-              <strong>84,120.25</strong> kw
+              <strong>15.6</strong> m/s
             </div>
           </li>
         </WindfarmInfoList>

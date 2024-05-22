@@ -28,9 +28,6 @@ const UserManagement = () => {
               }}
             />
           </HeaderContainer>
-          <UserSearchContainer>
-            <SearchInput height={40} text="Search users" />
-          </UserSearchContainer>
           <UserManagementTable />
         </CommonInner>
       </CommonContainer>
