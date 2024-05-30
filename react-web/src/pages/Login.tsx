@@ -56,7 +56,7 @@ const Login = () => {
     let formData = new FormData(event.currentTarget);
 
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://www.localhost:6789/api/login", {
+      const response = await fetch("http://182.208.91.171:6789/api/login", {
         mode: "cors",
         method: "POST",
         credentials: "include",
@@ -92,7 +92,6 @@ const Login = () => {
               <InputLabel>password</InputLabel>
               <Input type="password" name="password " placeholder="password" />
             </InputContainer>
-            <RadioButton />
             <LoginButtonContainer>
               <Button type="submit" isPrimary={true} text="Log in" width="100%" />
             </LoginButtonContainer>

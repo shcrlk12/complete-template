@@ -66,7 +66,7 @@ const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
 
   const logoutBtnClick = () => {
     fetchData(dispatch, navigate, async () => {
-      await fetch("http://www.localhost:6789/logout", {
+      await fetch("http://182.208.91.171:6789/logout", {
         mode: "cors",
         method: "POST",
         credentials: "include",
@@ -88,7 +88,9 @@ const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
             src={logo}
             alt="unison logo"
             onClick={() => {
-              navigate(Paths.availability.annually.path);
+              let date = new Date(Date.now());
+
+              navigate(Paths.availability.annually.path + `/${date.getFullYear()}`);
             }}
           />
           <PageTitle>{pageTitle}</PageTitle>

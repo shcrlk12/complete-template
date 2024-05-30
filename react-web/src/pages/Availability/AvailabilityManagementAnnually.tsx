@@ -29,11 +29,21 @@ export type AnnuallyTableData = {
   turbinesNumber: number;
   availability: number;
   capacityFactor: number;
-  windSpeed: number;
   yearsOfWarranty: number;
   startTimeOfYears: Date;
   date: string;
   turbines: AnnuallyTurbineData[];
+};
+
+type RealTimeDataType = {
+  base: number;
+  name: string;
+  value: number;
+};
+
+type RealTimeType = {
+  timestamp: Date;
+  dataList: RealTimeDataType[];
 };
 
 const AvailabilityManagementAnnually = () => {
@@ -41,10 +51,11 @@ const AvailabilityManagementAnnually = () => {
   const { year } = useParams();
 
   const [annuallyTableData, setAnnuallyTableData] = useState<AnnuallyTableData>();
+  const [realTime, setRealTime] = useState<RealTimeType>();
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch(`http://www.localhost:6789/api/wind-farm/annually/${year}`, {
+      const response = await fetch(`http://182.208.91.171:6789/api/wind-farm/annually/${year}`, {
         mode: "cors",
         method: "GET",
         credentials: "include",
@@ -64,6 +75,23 @@ const AvailabilityManagementAnnually = () => {
 
       setAnnuallyTableData(data);
     });
+
+    const fetchRealTimeData = async () => {
+      const response = await fetch(`http://182.208.91.171:6789/api/wind-farm/realtime`, {
+        mode: "cors",
+        method: "GET",
+        credentials: "include",
+      });
+
+      const json = await response.json();
+      const data = json.data;
+
+      setRealTime(data);
+    };
+    fetchRealTimeData();
+
+    const intervalId = setInterval(fetchRealTimeData, 2000);
+    return () => clearInterval(intervalId);
   }, [year]);
 
   const getPeriod = (date: Date): string => {
@@ -77,6 +105,15 @@ const AvailabilityManagementAnnually = () => {
     }
     return `${startDate.getFullYear()}.${startDate.getMonth() + 1}.${startDate.getDate()} - ${endDate.getFullYear()}.${endDate.getMonth() + 1}.${endDate.getDate()}`;
   };
+
+  const getWindSpeed = () => {
+    if (realTime !== undefined) {
+      for (const data of realTime.dataList) {
+        if (data.name === "U88_WNAC_sviWindSpeed1s") return (data.value / data.base).toFixed(1);
+      }
+    }
+  };
+
   return (
     <MainSection>
       <TableMetaContainer>
@@ -90,19 +127,19 @@ const AvailabilityManagementAnnually = () => {
           <li>
             <strong>가동률</strong>
             <div>
-              <strong>99.8</strong> %
+              <strong>{annuallyTableData?.availability.toFixed(2)}</strong> %
             </div>
           </li>
           <li>
             <strong>이용률</strong>
             <div>
-              <strong>30</strong> %
+              <strong>{annuallyTableData?.capacityFactor.toFixed(2)}</strong> %
             </div>
           </li>
           <li>
             <strong>풍속</strong>
             <div>
-              <strong>15.6</strong> m/s
+              <strong>{realTime && getWindSpeed()}</strong> m/s
             </div>
           </li>
         </WindfarmInfoList>

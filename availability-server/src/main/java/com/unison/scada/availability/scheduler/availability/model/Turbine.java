@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Builder
@@ -16,8 +17,7 @@ public class Turbine {
 
     int turbineId;
     AvailabilityStatus availabilityStatus;
-    double activePower;
-    double windSpeed;
+    Map<String, Double> dataMap;
 
     public Turbine(int turbineId){
         this.turbineId = turbineId;

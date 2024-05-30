@@ -7,9 +7,10 @@ import java.util.List;
 
 @Getter
 public enum OPCVariable {
-    WIND_SPEED(OPCGroupName.REAL_TIME, "U136_WNAC_WindSpeed1s"),
-    ACTIVE_POWER(OPCGroupName.REAL_TIME, "U136_WGDC_TurW"),
-    AVAILABILITY(OPCGroupName.AVAILABILITY, "U136_WTUR_TurOperationSt");
+
+    WIND_SPEED(OPCGroupName.REAL_TIME, "U88_WNAC_sviWindSpeed1s"),
+    TOTAL_EXPORTED_POWER(OPCGroupName.REAL_TIME, "U88_WTUR_sviTotWh"),
+    AVAILABILITY(OPCGroupName.AVAILABILITY, "U88_WTUR_sviAvlBehaviorSt");
 
     private final String groupName;
     private final String variableName;
@@ -20,6 +21,17 @@ public enum OPCVariable {
 
     }
 
+    public static List<String> getVariableNames(String groupName){
+        List<String> result = new ArrayList<>();
+
+        for(OPCVariable opcVariable : OPCVariable.values()){
+            if(opcVariable.getGroupName().compareTo(groupName) == 0){
+                result.add(opcVariable.getVariableName());
+            }
+        }
+
+        return result;
+    }
     public static List<OPCVariable> getVariablesByName(OPCGroupName opcGroupName) throws OPCException {
         List<OPCVariable> result = new ArrayList<>();
 

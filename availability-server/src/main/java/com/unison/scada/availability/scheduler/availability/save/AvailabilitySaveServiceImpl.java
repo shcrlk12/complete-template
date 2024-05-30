@@ -6,6 +6,7 @@ import com.unison.scada.availability.api.availability.repository.AvailabilityDat
 import com.unison.scada.availability.api.availability.repository.AvailabilityTypeRepository;
 
 import com.unison.scada.availability.scheduler.availability.model.AvailabilityTotalTime;
+import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,35 @@ public class AvailabilitySaveServiceImpl implements AvailabilitySaveService {
 
         availabilityTotalTime.cleanAllTotalTime();
     }
+
+    @Override
+    public void saveTurbineData(List<Turbine> turbineList) {
+        List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByVariableType(2);
+        List<AvailabilityData> availabilityDataList = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+
+        for(Turbine turbine : turbineList){
+
+            Map<String, Double> dataMap = turbine.getDataMap();
+
+            for(AvailabilityType availabilityType: availabilityTypeList)
+            {
+                if(dataMap.containsKey(availabilityType.getName())){
+                    Double value = dataMap.get(availabilityType.getName());
+
+                    availabilityDataList.add(AvailabilityData.builder()
+                            .availabilityDataId(new AvailabilityData.AvailabilityDataId(now, turbine.getTurbineId(), UUID.randomUUID()))
+                            .availabilityType(availabilityType)
+                            .time(value.intValue())
+                            .createdAt(LocalDateTime.now())
+                            .build());
+                }
+            }
+        }
+
+        availabilityDataRepository.saveAll(availabilityDataList);
+    }
+
 
     private AvailabilityType findAvailabilityTypeByName(String name, List<AvailabilityType> availabilityTypes){
         for(AvailabilityType availabilityType : availabilityTypes) {

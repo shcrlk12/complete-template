@@ -81,23 +81,23 @@ public class AvailabilityTotalTime {
     }
 
     public Map<String, Integer> get1HourAvailabilityTimeByTurbineId(int turbineId){
-        Map<String, Integer> result = new HashMap<>();
-
-        Map<String, Integer> availabilityTypeAndTimeMapOfATurbine =
-                availabilityTypeAndTimeMapOfAllTurbine.get(turbineId);
-
-        for(String availabilityType : availabilityTypeAndTimeMapOfATurbine.keySet())
-        {
-            int totalTime = availabilityTypeAndTimeMapOfATurbine.get(availabilityType);
-
-            if(availabilityType.equalsIgnoreCase(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE))
-            {
-                result.put(availabilityType, totalTime + (elapsedTotalTime / availabilityTypeAndTimeMapOfAllTurbine.size()));
-            }
-            else{
-                result.put(availabilityType, totalTime);
-            }
-        }
-        return result;
+//        Map<String, Integer> result = new HashMap<>();
+//
+//        Map<String, Integer> availabilityTypeAndTimeMapOfATurbine =
+//                availabilityTypeAndTimeMapOfAllTurbine.get(turbineId);
+//
+//        for(String availabilityType : availabilityTypeAndTimeMapOfATurbine.keySet())
+//        {
+//            int totalTime = availabilityTypeAndTimeMapOfATurbine.get(availabilityType);
+//
+//            if(availabilityType.equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
+//            {
+//                result.put(availabilityType, totalTime + (elapsedTotalTime / availabilityTypeAndTimeMapOfAllTurbine.size()));
+//            }
+//            else{
+//                result.put(availabilityType, totalTime);
+//            }
+//        }
+        return availabilityTypeAndTimeMapOfAllTurbine.get(turbineId);
     }
 }

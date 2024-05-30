@@ -128,7 +128,7 @@ export default function UserManagementTable() {
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://www.localhost:6789/api/user/list", {
+      const response = await fetch("http://182.208.91.171:6789/api/user/list", {
         mode: "cors",
         method: "GET",
         credentials: "include",
@@ -143,7 +143,7 @@ export default function UserManagementTable() {
 
   const deleteUser = async (userId: string) => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://www.localhost:6789/api/user/" + userId, {
+      const response = await fetch("http://182.208.91.171:6789/api/user/" + userId, {
         mode: "cors",
         method: "DELETE",
         credentials: "include",

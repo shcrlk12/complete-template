@@ -31,7 +31,7 @@ public class WindFarmController {
     @GetMapping("/annually/{year}")
     public ResponseEntity<JSONResponse<AnnuallyWindFarmDTO.Response, Error>> getAnnuallyWindFarmInfo(
             @PathVariable("year") int year
-    ){
+    ) throws Exception {
         LocalDateTime searchTime = LocalDateTime.of(year, 12, 31, 0, 0, 0);
 
         AnnuallyWindFarmDTO.Response response = windFarmService.getAnnuallyWindFarmGeneralInfo(searchTime);

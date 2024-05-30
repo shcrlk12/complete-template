@@ -2,6 +2,7 @@ package com.unison.scada.availability.api.availability.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -31,7 +32,6 @@ public class AvailabilityData {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @Column(nullable = true)
     @Setter
     private LocalDateTime updatedAt;
@@ -39,6 +39,11 @@ public class AvailabilityData {
     @Column(nullable = true)
     @Setter
     private String updatedBy;
+
+
+    @Column(nullable = true)
+    @ColumnDefault(value = "0")
+    private Boolean changed;
 
     @Data
     @Embeddable

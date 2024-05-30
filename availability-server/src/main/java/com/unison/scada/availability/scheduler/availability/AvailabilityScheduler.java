@@ -51,6 +51,6 @@ public class AvailabilityScheduler {
     @Scheduled(cron = "0 0 * * * *")
     public void oneHourScheduler(){
         availabilitySaveService.save1HourAvailabilityTotalTime(windFarm.getTurbines().size());
-
+        availabilitySaveService.saveTurbineData(windFarm.getTurbines());
     }
 }

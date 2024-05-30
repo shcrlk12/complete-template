@@ -15,7 +15,7 @@ const ModifyUser = () => {
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://www.localhost:6789/api/user/" + userId, {
+      const response = await fetch("http://182.208.91.171:6789/api/user/" + userId, {
         mode: "cors",
         method: "GET",
         credentials: "include",

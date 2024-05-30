@@ -96,11 +96,14 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
         OPCGroup realTimeOPCGroup = opcServer.getGroupByName(prefixTurbineId + OPCGroupName.REAL_TIME.getName());
         realTimeOPCGroup.syncRead(OPC.OPC_DS_CACHE);
 
-        OPCItem activePowerOPCItem = realTimeOPCGroup.getItemByName(prefixTurbineId + OPCVariable.ACTIVE_POWER.getVariableName());
-        OPCItem windSpeedOPCItem = realTimeOPCGroup.getItemByName(prefixTurbineId + OPCVariable.WIND_SPEED.getVariableName());
+        Map<String, Double> dataMap = new HashMap<>();
 
-        String activePower = activePowerOPCItem.getValueAsString();
-        String windSpeed = windSpeedOPCItem.getValueAsString();
+        for(String variableName : OPCVariable.getVariableNames(OPCGroupName.REAL_TIME.getName()))
+        {
+            String realTimeValue = realTimeOPCGroup.getItemByName(prefixTurbineId + variableName).getValueAsString();
+
+            dataMap.put(variableName, Double.parseDouble(realTimeValue));
+        }
 
         //get variable of availability opc group
         OPCGroup availabilityOPCGroup = opcServer.getGroupByName(prefixTurbineId + OPCGroupName.AVAILABILITY.getName());
@@ -111,8 +114,7 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
 
         return Turbine.builder()
                 .turbineId(turbineId)
-                .activePower(Double.parseDouble(activePower))
-                .windSpeed(Double.parseDouble(windSpeed))
+                .dataMap(dataMap)
                 .availabilityStatus(AvailabilityStatus.getStatus(Integer.parseInt(availability)))
                 .build();
     }

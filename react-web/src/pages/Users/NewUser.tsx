@@ -13,7 +13,7 @@ const NewUser = () => {
 
   const addUserOnClick = (props: User) => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://www.localhost:6789/api/user/new", {
+      const response = await fetch("http://182.208.91.171:6789/api/user/new", {
         mode: "cors",
         method: "POST",
         credentials: "include",

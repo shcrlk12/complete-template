@@ -1,16 +1,5 @@
 --User Table
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_USER', 'kim garden', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon2@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_MANAGER', 'kim jae woo', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon3@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_ADMIN', 'kim won', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon4@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_USER', 'kim garden', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon5@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_MANAGER', 'kim jae woo', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon6@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_ADMIN', 'kim won', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon7@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_USER', 'kim garden', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon8@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_MANAGER', 'kim jae woo', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon9@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_ADMIN', 'kim won', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon10@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_USER', 'kim garden', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon11@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_MANAGER', 'kim jae woo', CURRENT_TIMESTAMP());
-INSERT INTO users (id, pw, role, name, created_at) VALUES ('kjwon12@unison.co.kr', '$2a$12$Vxiv/v2kiznDm1QmQv6fVO8bIrqNiChKWOQeV4Ke0l4vvLEQ0mdvm', 'ROLE_ADMIN', 'kim won', CURRENT_TIMESTAMP());
+INSERT INTO users (id, pw, role, name, created_at) VALUES ('admin@unison.co.kr', '$2a$10$kwsmnExaw.30g8nMJROov.naBQVmkeaccvWmVdGM76X5bV9mPGyJ2', 'ROLE_ADMIN', 'Administrator', CURRENT_TIMESTAMP());
 
 -- Memo Table
 INSERT INTO memo (timestamp, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T16:00', 0, 'korean', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name');
@@ -43,7 +32,7 @@ INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VAL
 INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@requested_uuid, 'requested shutdown', 1, '#33A1DE', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, variable_type, color,created_at) VALUES (@low_uuid, 'low temperature', 1, '#33A1AA', CURRENT_TIMESTAMP());
 INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES (@etc_uuid, 'etc', 1, '#D97733', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, created_at) VALUES (@export_power, 'export power', 2, CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, variable_type, created_at) VALUES (@export_power, 'U136_WTUR_TotWh', 2, CURRENT_TIMESTAMP());
 
 -- AvailabilityData Table
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 0, '0a5dc96f-70a3-49cd-87f5-1beac1119b8d', 140, @requested_uuid, CURRENT_TIMESTAMP());
@@ -17686,6 +17675,32 @@ INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_t
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-17T16:00', 2, '5830e708-71d6-4b9c-b270-0f85be2f9f0a', 252, @information_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-17T16:00', 2, 'cbadf881-d78f-4090-9424-1cafbfe5ae84', 90, @requested_uuid, CURRENT_TIMESTAMP());
 INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-04-17T16:00', 2, '653e95b8-b950-43d0-87ae-fafbd755e6d7', 176, @etc_uuid, CURRENT_TIMESTAMP());
+-- exported power
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 0, '0a5dc96f-70a3-49cd-87f5-1beac111912d', 488, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 1, '770365d4-0157-4d12-9f14-f6069a1d6125', 122, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 2, '83ff2124-e5f0-4761-9397-3afa040ae123', 2476, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T22:00', 0, '1ff874a5-e5c5-4deb-a30d-c73d0a47c129', 555, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T22:00', 1, '22fbb3f3-0ef5-4b0a-a300-4ee3a9a8d12e', 888, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T22:00', 2, 'e742e4c5-4416-42f7-b5e5-fcb378e61128', 999, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T23:00', 0, '15cfc683-5fcb-42fa-b93d-e46c759b8123', 666, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T23:00', 1, 'a6822c06-e5f8-4d85-b7b1-7f3b6cc1c125', 1111, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T23:00', 2, '2ee1ed79-9080-434c-a319-1bda8df212d6', 1122, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T00:00', 0, '7551359f-a73a-4101-a1cf-cb57d38ae123', 999, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T00:00', 1, '5c0baa88-2d0c-4270-b082-4299f1312bf2', 1223, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T00:00', 2, '922d9110-52b5-48e1-9766-41c4edb0c128', 1566, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T01:00', 0, '4935b2fb-73df-4adf-b3ad-24b91418912c', 1234, @export_power, CURRENT_TIMESTAMP());
+
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-14T23:00', 0, '2ee1ed79-9080-434c-a319-1bd34df212d6', 3333, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-14T23:00', 1, '7551359f-a73a-4101-a1cf-cb57348ae123', 4444, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-14T23:00', 2, '5c0baa88-2d0c-4270-b082-4299f3412bf2', 5555, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T01:00', 0, '922d9110-52b5-48e1-9766-41c4ed34c128', 4646, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T01:00', 1, '4935b2fb-73df-4adf-b3ad-24b91413412c', 8464, @export_power, CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T01:00', 2, '4935b2fb-73df-4adf-b3ad-24b91418342c', 6764, @export_power, CURRENT_TIMESTAMP());
 
 -- Parameter Table
 INSERT INTO parameter (id, warranty_date) VALUES (UUID(), '2023-02-01 00:00:00');
+
+-- Parameter Table
+INSERT INTO general (wind_farm_id, turbine_id, rated_power) VALUES (0, 0, 2.3);
+INSERT INTO general (wind_farm_id, turbine_id, rated_power) VALUES (0, 1, 2.3);
+INSERT INTO general (wind_farm_id, turbine_id, rated_power) VALUES (0, 2, 2.3);

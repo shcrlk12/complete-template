@@ -116,7 +116,6 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
   const { startOfWarrantyDate } = useSelector((store: RootState) => store.appReducer);
 
   useEffect(() => {
-    console.log(getStatusColor(tableData.turbines[0].data[0].availability));
     initAvailabilityMap();
     setTableData(dailyTableData);
   }, [dailyTableData]);
@@ -176,12 +175,17 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     let statusColor = `linear-gradient(to right `;
     let beforePositoin = 0;
 
-    availability?.forEach((element, index) => {
-      let currentPosition = Number(((element.time / 3600) * 100).toFixed(1));
+    let totalTime = 0;
+    for (let avail of availability) {
+      totalTime += avail.time;
+    }
 
-      if (index === 0) {
+    availability?.forEach((element, index) => {
+      let currentPosition = Number(((element.time / totalTime) * 100).toFixed(1));
+
+      if (!index) {
         statusColor += `, ${map.get(element.name)?.color} ${currentPosition}%`;
-        beforePositoin = Number(((element.time / 3600) * 100).toFixed(1));
+        beforePositoin = Number(((element.time / totalTime) * 100).toFixed(1));
       } else {
         statusColor += `, ${map.get(element.name)?.color} ${beforePositoin}%`;
         statusColor += `, ${map.get(element.name)?.color} ${beforePositoin + currentPosition}%`;
@@ -198,8 +202,8 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     for (let i = 0; i < tableData.turbinesNumber; i++) {
       newArr.push(
         <TableCell key={i}>
-          <div>WTG{String(i + 1).padStart(2, "0")}</div>
-          <div>({tableData.turbines[i]?.availability.toFixed(1)} %)</div>
+          <div style={{ fontSize: "14px" }}>WTG{String(i + 1).padStart(2, "0")}</div>
+          <div style={{ fontSize: "14px" }}>({tableData.turbines[i]?.availability.toFixed(1)} %)</div>
         </TableCell>,
       );
     }
@@ -243,12 +247,14 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     let now = new Date(Date.now());
     let date = new Date(tableData.date);
     let index = 0;
-    let endTime;
+    let endDate;
 
-    if (date.setDate(date.getDate() + 1) < Date.now()) endTime = date;
-    else endTime = now;
+    if (date.setDate(date.getDate() + 1) < Date.now()) endDate = new Date(date.getTime());
+    else {
+      endDate = new Date(now);
+      endDate.setHours(endDate.getHours() - 1);
+    }
 
-    let endDate = new Date(endTime);
     let startDate = new Date(date.setDate(date.getDate() - 1));
 
     while (startDate < endDate) {
@@ -274,6 +280,21 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
     setMap(newMap);
   };
 
+  const clearTimeMap = (map: any) => {
+    let newMap = new Map<string, MapTypes>();
+
+    for (var key of map.keys()) {
+      let value: MapTypes = map.get(key) as MapTypes;
+
+      newMap.set(key, {
+        ...value,
+        time: 0,
+      });
+    }
+
+    return newMap;
+  };
+
   const cloneMap = (map: any) => {
     let newMap = new Map<string, MapTypes>();
 
@@ -291,11 +312,11 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
   const clickTableStatus = (event: MouseEvent<HTMLElement>) => {
     let { turbineId, time } = parseRowColumn(event);
 
-    console.log(turbineId);
+    let newArr: SelectedCellType[] = [...seleectedCell];
 
     // click cell
     if (turbineId !== undefined && turbineId != -1 && time !== undefined) {
-      let newMap = cloneMap(map);
+      let newMap = clearTimeMap(map);
 
       let avail = tableData.turbines[turbineId].data[time].availability;
 
@@ -315,8 +336,6 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
       let memo = tableData.turbines[turbineId].data[time].memo;
 
       if (memo) {
-        console.log(memo);
-
         setMemo({
           engineerName: memo.engineerName,
           workTime: dayjs(memo.workTime),
@@ -331,7 +350,6 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
       }
 
       //Set selected cell
-      let newArr: SelectedCellType[] = [...seleectedCell];
       if (event.ctrlKey) {
         if (event !== null) {
           if (!(event.target as any).className.includes("selected-cell")) {
@@ -340,30 +358,64 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           }
         }
       } else if (event.shiftKey) {
-        let lastRow = seleectedCell[seleectedCell.length - 1].row;
-        if (Number(lastRow) < Number(time)) {
-          for (let j = ++lastRow; j <= time; j++) {
-            let event2 = event.currentTarget.querySelector(`#cell_${turbineId}_${j}`);
+        removeAllSelectedCell(seleectedCell);
+        newArr = [];
+        let lastRow = seleectedCell[0].row;
+        let lastColumn = seleectedCell[0].column;
 
-            if (event2 !== null) {
-              if (!event2.className.includes("selected-cell")) {
-                event2.className += " selected-cell";
-                newArr.push({ event: event2, row: j, column: turbineId });
+        if (Number(lastRow) <= Number(time)) {
+          if (Number(lastColumn) <= Number(turbineId)) {
+            for (let k = Number(lastColumn); k <= Number(turbineId); k++) {
+              for (let j = Number(lastRow); j <= Number(time); j++) {
+                let event2 = event.currentTarget.querySelector(`#cell_${k}_${j}`);
+
+                if (event2 !== null) {
+                  if (!event2.className.includes("selected-cell")) {
+                    event2.className += " selected-cell";
+                    newArr.push({ event: event2, row: j, column: k });
+                  }
+                }
+              }
+            }
+          } else {
+            for (let k = Number(lastColumn); k >= Number(turbineId); k--) {
+              for (let j = Number(lastRow); j <= Number(time); j++) {
+                let event2 = event.currentTarget.querySelector(`#cell_${k}_${j}`);
+
+                if (event2 !== null) {
+                  if (!event2.className.includes("selected-cell")) {
+                    event2.className += " selected-cell";
+                    newArr.push({ event: event2, row: j, column: k });
+                  }
+                }
               }
             }
           }
-        } else if (Number(lastRow) > Number(time)) {
-          console.log("왱나돼");
+        } else {
+          if (Number(lastColumn) <= Number(turbineId)) {
+            for (let k = Number(lastColumn); k <= Number(turbineId); k++) {
+              for (let j = Number(lastRow); j >= Number(time); j--) {
+                let event2 = event.currentTarget.querySelector(`#cell_${k}_${j}`);
 
-          for (let j = --lastRow; j >= time; j--) {
-            console.log(j);
+                if (event2 !== null) {
+                  if (!event2.className.includes("selected-cell")) {
+                    event2.className += " selected-cell";
+                    newArr.push({ event: event2, row: j, column: k });
+                  }
+                }
+              }
+            }
+          } else {
+            for (let k = Number(lastColumn); k >= Number(turbineId); k--) {
+              for (let j = Number(lastRow); j >= Number(time); j--) {
+                let event2 = event.currentTarget.querySelector(`#cell_${k}_${j}`);
 
-            let event2 = event.currentTarget.querySelector(`#cell_${turbineId}_${j}`);
-
-            if (event2 !== null) {
-              if (!event2.className.includes("selected-cell")) {
-                event2.className += " selected-cell";
-                newArr.push({ event: event2, row: j, column: turbineId });
+                if (event2 !== null) {
+                  if (!event2.className.includes("selected-cell")) {
+                    event2.className += " selected-cell";
+                    newArr.push({ event: event2, row: j, column: k });
+                  }
+                }
               }
             }
           }
@@ -378,17 +430,11 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           }
         }
       }
-      setSeleectedCell(newArr);
-      console.log(newArr);
     }
     // click row header
-    else if (turbineId == -1 && time !== undefined) {
-      let newArr: SelectedCellType[] = [...seleectedCell];
-
+    else if (Number(turbineId) === -1 && time !== undefined) {
       // ctrl click logic
       if (event.ctrlKey) {
-        console.log("ctrl");
-
         for (let i = 0; i < tableData.turbinesNumber; i++) {
           let event2 = event.currentTarget.querySelector(`#cell_${i}_${time}`);
 
@@ -399,20 +445,18 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
             }
           }
         }
-        setSeleectedCell(newArr);
       }
 
       // shift click logic
       else if (event.shiftKey) {
-        let lastRow = seleectedCell[seleectedCell.length - 1].row;
-        console.log(lastRow);
-        console.log(time);
+        removeAllSelectedCell(seleectedCell);
+        newArr = [];
 
-        if (Number(lastRow) < Number(time)) {
-          console.log("뭐야");
+        let lastRow = seleectedCell[0].row;
 
-          for (let j = ++lastRow; j <= time; j++) {
-            for (let i = 0; i < tableData.turbinesNumber; i++) {
+        if (Number(lastRow) <= Number(time)) {
+          for (let j = Number(lastRow); j <= Number(time); j++) {
+            for (let i = 0; i < Number(tableData.turbinesNumber); i++) {
               let event2 = event.currentTarget.querySelector(`#cell_${i}_${j}`);
 
               if (event2 !== null) {
@@ -424,12 +468,8 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
             }
           }
         } else if (Number(lastRow) > Number(time)) {
-          console.log("왱나돼");
-
-          for (let j = --lastRow; j >= time; j--) {
-            for (let i = 0; i < tableData.turbinesNumber; i++) {
-              console.log(j);
-
+          for (let j = Number(lastRow); j >= Number(time); j--) {
+            for (let i = 0; i < Number(tableData.turbinesNumber); i++) {
               let event2 = event.currentTarget.querySelector(`#cell_${i}_${j}`);
 
               if (event2 !== null) {
@@ -441,7 +481,6 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
             }
           }
         }
-        setSeleectedCell(newArr);
       }
       // normal click logic
       else {
@@ -457,10 +496,10 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
 
           newArr.push({ event: event2, row: time, column: i });
         }
-        setSeleectedCell(newArr);
       }
-      console.log(newArr);
     }
+    setSeleectedCell(newArr);
+    console.log(newArr);
   };
 
   const removeAllSelectedCell = (cellList: SelectedCellType[]) => {
@@ -523,7 +562,12 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           <TableLeftInfo onClick={clickTableStatus}>
             <TableHeader>
               <TableRow>
-                <TableCell>
+                <TableCell
+                  onClick={() => {
+                    let date = new Date(tableData.date);
+
+                    navigate(Paths.availability.annually.path + `/${date.getFullYear()}`);
+                  }}>
                   <div>{year}</div>
                   <div>{`${month}.${day}`}</div>
                 </TableCell>
@@ -610,10 +654,13 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
               <StyledButton
                 text="저장"
                 onClick={() => {
-                  console.log(seleectedCell);
+                  if (getTotalTime(map) < 60) {
+                    alert("시간 합계가 60분 이하 입니다.");
+                    return;
+                  }
 
                   fetchData(dispatch, navigate, async () => {
-                    const response = await fetch(`http://www.localhost:6789/api/wind-farm/daily/register`, {
+                    const response = await fetch(`http://182.208.91.171:6789/api/wind-farm/daily/register`, {
                       mode: "cors",
                       method: "POST",
                       credentials: "include",
@@ -632,8 +679,6 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
 
                     const json = await response.json();
                     const data = json.data;
-
-                    console.log(data);
                   });
 
                   let newTableData = { ...tableData };
@@ -663,6 +708,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           date.setDate(date.getDate() - 1);
 
           if (startOfWarrantyDate.getTime() <= date.getTime()) {
+            removeAllSelectedCell(seleectedCell);
             navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
           }
         }}
@@ -671,6 +717,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           date.setDate(date.getDate() + 1);
 
           if (date.getTime() < new Date(Date.now()).getTime()) {
+            removeAllSelectedCell(seleectedCell);
             navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
           }
         }}

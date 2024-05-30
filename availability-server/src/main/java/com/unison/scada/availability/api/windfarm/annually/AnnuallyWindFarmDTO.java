@@ -15,6 +15,8 @@ public class AnnuallyWindFarmDTO {
     @Builder
     public static class Response{
         private final int turbinesNumber;
+        private final double availability;
+        private final double capacityFactor;
         private final int yearsOfWarranty;
         private final LocalDateTime date;
         private final LocalDateTime startTimeOfYears;

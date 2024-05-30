@@ -42,11 +42,11 @@ public class Memo {
     private String etc;
 
     @Column(nullable = false)
-    @ColumnDefault("true")
+    @ColumnDefault("1")
     private boolean isActive;
 
     @Column(nullable = false)
-    @ColumnDefault("false")
+    @ColumnDefault("0")
     private boolean isDelete;
 
     @Column(nullable = false)

@@ -14,6 +14,9 @@ import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmDTO;
 import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmService;
 import com.unison.scada.availability.api.windfarm.realtime.RealTimeDTO;
 import com.unison.scada.availability.api.windfarm.realtime.RealTimeService;
+import com.unison.scada.availability.global.General;
+import com.unison.scada.availability.global.filter.GeneralRepository;
+import com.unison.scada.availability.global.filter.OriginalAvailabilityDataRepository;
 import com.unison.scada.availability.scheduler.availability.model.AvailabilityStatus;
 import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import com.unison.scada.availability.scheduler.availability.model.WindFarm;
@@ -36,6 +39,9 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     private final AvailabilityTypeRepository availabilityTypeRepository;
     private final MemoRepository memoRepository;
     private final WindFarm windFarm;
+    private final GeneralRepository generalRepository;
+    private final OriginalAvailabilityDataRepository originalAvailabilityDataRepository;
+
     @Override
     public DailyWindFarmDTO.Response getDailyWindFarmGeneralInfo(LocalDateTime searchTime) {
         List<Memo> memos = memoRepository.findAllDataByTimeRange(searchTime, searchTime.plusHours(23).plusMinutes(59));
@@ -199,6 +205,8 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                                         .availabilityType(availabilityType)
                                         .time(availability.getTime())
                                         .createdAt(LocalDateTime.now())
+                                        .updatedAt(LocalDateTime.now())
+                                        .updatedBy(principal.getName())
                                         .build()
                         );
                     }
@@ -210,7 +218,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     }
 
     private List<Map<LocalDateTime, List<AvailabilityData>>> getDailyMap(LocalDateTime startTime){
-        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, startTime.plusHours(23).plusMinutes(59));
+        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, startTime.plusHours(23).plusMinutes(59), 1);
 
         Map<Integer, List<AvailabilityData>> listMap = availabilityDataList.stream()
                 .collect(Collectors.groupingBy((data) -> data.getAvailabilityDataId().getTurbineId()));
@@ -218,7 +226,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         List<Map<LocalDateTime, List<AvailabilityData>>> turbines = new ArrayList<>();
         int turbinesNumber = windFarmProperties.getTurbinesNumber();
 
-        Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE);
+        Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE);
         for(int turbineId = 0; turbineId < turbinesNumber; turbineId++)
         {
             Map<LocalDateTime, List<AvailabilityData>> data = new HashMap<>();
@@ -254,7 +262,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 if(clonedDateTime.plusDays(1).isBefore(LocalDateTime.now()))
                     endTime = clonedDateTime.plusDays(1);
                 else
-                    endTime = LocalDateTime.now();
+                    endTime = LocalDateTime.now().minusHours(1);
 
                 while(clonedDateTime.isBefore(endTime)){
                     List<AvailabilityData> availabilityDataList1 = new ArrayList<>();
@@ -265,7 +273,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                                     .time(3600)
                                     .availabilityType(informationUnavailableType.orElse(
                                             AvailabilityType.builder()
-                                                    .name(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE)
+                                                    .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
                                                     .description("")
                                                     .color("#C4D8F0")
                                                     .build()
@@ -286,7 +294,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             if(clonedDateTime.plusDays(1).isBefore(LocalDateTime.now()))
                 endTime = clonedDateTime.plusDays(1);
             else
-                endTime = LocalDateTime.now();
+                endTime = LocalDateTime.now().minusHours(1);
 
             while(clonedDateTime.isBefore(endTime)){
                 if(!data.containsKey(clonedDateTime))
@@ -311,14 +319,14 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 .availabilityDataId(new AvailabilityData.AvailabilityDataId(timestamp, turbineId, null))
                 .time(3600)
                 .availabilityType(AvailabilityType.builder()
-                        .name(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE)
+                        .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
                         .description("")
                         .color("#C4D8F0")
                         .build())
                 .build();
     }
     @Override
-    public AnnuallyWindFarmDTO.Response getAnnuallyWindFarmGeneralInfo(LocalDateTime searchTime) {
+    public AnnuallyWindFarmDTO.Response getAnnuallyWindFarmGeneralInfo(LocalDateTime searchTime) throws Exception {
         List<Parameter> parameters = parameterRepository.findAll();
 
         Parameter parameter = parameters.get(0);
@@ -334,11 +342,16 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
         //set turbines
         List<AnnuallyWindFarmDTO.Response.Turbine> turbines = new ArrayList<>();
-        double numerator = 0; //분자
-        double denominator = 0; //분모
-        double etcTime = 0;
+
+        double windFarmNumerator = 0; //분자
+        double windFarmDenominator = 0; //분모
+        double windFarmEtcTime = 0;
 
         for(int i = 0; i < windFarmProperties.getTurbinesNumber(); i++) {
+            double numerator = 0; //분자
+            double denominator = 0; //분모
+            double etcTime = 0;
+
             Map<LocalDateTime, Avail> availMap = turbineAvailTotal.get(i);
 
             //set data
@@ -346,7 +359,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             LocalDateTime endTime = LocalDateTime.now().isBefore(startTimeOfWarranty.plusYears(1)) ? LocalDateTime.now() : startTimeOfWarranty.plusYears(1);
 
             for(LocalDateTime time = startTimeOfWarranty; time.isBefore(endTime); time = time.plusDays(1)){
-                double turbineAvailability = 0;
+                double dailyTurbineAvailability = 0;
 
                 if(availMap.containsKey(time)){
                     Avail avail = availMap.get(time);
@@ -355,26 +368,38 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                     denominator += avail.getDenominator();
                     etcTime += avail.getEtcTime();
 
-                    turbineAvailability = avail.getAvail();
+                    windFarmNumerator += avail.getNumerator();
+                    windFarmDenominator += avail.getDenominator();
+                    windFarmEtcTime += avail.getEtcTime();
+
+                    dailyTurbineAvailability = avail.getAvail();
                 }
 
-                dataList.add(new AnnuallyWindFarmDTO.Response.Data(time,  turbineAvailability));
+                dataList.add(new AnnuallyWindFarmDTO.Response.Data(time,  dailyTurbineAvailability));
             }
 
-            double windFarmAvailability;
+            double turbineAvailability;
 
             try {
-                windFarmAvailability = Avail.calcFormula(numerator, denominator, etcTime);
+                turbineAvailability = Avail.calcFormula(numerator, denominator, etcTime);
             }catch (Exception e){
-                windFarmAvailability = 0;
+                turbineAvailability = 0;
             }
 
-            turbines.add(new AnnuallyWindFarmDTO.Response.Turbine(i + 1, windFarmAvailability, dataList));
+            turbines.add(new AnnuallyWindFarmDTO.Response.Turbine(i + 1, turbineAvailability, dataList));
         }
+
+        double windFarmAvailability = Avail.calcFormula(windFarmNumerator, windFarmDenominator, windFarmEtcTime);
+
+
+        //calc capacity factor
+        double capacityFactor = getCapacityFactor(startTimeOfWarranty);
 
 
         return AnnuallyWindFarmDTO.Response.builder()
                 .turbinesNumber(turbinesNumber)
+                .availability(windFarmAvailability)
+                .capacityFactor(capacityFactor)
                 .yearsOfWarranty(howManyYearsOfWarranty)
                 .startTimeOfYears(startTimeOfWarranty)
                 .turbines(turbines)
@@ -382,22 +407,71 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 .build();
     }
 
+    private double getCapacityFactor(LocalDateTime startTime) throws Exception {
+        List<General> generalList = generalRepository.findAll();
+
+        int turbineNumber = generalList.size();
+        double bottom = 0;
+
+        LocalDateTime endTime = getMaximumTime(startTime, LocalDateTime.now());
+
+        Duration duration = Duration.between(startTime, endTime);
+        long period = duration.toSeconds();
+
+        List<Turbine> turbineList = windFarm.getTurbines();
+        Optional<AvailabilityType> optionalAvailabilityType = availabilityTypeRepository.findByName("U88_WTUR_sviTotWh");
+        AvailabilityType availabilityType = optionalAvailabilityType.orElseThrow(() ->  new Exception("Not matched total exported power name"));
+
+        long actualActivePower = 0;
+        for(General general : generalList)
+        {
+            bottom += (general.getRatedPower() * (period / 3600));
+            long test1 = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), endTime);
+            long test2 = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), startTime);
+
+            actualActivePower += availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), endTime) - availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), startTime);
+        }
+        return actualActivePower / bottom;
+    }
+
+    private LocalDateTime getMaximumTime(LocalDateTime time, LocalDateTime max){
+        LocalDateTime result;
+
+        if(time.plusYears(1).isBefore(max)){
+            result = time.plusYears(1);
+        }
+        else result = max;
+
+        return result;
+    }
     @Override
     public RealTimeDTO.Response getRealTimeData() {
-        double sumActivePower = 0;
-        double sumWindSpeed = 0;
-
-        int turbinesNumber = windFarm.getTurbines().size();
+        List<RealTimeDTO.Response.RealTime> dataList = new ArrayList<>();
 
         for(Turbine turbine : windFarm.getTurbines()){
-            sumActivePower += turbine.getActivePower();
-            sumWindSpeed += turbine.getWindSpeed();
+            Map<String, Double> turbineDataMap = turbine.getDataMap();
+
+            for(String valueName : turbineDataMap.keySet())
+            {
+                Optional<RealTimeDTO.Response.RealTime> optionalRealTime = dataList.stream().filter(data -> data.getName().equalsIgnoreCase(valueName)).findFirst();
+
+                if(optionalRealTime.isEmpty()) {
+                    dataList.add(RealTimeDTO.Response.RealTime.builder()
+                            .name(valueName)
+                            .value(turbineDataMap.get(valueName))
+                            .base(1)
+                            .build());
+                }else {
+                    RealTimeDTO.Response.RealTime realTime = optionalRealTime.get();
+                    realTime.setValue(realTime.getValue() + turbineDataMap.get(valueName));
+                    realTime.setBase(realTime.getBase() + 1);
+                }
+            }
         }
 
         return RealTimeDTO.Response.builder()
                 .timestamp(LocalDateTime.now())
-                .activePower(sumActivePower/turbinesNumber)
-                .windSpeed(sumWindSpeed/turbinesNumber)
+                .dataList(dataList)
                 .build();
     }
 
@@ -411,6 +485,8 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         private double etcTime;
 
         public static double calcFormula(double numerator, double denominator, double etcTime){
+            if((etcTime - denominator) == 0)
+                return 100;
             return (1 - (numerator / (etcTime - denominator))) * 100;
         }
 
@@ -437,7 +513,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             {
 
             }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.INFOMATION_UNAVAILABLE_TYPE))
+            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
             {
             }
             else
@@ -449,7 +525,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     }
 
     private List<Map<LocalDateTime, Avail>> getMap(LocalDateTime startTime){
-        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, startTime.plusYears(1));
+        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, startTime.plusYears(1), 1);
         Map<Integer, List<AvailabilityData>> listMap = availabilityDataList.stream()
                 .collect(Collectors.groupingBy((data) -> data.getAvailabilityDataId().getTurbineId()));
 

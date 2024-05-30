@@ -4,5 +4,5 @@ import java.time.LocalDateTime;
 
 
 public interface AnnuallyWindFarmService {
-    AnnuallyWindFarmDTO.Response getAnnuallyWindFarmGeneralInfo(LocalDateTime searchTime);
+    AnnuallyWindFarmDTO.Response getAnnuallyWindFarmGeneralInfo(LocalDateTime searchTime) throws Exception;
 }
