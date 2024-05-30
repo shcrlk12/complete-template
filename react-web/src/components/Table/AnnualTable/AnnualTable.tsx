@@ -22,8 +22,8 @@ const AnnualTable = ({ annuallyTableData }: { annuallyTableData: AnnuallyTableDa
     for (let i = 0; i < annuallyTableData.turbinesNumber; i++) {
       newArr.push(
         <TableCell key={i}>
-          <div>WTG{String(i + 1).padStart(2, "0")}</div>
-          <div>({annuallyTableData.turbines[i].availability.toFixed(1)} %)</div>
+          <div style={{ fontSize: "14px" }}>WTG{String(i + 1).padStart(2, "0")}</div>
+          <div style={{ fontSize: "14px" }}>({annuallyTableData.turbines[i].availability.toFixed(1)} %)</div>
         </TableCell>,
       );
     }
