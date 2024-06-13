@@ -14,6 +14,7 @@ import useInits from "@src/hooks/useInits";
 import { fetchData, statusOk } from "@src/util/fetch";
 import { loginSuccess } from "@reducers/userActions";
 import { useParams } from "react-router";
+import { backendServerIp, windSpeedName } from "@src/Config";
 
 type DataOfDay = {
   time: Date;
@@ -55,7 +56,7 @@ const AvailabilityManagementAnnually = () => {
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch(`http://182.208.91.171:6789/api/wind-farm/annually/${year}`, {
+      const response = await fetch(`http://${backendServerIp}/api/wind-farm/annually/${year}`, {
         mode: "cors",
         method: "GET",
         credentials: "include",
@@ -77,7 +78,7 @@ const AvailabilityManagementAnnually = () => {
     });
 
     const fetchRealTimeData = async () => {
-      const response = await fetch(`http://182.208.91.171:6789/api/wind-farm/realtime`, {
+      const response = await fetch(`http://${backendServerIp}/api/wind-farm/realtime`, {
         mode: "cors",
         method: "GET",
         credentials: "include",
@@ -109,7 +110,7 @@ const AvailabilityManagementAnnually = () => {
   const getWindSpeed = () => {
     if (realTime !== undefined) {
       for (const data of realTime.dataList) {
-        if (data.name === "U88_WNAC_sviWindSpeed1s") return (data.value / data.base).toFixed(1);
+        if (data.name === windSpeedName) return (data.value / data.base).toFixed(1);
       }
     }
   };

@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ROLE_ANONYMOUS, UserRoleType, logout } from "../../reducers/userActions";
 import GlobalNavigationBar from "./Navigation/GlobalNavigationBarList";
-import { PathDetail, PathType, Paths, ProjectVersion } from "../../Config";
+import { PathDetail, PathType, Paths, ProjectVersion, backendServerIp } from "../../Config";
 import { HeaderInner, LeftHeaderContainer, Logo, PageTitle, RightHeaderContainer, StyledHeader } from "./Header.styled";
 import { RootState } from "src";
 import { useSelector } from "react-redux";
@@ -66,7 +66,7 @@ const Header = ({ headerNavList, projectVersion }: HeaderProps) => {
 
   const logoutBtnClick = () => {
     fetchData(dispatch, navigate, async () => {
-      await fetch("http://182.208.91.171:6789/logout", {
+      await fetch(`http://${backendServerIp}/logout`, {
         mode: "cors",
         method: "POST",
         credentials: "include",

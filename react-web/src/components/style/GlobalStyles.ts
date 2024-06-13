@@ -87,6 +87,11 @@ body {
 	box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.black} inset;
 }
 
+.MuiTableCell-root.MuiTableCell-footer{
+	border-bottom:none !important;
+	min-width: 800px;
+}
+
 @keyframes selected {
   0% {
 	outline: ${({ theme }) => theme.colors.black} dashed 2px;

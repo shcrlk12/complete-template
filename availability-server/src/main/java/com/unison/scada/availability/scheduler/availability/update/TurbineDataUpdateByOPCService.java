@@ -1,5 +1,6 @@
 package com.unison.scada.availability.scheduler.availability.update;
 
+import com.unison.scada.availability.api.availability.entity.AvailabilityData;
 import com.unison.scada.availability.api.windfarm.WindFarmProperties;
 import com.unison.scada.availability.comm.opcda.*;
 import com.unison.scada.availability.scheduler.availability.model.AvailabilityStatus;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -54,9 +56,11 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
 
                 opcServer.addNewGroup(prefixName + opcGroupName.getName(), (int) (long) DEFAULT_OPC_GROUP_UPDATE_RATE, 0, true);
 
-                //config opc items name
-                for (OPCVariable opcVariable : OPCVariable.getVariablesByName(opcGroupName)) {
-                    addOPCItem(prefixName + opcGroupName.getName(), prefixName + opcVariable.getVariableName());
+                Map<String, List<OPCProperties.Variable>> groupVariable = opcProperties.getVariable().stream()
+                        .collect(Collectors.groupingBy(OPCProperties.Variable::getType));
+
+                for (OPCProperties.Variable variable : groupVariable.get(opcGroupName.getName())) {
+                    addOPCItem(prefixName + opcGroupName.getName(), prefixName + variable.getName());
                 }
             }
         }
@@ -98,18 +102,26 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
 
         Map<String, Double> dataMap = new HashMap<>();
 
-        for(String variableName : OPCVariable.getVariableNames(OPCGroupName.REAL_TIME.getName()))
-        {
-            String realTimeValue = realTimeOPCGroup.getItemByName(prefixTurbineId + variableName).getValueAsString();
+        Map<String, List<OPCProperties.Variable>> groupVariable = opcProperties.getVariable().stream()
+                                                                                .collect(Collectors.groupingBy(OPCProperties.Variable::getType));
 
-            dataMap.put(variableName, Double.parseDouble(realTimeValue));
+        for(OPCProperties.Variable variable : groupVariable.get(OPCGroupName.REAL_TIME.getName()))
+        {
+            String realTimeValue = realTimeOPCGroup.getItemByName(prefixTurbineId + variable.getName()).getValueAsString();
+
+            dataMap.put(variable.getName(), Double.parseDouble(realTimeValue));
         }
 
         //get variable of availability opc group
         OPCGroup availabilityOPCGroup = opcServer.getGroupByName(prefixTurbineId + OPCGroupName.AVAILABILITY.getName());
         availabilityOPCGroup.syncRead(OPC.OPC_DS_CACHE);
 
-        OPCItem availabilityOPCItem = availabilityOPCGroup.getItemByName(prefixTurbineId + OPCVariable.AVAILABILITY.getVariableName());
+        OPCProperties.Variable variable = groupVariable.get(OPCGroupName.AVAILABILITY.getName())
+                                                                            .stream()
+                                                                            .findFirst()
+                                                                            .get();
+
+        OPCItem availabilityOPCItem = availabilityOPCGroup.getItemByName(prefixTurbineId + variable.getName());
         String availability = availabilityOPCItem.getValueAsString();
 
         return Turbine.builder()

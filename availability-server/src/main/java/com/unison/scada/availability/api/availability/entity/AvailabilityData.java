@@ -43,6 +43,7 @@ public class AvailabilityData {
 
     @Column(nullable = true)
     @ColumnDefault(value = "0")
+    @Setter
     private Boolean changed;
 
     @Data
@@ -53,6 +54,9 @@ public class AvailabilityData {
     public static class AvailabilityDataId implements Serializable {
         @Column
         private LocalDateTime timestamp;
+
+        @Column
+        private int windFarmId;
 
         @Column
         private int turbineId;

@@ -15,6 +15,7 @@ import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmService;
 import com.unison.scada.availability.api.windfarm.realtime.RealTimeDTO;
 import com.unison.scada.availability.api.windfarm.realtime.RealTimeService;
 import com.unison.scada.availability.global.General;
+import com.unison.scada.availability.global.OriginalAvailabilityData;
 import com.unison.scada.availability.global.filter.GeneralRepository;
 import com.unison.scada.availability.global.filter.OriginalAvailabilityDataRepository;
 import com.unison.scada.availability.scheduler.availability.model.AvailabilityStatus;
@@ -146,6 +147,22 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     }
 
     @Override
+    public void resetDailyInfo(Principal principal, DailyWindFarmDTO.Request request) throws Exception {
+//        for(int i = 0; i < request.getTimestamps().size(); i++) {
+//            DailyWindFarmDTO.Request.Turbine timestamp = request.getTimestamps().get(i);
+//
+//            List<AvailabilityData> availabilityDataList = availabilityDataRepository.findByIdWithoutUUID(timestamp.getTimestamp().plusHours(9), timestamp.getTurbineId());
+//            if(availabilityDataList.isEmpty()){
+//                continue;
+//            }
+//
+//            availabilityDataRepository.save(null);
+//        }
+
+//        originalAvailabilityDataRepository.findByOriginalAvailabilityDataIdTimestampAndOriginalAvailabilityDataId
+    }
+
+    @Override
     public void registerDailyInfo(Principal principal, DailyWindFarmDTO.Request request) throws Exception{
         List<Memo> memoList = new ArrayList<>();
 
@@ -183,12 +200,27 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                         .filter(data -> data.getAvailabilityType().getName().equalsIgnoreCase(availability.getName()))
                         .findFirst();
 
+                //기존 저장되어 있는 데이터가 있을때
                 if(optionalAvailabilityData.isPresent())
                 {
                     AvailabilityData availabilityData = optionalAvailabilityData.get();
+
+                    originalAvailabilityDataRepository.save(OriginalAvailabilityData.builder()
+                            .originalAvailabilityDataId(new OriginalAvailabilityData.OriginalAvailabilityDataId(
+                                    availabilityData.getAvailabilityDataId().getTimestamp(),
+                                    availabilityData.getAvailabilityDataId().getWindFarmId(),
+                                    availabilityData.getAvailabilityDataId().getTurbineId()
+                            ))
+                            .availabilityType(availabilityData.getAvailabilityType())
+                            .time(availabilityData.getTime())
+                            .createdAt(LocalDateTime.now())
+                            .build());
+
                     availabilityData.setTime(availability.getTime());
                     availabilityData.setUpdatedAt(LocalDateTime.now());
                     availabilityData.setUpdatedBy(principal.getName());
+                    availabilityData.setChanged(true);
+
                 }
                 //기존 저장되어 있는 데이터가 없을때
                 else{
@@ -201,12 +233,13 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
                         availabilityDataList.add(
                                 AvailabilityData.builder()
-                                        .availabilityDataId(new AvailabilityData.AvailabilityDataId(turbine.getTimestamp().plusHours(9), turbine.getTurbineId(), UUID.randomUUID()))
+                                        .availabilityDataId(new AvailabilityData.AvailabilityDataId(turbine.getTimestamp().plusHours(9), 0, turbine.getTurbineId(), UUID.randomUUID()))
                                         .availabilityType(availabilityType)
                                         .time(availability.getTime())
                                         .createdAt(LocalDateTime.now())
                                         .updatedAt(LocalDateTime.now())
                                         .updatedBy(principal.getName())
+                                        .changed(true)
                                         .build()
                         );
                     }
@@ -269,7 +302,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
                     availabilityDataList1.add(
                             AvailabilityData.builder()
-                                    .availabilityDataId(new AvailabilityData.AvailabilityDataId(startTime, turbineId, null))
+                                    .availabilityDataId(new AvailabilityData.AvailabilityDataId(startTime, 0, turbineId, null))
                                     .time(3600)
                                     .availabilityType(informationUnavailableType.orElse(
                                             AvailabilityType.builder()
@@ -316,7 +349,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     }
     private AvailabilityData returnInformationUnavailable(LocalDateTime timestamp, int turbineId){
         return AvailabilityData.builder()
-                .availabilityDataId(new AvailabilityData.AvailabilityDataId(timestamp, turbineId, null))
+                .availabilityDataId(new AvailabilityData.AvailabilityDataId(timestamp, 0, turbineId, null))
                 .time(3600)
                 .availabilityType(AvailabilityType.builder()
                         .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
@@ -419,7 +452,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         long period = duration.toSeconds();
 
         List<Turbine> turbineList = windFarm.getTurbines();
-        Optional<AvailabilityType> optionalAvailabilityType = availabilityTypeRepository.findByName("U88_WTUR_sviTotWh");
+        Optional<AvailabilityType> optionalAvailabilityType = availabilityTypeRepository.findByName(windFarmProperties.getTotalExportedPowerName());
         AvailabilityType availabilityType = optionalAvailabilityType.orElseThrow(() ->  new Exception("Not matched total exported power name"));
 
         long actualActivePower = 0;

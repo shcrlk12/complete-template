@@ -24,7 +24,7 @@ public class UserDTO {
         private final String id;
         private final String name;
         private final String role;
-        private final LocalTime lastLoginTime;
+        private final String lastLoginTime;
         private Error error;
     }
 }

@@ -34,6 +34,11 @@ export const TYPE3_VERSION = 0.3 as const;
 
 export type ProjectVersion = typeof TYPE1_VERSION | typeof TYPE2_VERSION | typeof TYPE3_VERSION;
 
+export const projectVersion: ProjectVersion = TYPE2_VERSION;
+
+export let backendServerIp = "localhost:6789";
+export let windSpeedName = "U136_WNAC_WindSpeed1s";
+
 //config settings
 export const Paths: PathType = {
   login: { path: "/login", title: "로그인" },
@@ -54,8 +59,6 @@ export const Paths: PathType = {
     modify: { path: "/users/modify", title: "유저 수정" },
   },
 };
-
-export const projectVersion: ProjectVersion = TYPE1_VERSION;
 
 let now = new Date(Date.now());
 let { year, month, day } = parseyyyymmdd(now);
@@ -87,7 +90,7 @@ export const headerNavList: HeaderNavList[] = [
       {
         name: "Logs",
         link: Paths.availability.logs.path,
-        allowVersion: TYPE2_VERSION,
+        allowVersion: TYPE3_VERSION,
         userRole: ROLE_MANAGER,
       },
     ],

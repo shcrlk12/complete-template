@@ -84,6 +84,27 @@ public class WindFarmController {
         }
     }
 
+    @PostMapping("/daily/reset")
+    public ResponseEntity<JSONResponse<BasicDTO.Response, Error>> resetDailyInfo(
+            Principal principal,
+            @RequestBody DailyWindFarmDTO.Request request
+    ){
+        try{
+            windFarmService.resetDailyInfo(principal, request);
+            return ResponseEntity.ok()
+                    .body(JSONResponse.<BasicDTO.Response, Error>builder()
+                            .data(new BasicDTO.Response(true, "test"))
+                            .build());
+        }
+        catch(Exception e)
+        {
+            logger.error("error registering daily info", e);
+            return ResponseEntity.internalServerError()
+                    .body(JSONResponse.<BasicDTO.Response, Error>builder()
+                            .error(new Error(500, e.getMessage()))
+                            .build());
+        }
+    }
     @GetMapping("/realtime")
     public ResponseEntity<JSONResponse<RealTimeDTO.Response, Error>> getRealTimeData(){
         RealTimeDTO.Response response = windFarmService.getRealTimeData();

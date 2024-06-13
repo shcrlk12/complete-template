@@ -1,7 +1,7 @@
 import { CommonContainer, CommonInner } from "@pages/Common.styled";
 import UserDetail from "./../../components/Users/UserDetail";
 import { User } from "@reducers/userActions";
-import { Paths } from "@src/Config";
+import { Paths, backendServerIp } from "@src/Config";
 import { useEffect } from "react";
 import useInits from "@src/hooks/useInits";
 import { fetchData, statusOk } from "@src/util/fetch";
@@ -13,7 +13,7 @@ const NewUser = () => {
 
   const addUserOnClick = (props: User) => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://182.208.91.171:6789/api/user/new", {
+      const response = await fetch(`http://${backendServerIp}/api/user/new`, {
         mode: "cors",
         method: "POST",
         credentials: "include",

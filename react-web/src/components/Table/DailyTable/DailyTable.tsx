@@ -32,7 +32,7 @@ import { Availability, DailyTableData, MemoType } from "@pages/Availability/Avai
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import useInits from "@src/hooks/useInits";
-import { Paths } from "@src/Config";
+import { Paths, backendServerIp } from "@src/Config";
 import { JSX } from "react/jsx-runtime";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
@@ -660,7 +660,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
                   }
 
                   fetchData(dispatch, navigate, async () => {
-                    const response = await fetch(`http://182.208.91.171:6789/api/wind-farm/daily/register`, {
+                    const response = await fetch(`http://${backendServerIp}/api/wind-farm/daily/register`, {
                       mode: "cors",
                       method: "POST",
                       credentials: "include",

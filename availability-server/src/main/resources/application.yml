@@ -1,42 +1,8 @@
 spring:
-  security:
-    debug: true
-  datasource:
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://10.10.0.10:1433;databaseName=AvailManage;encrypt=true;trustServerCertificate=true;
-    username: wppis_user
-    password: unison
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false  # SQL 로그 출력 비활성화
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: never
-
-logging:
-  level:
-    org:
-      springframework:
-        security: INFO
-    # Hibernate SQL 로그 레벨 설정
-      hibernate:
-        SQL: ERROR
-        type:
-          descriptor:
-            sql:
-              BasicBinder: ERROR
-
-
-server:
-  port: 6789
-
-wind-farm:
-  turbines-number: 14
-
-opc:
-  server-name: BACHMANN.OPCEnterpriseServer
-  prefix-format: WindFarm.WTG%02d.
+  config:
+    import:
+      - classpath:/yml/application-prod.yml
+      - classpath:/yml/application-dev.yml
+      - classpath:/yml/application-local.yml
+  profiles:
+    active: local #dev, local, prod

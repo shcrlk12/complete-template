@@ -7,5 +7,7 @@ public interface DailyWindFarmService {
 
     DailyWindFarmDTO.Response getDailyWindFarmGeneralInfo(LocalDateTime searchTime);
 
+    void resetDailyInfo(Principal principal, DailyWindFarmDTO.Request request) throws Exception;
+
     void registerDailyInfo(Principal principal, DailyWindFarmDTO.Request request) throws Exception;
 }

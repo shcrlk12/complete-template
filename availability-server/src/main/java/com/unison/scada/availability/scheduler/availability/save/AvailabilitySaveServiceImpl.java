@@ -41,7 +41,7 @@ public class AvailabilitySaveServiceImpl implements AvailabilitySaveService {
                 LocalDateTime timeBefore1Hour = LocalDateTime.now().minusHours(1).withMinute(0).withSecond(0).withNano(0);
 
                 availabilityDataList.add(AvailabilityData.builder()
-                        .availabilityDataId(new AvailabilityData.AvailabilityDataId(timeBefore1Hour, turbineId, UUID.randomUUID()))
+                        .availabilityDataId(new AvailabilityData.AvailabilityDataId(timeBefore1Hour, 0, turbineId, UUID.randomUUID()))
                         .availabilityType(findAvailabilityTypeByName(availabilityType, availabilityTypeList))
                         .time(totalTime)
                         .createdAt(LocalDateTime.now())
@@ -69,7 +69,7 @@ public class AvailabilitySaveServiceImpl implements AvailabilitySaveService {
                     Double value = dataMap.get(availabilityType.getName());
 
                     availabilityDataList.add(AvailabilityData.builder()
-                            .availabilityDataId(new AvailabilityData.AvailabilityDataId(now, turbine.getTurbineId(), UUID.randomUUID()))
+                            .availabilityDataId(new AvailabilityData.AvailabilityDataId(now, 0, turbine.getTurbineId(), UUID.randomUUID()))
                             .availabilityType(availabilityType)
                             .time(value.intValue())
                             .createdAt(LocalDateTime.now())

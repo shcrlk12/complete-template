@@ -2,7 +2,7 @@ import UserDetail from "@components/Users/UserDetail";
 import { CommonContainer, CommonInner } from "@pages/Common.styled";
 import { resetLoading, setLoading } from "@reducers/appAction";
 import { ROLE_ANONYMOUS, ROLE_USER, User, userTypeInitialize } from "@reducers/userActions";
-import { Paths } from "@src/Config";
+import { Paths, backendServerIp } from "@src/Config";
 import useInits from "@src/hooks/useInits";
 import { fetchData, statusOk } from "@src/util/fetch";
 import { useEffect, useState } from "react";
@@ -15,7 +15,7 @@ const ModifyUser = () => {
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://182.208.91.171:6789/api/user/" + userId, {
+      const response = await fetch(`http://${backendServerIp}/api/user/` + userId, {
         mode: "cors",
         method: "GET",
         credentials: "include",

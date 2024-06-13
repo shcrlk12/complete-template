@@ -1,4 +1,4 @@
-package com.unison.scada.availability.api.windfarm;
+package com.unison.scada.availability.global;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,11 +6,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "wind-farm")
+@ConfigurationProperties(prefix = "unlock-cors")
 @Getter
 @Setter
-public class WindFarmProperties {
-
-    private int turbinesNumber = 1;
-    private String totalExportedPowerName;
+public class CorsProperties {
+    private String ip;
+    private String port;
+    private String domain;
 }

@@ -20,7 +20,7 @@ import TableHead from "@mui/material/TableHead";
 import { NavigateFunction, useNavigate } from "react-router";
 import { TablePaginationActionsProps } from "@mui/material/TablePagination/TablePaginationActions";
 import { User } from "@reducers/userActions";
-import { Paths } from "@src/Config";
+import { Paths, backendServerIp } from "@src/Config";
 import { resetLoading, setLoading } from "@reducers/appAction";
 import { useDispatch } from "react-redux";
 import { Dispatch, UnknownAction } from "redux";
@@ -128,7 +128,7 @@ export default function UserManagementTable() {
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://182.208.91.171:6789/api/user/list", {
+      const response = await fetch(`http://${backendServerIp}/api/user/list`, {
         mode: "cors",
         method: "GET",
         credentials: "include",
@@ -143,7 +143,7 @@ export default function UserManagementTable() {
 
   const deleteUser = async (userId: string) => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://182.208.91.171:6789/api/user/" + userId, {
+      const response = await fetch(`http://${backendServerIp}/api/user/` + userId, {
         mode: "cors",
         method: "DELETE",
         credentials: "include",
@@ -166,6 +166,9 @@ export default function UserManagementTable() {
     });
   };
 
+  const getStringDate = (date: Date) => {
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+  };
   console.log(userList);
 
   return (
@@ -192,10 +195,10 @@ export default function UserManagementTable() {
                   {row.name}
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 100 }} align="center">
-                  {row.role}
+                  {row.role.substring(5)}
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 100 }} align="center">
-                  {row.lastLoginTime}
+                  {row.lastLoginTime && getStringDate(new Date(row.lastLoginTime))}
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 122 }} align="center">
                   <Button

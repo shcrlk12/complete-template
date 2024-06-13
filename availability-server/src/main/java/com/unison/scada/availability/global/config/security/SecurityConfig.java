@@ -1,14 +1,13 @@
 package com.unison.scada.availability.global.config.security;
 
 
+import com.unison.scada.availability.global.CorsProperties;
 import com.unison.scada.availability.global.config.security.handler.*;
 import com.unison.scada.availability.global.filter.CookieAttributeFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,7 +22,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
@@ -34,7 +32,7 @@ import java.util.Collections;
 public class SecurityConfig{
 
     private final UserDetailsService userDetailsService;
-
+    private final CorsProperties corsProperties;
     @Bean
     public AuthenticationSuccessHandler appAuthenticationSuccessHandler(){
         return new AppAuthenticationSuccessHandler();
@@ -64,7 +62,13 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(Arrays.asList("http://182.208.91.171:5151", "http://jeongam.scada.unison.co.kr:5151"));
+                    config.setAllowedOrigins(Arrays.asList("http://" +
+                                                            corsProperties.getIp() +
+                                                            ":" + corsProperties.getPort(),
+                                                            "http://" +
+                                                            corsProperties.getDomain() +
+                                                            ":" + corsProperties.getPort()
+                            ));
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));
@@ -88,6 +92,9 @@ public class SecurityConfig{
                                 ).hasAnyRole("USER", "MANAGER", "ADMIN")
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/memo/**")
+                                ).hasAnyRole("MANAGER", "ADMIN")
+                                .requestMatchers(
+                                        AntPathRequestMatcher.antMatcher("/api/reports/**")
                                 ).hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/user/**")

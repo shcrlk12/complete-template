@@ -46,6 +46,10 @@ public class AvailabilityType {
     private boolean isDelete;
 
     @Column(nullable = false)
+    @ColumnDefault("1")
+    private boolean isSave;
+
+    @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 

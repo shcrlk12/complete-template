@@ -6,7 +6,7 @@ import GlobalStyles from "@components/style/GlobalStyles";
 import UserManagement from "@pages/Users/UserManagement";
 import NewUser from "@pages/Users/NewUser";
 import ModifyUser from "@pages/Users/ModifyUser";
-import { Paths, headerNavList, projectVersion } from "./Config";
+import { Paths, backendServerIp, headerNavList, projectVersion } from "./Config";
 import Header from "@components/Header/Header";
 import Loading from "@components/App/Loading";
 import { useSelector } from "react-redux";
@@ -18,6 +18,8 @@ import { Dispatch, UnknownAction } from "redux";
 import { resetLoading, setLoading } from "@reducers/appAction";
 import { fetchData, statusOk } from "./util/fetch";
 import { parseyyyymmdd } from "./util/date";
+import StaticReport from "@pages/reports/StaticReport";
+import MemoReport from "@pages/reports/MemoReport";
 
 type PageRole = {
   path: string;
@@ -54,11 +56,13 @@ const getRouteByRole = (userRole: UserRoleType) => {
   const userRoleRoutes: PageRole[] = [
     ...anonymousRoleRoutes,
     { path: `${Paths.availability.annually.path}/:year`, component: <AvailabilityManagementAnnually /> },
+    { path: `${Paths.availability.daily.path}/:year/:month/:day`, component: <AvailabilityManagementDaily /> },
   ];
 
   const managerRoleRoutes: PageRole[] = [
     ...userRoleRoutes,
-    { path: `${Paths.availability.daily.path}/:year/:month/:day`, component: <AvailabilityManagementDaily /> },
+    { path: `${Paths.reports.static.path}`, component: <StaticReport /> },
+    { path: `${Paths.reports.memo.path}`, component: <MemoReport /> },
   ];
 
   const adminRoleRoutes: PageRole[] = [
@@ -99,7 +103,7 @@ const App = () => {
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://182.208.91.171:6789/api/login/auth", {
+      const response = await fetch(`http://${backendServerIp}/api/login/auth`, {
         mode: "cors",
         method: "GET",
         credentials: "include",

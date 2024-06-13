@@ -8,8 +8,8 @@ import java.util.List;
 
 @Getter
 public enum OPCGroupName {
-    REAL_TIME("RealTime"),
-    AVAILABILITY("Availability");
+    REAL_TIME("realTime"),
+    AVAILABILITY("availability");
 
     private final String name;
 

@@ -1,10 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 
-const CheckBoxContainer = styled.div`
-  height: 32px;
+const CheckBoxContainer = styled.div<{ width: string }>`
+  height: 20px;
   display: flex;
   align-items: center;
+  width: ${(props) => props.width};
 `;
 
 const CheckBoxInput = styled.input`
@@ -12,7 +13,7 @@ const CheckBoxInput = styled.input`
   height: 18px;
   width: 18px;
   border: 1px solid ${({ theme }) => theme.colors.primary};
-  border-radius: 3px;
+  border-radius: 9px;
   cursor: pointer;
   transition: background 300ms;
 
@@ -48,12 +49,19 @@ const CheckBoxLabel = styled.label`
   }
 `;
 
-const CheckBox = () => {
+type CheckBoxProps = {
+  checked: boolean;
+  type: "checkbox" | "radio";
+  text: string;
+  width?: string;
+  name: string;
+};
+const CheckBox = ({ checked, type, text, width = "auto", name }: CheckBoxProps) => {
   return (
-    <CheckBoxContainer>
+    <CheckBoxContainer width={width}>
       <CheckBoxLabel>
-        <CheckBoxInput type="checkbox" />
-        <span>Remember me</span>
+        <CheckBoxInput checked={checked} type={type} name={name} value={text} />
+        <span>{text}</span>
       </CheckBoxLabel>
     </CheckBoxContainer>
   );

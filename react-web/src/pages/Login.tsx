@@ -6,7 +6,7 @@ import Button from "../components/Button/Button";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../reducers/userActions";
 import { useNavigate } from "react-router";
-import { Paths } from "../Config";
+import { Paths, backendServerIp } from "../Config";
 import { resetLoading, setLoading } from "@reducers/appAction";
 import { fetchData, statusOk } from "@src/util/fetch";
 import { parseyymmdd, parseyyyymmdd } from "@src/util/date";
@@ -56,7 +56,7 @@ const Login = () => {
     let formData = new FormData(event.currentTarget);
 
     fetchData(dispatch, navigate, async () => {
-      const response = await fetch("http://182.208.91.171:6789/api/login", {
+      const response = await fetch(`http://${backendServerIp}/api/login`, {
         mode: "cors",
         method: "POST",
         credentials: "include",
