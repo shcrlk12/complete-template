@@ -51,7 +51,7 @@ const MemoReport = () => {
   const { dispatch, navigate } = useInits();
   const [deviceType, setDeviceType] = useState<MemoReportSelectionData>({
     selectedDeviceType: "Wind farm",
-    selectedTurbine: "1",
+    selectedTurbine: "0",
     selectedWindFarm: "JEONG AM",
   });
 
@@ -167,7 +167,30 @@ const MemoReport = () => {
                 setStaticTableData(null);
               }}
             />
-            <Button text="Download" height="25px" radius="5px" />
+            <Button
+              text="Download"
+              height="25px"
+              radius="5px"
+              onClick={() => {
+                fetchData(dispatch, navigate, async () => {
+                  const response = await fetch(`http://${backendServerIp}/api/reports/memo/download/excel`, {
+                    mode: "cors",
+                    method: "GET",
+                    credentials: "include",
+                  });
+
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = "memo-report.xlsx";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+                });
+              }}
+            />
           </TopOnTableButtonContainer>
           <ReportTable tableHeader={staticTableData.tableHeader} tableData={staticTableData.tableData} />
         </ReportTableContainer>

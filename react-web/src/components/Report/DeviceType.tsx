@@ -47,10 +47,14 @@ const DeviceType = ({ onClick, onChange, props }: DeviceTypeProps) => {
           width="150px"
           name="device-type"
         />
-        <select name="wind-turbine" id="wind-turbine" disabled={props.selectedDeviceType !== "Wind turbine"}>
-          <option value="1">WTG01</option>
-          <option value="2">WTG02</option>
-          <option value="3">WTG03</option>
+        <select
+          name="wind-turbine"
+          id="wind-turbine"
+          disabled={props.selectedDeviceType !== "Wind turbine"}
+          value={props.selectedTurbine}>
+          <option value="0">WTG01</option>
+          <option value="1">WTG02</option>
+          <option value="2">WTG03</option>
         </select>
       </WindTurbineContainer>
     </StyledDeviceType>

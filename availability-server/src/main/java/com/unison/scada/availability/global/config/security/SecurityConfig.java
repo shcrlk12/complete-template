@@ -82,14 +82,15 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorizeRequest ->
                         authorizeRequest
                                 .requestMatchers(
+                                        AntPathRequestMatcher.antMatcher("/api/wind-farm/daily/register"),
+                                        AntPathRequestMatcher.antMatcher("/api/wind-farm/daily/reset")
+                                ).hasAnyRole("MANAGER", "ADMIN")
+                                .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/login/**")
                                 ).hasAnyRole("USER", "MANAGER", "ADMIN")
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/wind-farm/**")
-                                ).hasAnyRole("MANAGER", "ADMIN")
-                                .requestMatchers(
-                                        AntPathRequestMatcher.antMatcher("/api/wind-farm/realtime")
-                                ).hasAnyRole("USER", "MANAGER", "ADMIN")
+                                ).hasAnyRole("USER","MANAGER", "ADMIN")
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/memo/**")
                                 ).hasAnyRole("MANAGER", "ADMIN")

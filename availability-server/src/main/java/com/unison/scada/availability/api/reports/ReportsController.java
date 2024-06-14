@@ -2,17 +2,20 @@ package com.unison.scada.availability.api.reports;
 
 import com.unison.scada.availability.api.user.Error;
 import com.unison.scada.availability.api.user.JSONResponse;
-import com.unison.scada.availability.api.windfarm.WindFarmController;
-import com.unison.scada.availability.api.windfarm.annually.AnnuallyWindFarmDTO;
-import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmDTO;
+import com.unison.scada.availability.global.ReportExcelGenerator;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -54,7 +57,6 @@ public class ReportsController {
     public ResponseEntity<JSONResponse<MemoReportDTO.Response, Error>> getMemoReport(
             Principal principal,
             @ModelAttribute ReportsDTO.Request request
-
     ) {
 
         MemoReportDTO.Response response = reportsService.getMemoReportData(principal, request);
@@ -65,6 +67,12 @@ public class ReportsController {
                         JSONResponse.<MemoReportDTO.Response, Error>builder()
                                 .data(response)
                                 .build()
-                );    }
+                );
+    }
 
+    @GetMapping("/memo/download/excel")
+    public void memoExcelDownload(HttpServletResponse response, Principal principal) throws Exception {
+
+        reportsService.memoReportExcelGenerate(response, principal);
+    }
 }

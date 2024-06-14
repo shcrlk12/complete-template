@@ -79,7 +79,7 @@ export const headerNavList: HeaderNavList[] = [
         name: "일간 가동률 현황",
         link: `${Paths.availability.daily.path}/${year}/${month}/${day}`,
         allowVersion: TYPE1_VERSION,
-        userRole: ROLE_MANAGER,
+        userRole: ROLE_USER,
       },
       {
         name: "Settings",

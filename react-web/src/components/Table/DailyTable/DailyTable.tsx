@@ -40,6 +40,7 @@ import { RootState } from "@src/index";
 import { flexCenter, flexRowReverse } from "@components/style/Common";
 import theme from "@components/style/Theme";
 import { fetchData, statusOk } from "@src/util/fetch";
+import { ROLE_USER } from "@reducers/userActions";
 
 type ColorType = {
   name: string;
@@ -114,6 +115,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
   const [tableData, setTableData] = useState(dailyTableData);
 
   const { startOfWarrantyDate } = useSelector((store: RootState) => store.appReducer);
+  const userRole = useSelector((store: RootState) => store.userReducer.user.role);
 
   useEffect(() => {
     initAvailabilityMap();
@@ -653,6 +655,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
             <ButtonContainer>
               <StyledButton
                 text="저장"
+                disabled={userRole === ROLE_USER}
                 onClick={() => {
                   if (getTotalTime(map) < 60) {
                     alert("시간 합계가 60분 이하 입니다.");
@@ -694,6 +697,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
               />
               <StyledButton
                 text="시간 초기화"
+                disabled={userRole === ROLE_USER}
                 onClick={() => {
                   initAvailabilityMap();
                 }}

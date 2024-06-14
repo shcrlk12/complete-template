@@ -10,5 +10,5 @@ import java.util.Map;
 @Getter
 public class MemoReportDataInMemory {
 
-    private Map<String, MemoReportDTO.Response> memoReportDataMap = new HashMap<>();
+    private final Map<String, MemoReportDTO.Response> memoReportDataMap = new HashMap<>();
 }

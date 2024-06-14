@@ -5,9 +5,13 @@ type ButtonProps = {
   isPrimary?: boolean;
   isDangerous?: boolean;
   fontWeight?: number;
-  text?: string;
+  text?: string | JSX.Element;
   onClick?: any;
   width?: string;
+  height?: string;
+  radius?: string;
+  padding?: string;
+  disabled?: boolean;
   type?: "submit" | "button" | "reset";
 };
 
@@ -18,7 +22,11 @@ const Button = ({
   fontWeight,
   text,
   width = "auto",
+  height = "40px",
+  radius = "20px",
+  padding = "5px 20px",
   onClick,
+  disabled = false,
   type,
 }: ButtonProps) => {
   return (
@@ -30,7 +38,11 @@ const Button = ({
         isDangerous={isDangerous}
         fontWeight={fontWeight}
         width={width}
-        onClick={onClick}>
+        height={height}
+        radius={radius}
+        padding={padding}
+        onClick={onClick}
+        disabled={disabled}>
         {text}
       </StyledButton>
     </>

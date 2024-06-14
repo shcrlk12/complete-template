@@ -15,8 +15,8 @@ public class ReportsMapper {
         MemoReportDTO.Response.MemoData response;
 
         return MemoReportDTO.Response.MemoData.builder()
-                .deviceName(String.format("WTG%02d", memo.getMemoId().getTurbineId()))
                 .timeStamp(memo.getMemoId().getTimestamp())
+                .deviceName(String.format("WTG%02d", memo.getMemoId().getTurbineId() + 1))
                 .engineerName(memo.getEngineerName())
                 .workTime(memo.getWorkTime())
                 .material(memo.getMaterial())
@@ -35,10 +35,10 @@ public class ReportsMapper {
 
         List<String> headerList = new ArrayList<>();
 
-        headerList.add("Device Name");
         headerList.add("Time");
+        headerList.add("Device Name");
         headerList.add("작업자");
-        headerList.add("시간");
+        headerList.add("작업 시간");
         headerList.add("자재");
         headerList.add("수량");
         headerList.add("작업 유형");

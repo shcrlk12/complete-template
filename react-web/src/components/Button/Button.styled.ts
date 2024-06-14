@@ -5,6 +5,9 @@ const StyledButton = styled.button<{
   isDangerous?: boolean;
   fontWeight?: number;
   width?: string;
+  height?: string;
+  radius?: string;
+  padding?: string;
 }>`
   background-color: ${(props) =>
     props.isPrimary
@@ -13,13 +16,13 @@ const StyledButton = styled.button<{
         ? props.theme.colors.activeDangerous
         : props.theme.colors.quaternary};
   border: none;
-  border-radius: 20px;
-  height: 40px;
+  border-radius: ${(props) => props.radius};
+  height: ${(props) => props.height};
   width: ${(props) => props.width};
   color: ${(props) =>
     props.isPrimary || props.isDangerous ? props.theme.colors.textOnPrimary : props.theme.colors.black};
   font-size: 14px;
-  padding: 5px 20px;
+  padding: ${(props) => props.padding};
   box-shadow: 1px 1px 5px ${({ theme }) => theme.colors.secondary};
 
   cursor: pointer;
