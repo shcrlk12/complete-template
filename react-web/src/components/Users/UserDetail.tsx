@@ -88,6 +88,13 @@ const UserDetail = ({
           isPrimary={true}
           width="auto"
           onClick={() => {
+            if (confirmPasswordRef.current?.value !== passwordRef.current?.value) {
+              alert("확인 비밀번호를 정확히 입력하세요.");
+              return;
+            } else if (nameRef.current?.value === "") {
+              alert("이름을 입력하세요.");
+              return;
+            }
             saveButtonOnClick({
               id: emailRef.current?.value || "",
               password: passwordRef.current?.value || "",
