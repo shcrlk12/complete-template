@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,11 +25,12 @@ public class ReportsController {
 
     @GetMapping("/static")
     public ResponseEntity<JSONResponse<ReportsDTO.Response, Error>> getStaticReport(
+            Principal principal,
             @ModelAttribute ReportsDTO.Request request
 
             ) {
 
-        ReportsDTO.Response response = reportsService.getStaticReportData(request);
+        ReportsDTO.Response response = reportsService.getStaticReportData(principal, request);
 //        String[] startDateSplits = startDate.split("_");
 //        String[] endDateSplits = startDate.split("_");
 //
@@ -48,17 +51,18 @@ public class ReportsController {
                 );    }
 
     @GetMapping("/memo")
-    public ResponseEntity<JSONResponse<ReportsDTO.Response, Error>> getMemoReport(
+    public ResponseEntity<JSONResponse<MemoReportDTO.Response, Error>> getMemoReport(
+            Principal principal,
             @ModelAttribute ReportsDTO.Request request
 
     ) {
 
-        ReportsDTO.Response response = reportsService.getMemoReportData(request);
+        MemoReportDTO.Response response = reportsService.getMemoReportData(principal, request);
 
 
         return ResponseEntity.ok()
                 .body(
-                        JSONResponse.<ReportsDTO.Response, Error>builder()
+                        JSONResponse.<MemoReportDTO.Response, Error>builder()
                                 .data(response)
                                 .build()
                 );    }

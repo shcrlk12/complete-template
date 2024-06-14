@@ -33,3 +33,8 @@ export const parseyyyymmdd = (date: Date) => {
 
   return { year, month, day };
 };
+
+export function isIsoDateString(str: string) {
+  const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/;
+  return iso8601Regex.test(str);
+}

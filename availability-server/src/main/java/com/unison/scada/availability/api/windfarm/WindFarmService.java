@@ -51,7 +51,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         Map<Integer, List<Memo>> memoMap = memos.stream().collect(Collectors.groupingBy((data) -> data.getMemoId().getTurbineId()));
         List<Map<LocalDateTime, Memo>> data22 = new ArrayList<>();
 
-        for(int turbineId = 0; turbineId < windFarmProperties.getTurbinesNumber(); turbineId++) {
+        for(int turbineId = 1; turbineId <= windFarmProperties.getTurbinesNumber(); turbineId++) {
             Map<LocalDateTime, Memo> data = new HashMap<>();
             Optional<List<Memo>> optionalAvailabilityDataList = Optional.ofNullable(memoMap.get(turbineId));
 
@@ -260,7 +260,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         int turbinesNumber = windFarmProperties.getTurbinesNumber();
 
         Optional<AvailabilityType> informationUnavailableType = availabilityTypeRepository.findByName(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE);
-        for(int turbineId = 0; turbineId < turbinesNumber; turbineId++)
+        for(int turbineId = 1; turbineId <= turbinesNumber; turbineId++)
         {
             Map<LocalDateTime, List<AvailabilityData>> data = new HashMap<>();
 
@@ -564,7 +564,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
         List<Map<LocalDateTime, Avail>> turbines = new ArrayList<>();
 
-        for(int turbineId = 0; turbineId < windFarmProperties.getTurbinesNumber(); turbineId++)
+        for(int turbineId = 1; turbineId <= windFarmProperties.getTurbinesNumber(); turbineId++)
         {
             Map<LocalDateTime, Avail> data = new HashMap<>();
             if(listMap.containsKey(turbineId)) {

@@ -6,7 +6,7 @@ import { ButtonContainer } from "@pages/Common.styled";
 import DeviceType from "./../../components/Report/DeviceType";
 import Period from "./../../components/Report/Period";
 import ReportType from "./../../components/Report/ReportType";
-import StaticReportDataTable, { StaticReportDataTableProps } from "@components/Report/Table/StaticReportDataTable";
+import ReportTable, { ReportTableProps } from "@components/Report/Table/ReportTable";
 import { backendServerIp } from "@src/Config";
 import { fetchData, statusOk } from "@src/util/fetch";
 
@@ -24,10 +24,10 @@ const StaticReport = () => {
   const [startDate, setStartDate] = useState<Date>(new Date(Date.now()));
   const [endDate, setEndDate] = useState<Date>(new Date(Date.now()));
   const [reportType, setReportType] = useState<string>("Hourly");
-  const [staticTableData, setStaticTableData] = useState<StaticReportDataTableProps[]>();
+  const [staticTableData, setStaticTableData] = useState<ReportTableProps[]>();
 
-  const createStaticData = (): StaticReportDataTableProps => {
-    let newArr: StaticReportDataTableProps = {
+  const createStaticData = (): ReportTableProps => {
+    let newArr: ReportTableProps = {
       tableHeader: [
         { name: "Device Name", unit: null },
         { name: "Time", unit: null },
@@ -145,7 +145,7 @@ const StaticReport = () => {
           </ButtonContainer>
         </ReportInner>
       ) : (
-        <StaticReportDataTable tableHeader={tableHeader} tableData={tableData} />
+        <ReportTable tableHeader={tableHeader} tableData={tableData} />
       )}
     </ReportContainer>
   );

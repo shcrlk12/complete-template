@@ -1,6 +1,9 @@
 package com.unison.scada.availability.api.reports;
 
+import java.security.Principal;
+import java.util.List;
+
 public interface MemoReportService {
-    ReportsDTO.Response getMemoReportData(ReportsDTO.Request request);
+    MemoReportDTO.Response getMemoReportData(Principal principal, ReportsDTO.Request request);
 
 }

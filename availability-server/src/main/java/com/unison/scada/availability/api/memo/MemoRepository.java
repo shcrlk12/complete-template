@@ -1,5 +1,6 @@
 package com.unison.scada.availability.api.memo;
 
+import com.unison.scada.availability.api.windfarm.WindFarmOverview;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,4 +14,15 @@ public interface MemoRepository extends JpaRepository<Memo, Memo.MemoId> {
             "WHERE " +
             "m.memoId.timestamp BETWEEN :startTime AND :endTime")
     List<Memo> findAllDataByTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+
+    @Query("SELECT m " +
+            "FROM Memo m " +
+            "WHERE m.memoId.timestamp BETWEEN :startTime AND :endTime " +
+            "AND m.memoId.windFarmId = :windFarmId " +
+            "AND m.memoId.turbineId = :turbineId")
+    List<Memo> findByIdBetween(@Param("windFarmId") Integer windFarmId, @Param("turbineId") Integer turbineId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+
+
+    List<Memo> findByMemoIdWindFarmIdAndMemoIdTimestampBetween(Integer windFarmId, LocalDateTime startTime, LocalDateTime endTime);
+
 }

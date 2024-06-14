@@ -74,6 +74,9 @@ public class Memo {
         private LocalDateTime timestamp;
 
         @Column
-        private int turbineId;
+        private Integer windFarmId;
+
+        @Column
+        private Integer turbineId;
     }
 }
