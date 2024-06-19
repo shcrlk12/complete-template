@@ -116,6 +116,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
 
   const { startOfWarrantyDate } = useSelector((store: RootState) => store.appReducer);
   const userRole = useSelector((store: RootState) => store.userReducer.user.role);
+  const startWarrantyDate = new Date(startOfWarrantyDate);
 
   useEffect(() => {
     initAvailabilityMap();
@@ -711,7 +712,7 @@ const DailyTable = ({ dailyTableData }: { dailyTableData: DailyTableData }) => {
           let date = new Date(tableData.date);
           date.setDate(date.getDate() - 1);
 
-          if (startOfWarrantyDate.getTime() <= date.getTime()) {
+          if (startWarrantyDate.getTime() <= date.getTime()) {
             removeAllSelectedCell(seleectedCell);
             navigate(Paths.availability.daily.path + `/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
           }

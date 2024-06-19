@@ -2,7 +2,8 @@ package com.unison.scada.availability.api.reports;
 
 
 import com.unison.scada.availability.api.memo.Memo;
-import org.springframework.stereotype.Component;
+import com.unison.scada.availability.api.reports.daily.DailyReportDTO;
+import com.unison.scada.availability.api.reports.memo.MemoReportDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,4 +53,30 @@ public class ReportsMapper {
     }
 
 
+    public static DailyReportDTO.Response toDailyReport(){
+
+        DailyReportDTO.Response response = new DailyReportDTO.Response();
+
+        List<String> headerList = new ArrayList<>();
+
+        headerList.add("호기");
+        headerList.add("발전량 [kWh]");
+        headerList.add("가동률 [%]");
+        headerList.add("이용률 [%]");
+        headerList.add("월 누적 발전량 [kWh]");
+        headerList.add("월 누적 이용률 [%]");
+        headerList.add("월 누적 가동률 [%]");
+
+        DailyReportDTO.Response.DailyData dailyData = DailyReportDTO.Response.DailyData.builder()
+                .deviceName("TOTAL")
+
+                .build();
+
+        List<DailyReportDTO.Response.DailyData> dailyDataList = new ArrayList<>();
+
+        response.setHeaderList(headerList);
+        response.setTableData(dailyDataList);
+
+        return response;
+    }
 }

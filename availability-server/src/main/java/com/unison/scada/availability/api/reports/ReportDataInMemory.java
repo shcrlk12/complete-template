@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Component
 @Getter
-public class MemoReportDataInMemory {
+public class ReportDataInMemory {
 
-    private final Map<String, MemoReportDTO.Response> memoReportDataMap = new HashMap<>();
+    private final Map<String, Object> reportDataMap = new HashMap<>();
 }

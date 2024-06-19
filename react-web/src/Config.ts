@@ -18,6 +18,7 @@ export type PathType = {
     logs: PathDetail;
   };
   reports: {
+    daily: PathDetail;
     static: PathDetail;
     memo: PathDetail;
   };
@@ -50,6 +51,7 @@ export const Paths: PathType = {
     logs: { path: "/availability/logs", title: "Logs" },
   },
   reports: {
+    daily: { path: "/reports/daily", title: "Daily Report" },
     static: { path: "/reports/static", title: "Static Report" },
     memo: { path: "/reports/memo", title: "Memo Report" },
   },
@@ -100,6 +102,12 @@ export const headerNavList: HeaderNavList[] = [
     allowVersion: TYPE2_VERSION,
     userRole: ROLE_USER,
     LNBList: [
+      {
+        name: "Daily report",
+        link: Paths.reports.daily.path,
+        allowVersion: TYPE2_VERSION,
+        userRole: ROLE_USER,
+      },
       {
         name: "Static report",
         link: Paths.reports.static.path,

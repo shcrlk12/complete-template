@@ -20,6 +20,7 @@ import { fetchData, statusOk } from "./util/fetch";
 import { parseyyyymmdd } from "./util/date";
 import StaticReport from "@pages/reports/StaticReport";
 import MemoReport from "@pages/reports/MemoReport";
+import DailyReport from "@pages/reports/DailyReport";
 
 type PageRole = {
   path: string;
@@ -57,13 +58,12 @@ const getRouteByRole = (userRole: UserRoleType) => {
     ...anonymousRoleRoutes,
     { path: `${Paths.availability.annually.path}/:year`, component: <AvailabilityManagementAnnually /> },
     { path: `${Paths.availability.daily.path}/:year/:month/:day`, component: <AvailabilityManagementDaily /> },
-  ];
-
-  const managerRoleRoutes: PageRole[] = [
-    ...userRoleRoutes,
+    { path: `${Paths.reports.daily.path}`, component: <DailyReport /> },
     { path: `${Paths.reports.static.path}`, component: <StaticReport /> },
     { path: `${Paths.reports.memo.path}`, component: <MemoReport /> },
   ];
+
+  const managerRoleRoutes: PageRole[] = [...userRoleRoutes];
 
   const adminRoleRoutes: PageRole[] = [
     ...managerRoleRoutes,
@@ -98,8 +98,6 @@ const App = () => {
   const userRole = useSelector((store: RootState) => store.userReducer.user.role);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  console.log("App Rendering");
 
   useEffect(() => {
     fetchData(dispatch, navigate, async () => {

@@ -96,7 +96,7 @@ public class SecurityConfig{
                                 ).hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/reports/**")
-                                ).hasAnyRole("MANAGER", "ADMIN")
+                                ).hasAnyRole("USER", "MANAGER", "ADMIN")
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/api/user/**")
                                 ).hasAnyRole("ADMIN")

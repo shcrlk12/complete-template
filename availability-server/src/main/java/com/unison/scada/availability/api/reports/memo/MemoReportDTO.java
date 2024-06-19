@@ -1,4 +1,4 @@
-package com.unison.scada.availability.api.reports;
+package com.unison.scada.availability.api.reports.memo;
 
 import jakarta.persistence.Column;
 import lombok.Builder;

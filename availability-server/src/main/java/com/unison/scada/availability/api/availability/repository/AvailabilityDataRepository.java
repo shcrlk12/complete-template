@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AvailabilityDataRepository extends JpaRepository<AvailabilityData, AvailabilityData.AvailabilityDataId> {
@@ -26,7 +27,7 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
             "AND at.variable_type = 2 " +
             "ORDER BY timestamp " +
             "ASC", nativeQuery = true)
-    Long getTimeAfterCertainTimestamp(@Param("turbineId") int turbineId, @Param("availabilityTypeUUID") UUID availabilityTypeUUID, @Param("time") LocalDateTime time);
+    Optional<Long> getTimeAfterCertainTimestamp(@Param("turbineId") int turbineId, @Param("availabilityTypeUUID") UUID availabilityTypeUUID, @Param("time") LocalDateTime time);
 
     @Query(value = "SELECT TOP 1 time FROM AVAILABILITY_DATA ad left outer join AVAILABILITY_TYPE at on ad.AVAILABILITY_TYPE_UUID = at.UUID " +
             "WHERE turbine_id = :turbineId " +
@@ -35,7 +36,7 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
             "AND at.variable_type = 2 " +
             "ORDER BY timestamp " +
             "DESC", nativeQuery = true)
-    Long getTimeBeforeCertainTimestamp(@Param("turbineId") int turbineId, @Param("availabilityTypeUUID") UUID availabilityTypeUUID, @Param("time") LocalDateTime time);
+    Optional<Long> getTimeBeforeCertainTimestamp(@Param("turbineId") int turbineId, @Param("availabilityTypeUUID") UUID availabilityTypeUUID, @Param("time") LocalDateTime time);
 
     @Query("SELECT ad " +
             "FROM AvailabilityData ad " +

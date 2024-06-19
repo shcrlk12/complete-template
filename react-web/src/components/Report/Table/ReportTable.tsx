@@ -18,7 +18,6 @@ import { JSX } from "react/jsx-runtime";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import { KeyboardArrowLeft, KeyboardArrowRight, Padding } from "@mui/icons-material";
 import LastPageIcon from "@mui/icons-material/LastPage";
-import { useTheme } from "styled-components";
 import { TablePaginationActionsProps } from "@mui/material/TablePagination/TablePaginationActions";
 import { isIsoDateString } from "@src/util/date";
 
@@ -50,8 +49,11 @@ const StyledTableCell = styled(TableCell)({
   },
 });
 
+export const initReportTableProps = (): ReportTableProps => {
+  return { tableHeader: [], tableData: { row: [] } };
+};
+
 function TablePaginationActions(props: TablePaginationActionsProps) {
-  const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -136,8 +138,8 @@ const ReportTable = ({ tableHeader, tableData }: ReportTableProps) => {
   const createTableHeader = () => {
     return (
       <>
-        {tableHeader.map((value) => (
-          <StyledTableCell style={{ padding: "5px", border: "1px solid #427D9E" }} align="center">
+        {tableHeader.map((value, index) => (
+          <StyledTableCell key={index} style={{ padding: "5px", border: "1px solid #427D9E" }} align="center">
             <div>{value.name}</div>
             <div>{value.unit && `[${value.unit}]`}</div>
           </StyledTableCell>

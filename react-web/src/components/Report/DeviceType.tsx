@@ -25,22 +25,24 @@ type DeviceTypeProps = {
 
 const DeviceType = ({ onClick, onChange, props }: DeviceTypeProps) => {
   return (
-    <StyledDeviceType onChange={onChange}>
+    <StyledDeviceType>
       <ItemHeader>Device Type</ItemHeader>
       <WindFarmContainer>
         <CheckBox
+          onChange={onChange}
           checked={props.selectedDeviceType === "Wind farm"}
           type="radio"
           text="Wind farm"
           width="150px"
           name="device-type"
         />
-        <select name="wind-farm" id="wind-farm" disabled={props.selectedDeviceType !== "Wind farm"}>
+        <select onChange={onChange} name="wind-farm" id="wind-farm" disabled={props.selectedDeviceType !== "Wind farm"}>
           <option value="jeong-am">JEONG AM</option>
         </select>
       </WindFarmContainer>
       <WindTurbineContainer>
         <CheckBox
+          onChange={onChange}
           checked={props.selectedDeviceType === "Wind turbine"}
           type="radio"
           text="Wind turbine"
@@ -48,6 +50,7 @@ const DeviceType = ({ onClick, onChange, props }: DeviceTypeProps) => {
           name="device-type"
         />
         <select
+          onChange={onChange}
           name="wind-turbine"
           id="wind-turbine"
           disabled={props.selectedDeviceType !== "Wind turbine"}

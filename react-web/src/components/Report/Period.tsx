@@ -30,10 +30,12 @@ const Period = ({ startDate, endDate, onChange }: PeriodProps) => {
   const { startOfWarrantyDate } = useSelector((store: RootState) => store.appReducer);
   const now = new Date(Date.now());
 
-  const getDateOpeions = (date: Date, type: string) => {
+  const startWarrantyDate = new Date(startOfWarrantyDate);
+
+  const createDateOpsionSinceStartDate = (date: Date, type: string) => {
     const options = [];
     if (type === "year") {
-      for (let time = startOfWarrantyDate.getFullYear(); time <= now.getFullYear(); time++)
+      for (let time = startWarrantyDate.getFullYear(); time <= now.getFullYear(); time++)
         options.push(<option value={time}>{time}</option>);
     } else if (type === "month") {
       for (let time = 1; time <= 12; time++) options.push(<option value={time}>{time}</option>);
@@ -45,34 +47,34 @@ const Period = ({ startDate, endDate, onChange }: PeriodProps) => {
     return options;
   };
   return (
-    <StyledPeriods onChange={onChange}>
+    <StyledPeriods>
       <ItemHeader>Periods</ItemHeader>
       <FromContainer>
         <PeriodDateText>From:</PeriodDateText>
-        <select value={startDate.getFullYear()} name="start-date-year" id="start-date-year">
-          {getDateOpeions(startDate, "year")}
+        <select onChange={onChange} value={startDate.getFullYear()} name="start-date-year" id="start-date-year">
+          {createDateOpsionSinceStartDate(startDate, "year")}
         </select>
         -
-        <select value={startDate.getMonth() + 1} name="start-date-month" id="start-date-month">
-          {getDateOpeions(startDate, "month")}
+        <select onChange={onChange} value={startDate.getMonth() + 1} name="start-date-month" id="start-date-month">
+          {createDateOpsionSinceStartDate(startDate, "month")}
         </select>
         -
-        <select value={startDate.getDate()} name="start-date-date" id="start-date-date">
-          {getDateOpeions(startDate, "date")}
+        <select onChange={onChange} value={startDate.getDate()} name="start-date-date" id="start-date-date">
+          {createDateOpsionSinceStartDate(startDate, "date")}
         </select>
       </FromContainer>
       <ToContainer>
         <PeriodDateText>To:</PeriodDateText>
-        <select value={endDate.getFullYear()} name="end-date-year" id="end-date-year">
-          {getDateOpeions(endDate, "year")}
+        <select onChange={onChange} value={endDate.getFullYear()} name="end-date-year" id="end-date-year">
+          {createDateOpsionSinceStartDate(endDate, "year")}
         </select>
         -
-        <select value={endDate.getMonth() + 1} name="end-date-month" id="end-date-month">
-          {getDateOpeions(endDate, "month")}
+        <select onChange={onChange} value={endDate.getMonth() + 1} name="end-date-month" id="end-date-month">
+          {createDateOpsionSinceStartDate(endDate, "month")}
         </select>
         -
-        <select value={endDate.getDate()} name="end-date-date" id="end-date-date">
-          {getDateOpeions(endDate, "date")}
+        <select onChange={onChange} value={endDate.getDate()} name="end-date-date" id="end-date-date">
+          {createDateOpsionSinceStartDate(endDate, "date")}
         </select>
       </ToContainer>
     </StyledPeriods>

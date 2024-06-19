@@ -6,4 +6,14 @@ public class Util {
             return "";
         return o.toString();
     }
+
+    public static boolean isEmpty(Object o){
+        if(o == null){
+            return true;
+        }
+        else if(o == ""){
+            return true;
+        }
+        return false;
+    }
 }

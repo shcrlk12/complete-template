@@ -55,12 +55,14 @@ type CheckBoxProps = {
   text: string;
   width?: string;
   name: string;
+  onChange?: any;
 };
-const CheckBox = ({ checked, type, text, width = "auto", name }: CheckBoxProps) => {
+
+const CheckBox = ({ checked, type, text, width = "auto", name, onChange }: CheckBoxProps) => {
   return (
     <CheckBoxContainer width={width}>
       <CheckBoxLabel>
-        <CheckBoxInput checked={checked} type={type} name={name} value={text} />
+        <CheckBoxInput readOnly onChange={onChange} checked={checked} type={type} name={name} value={text} />
         <span>{text}</span>
       </CheckBoxLabel>
     </CheckBoxContainer>

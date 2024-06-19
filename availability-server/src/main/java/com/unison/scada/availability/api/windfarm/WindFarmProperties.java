@@ -12,5 +12,4 @@ import org.springframework.context.annotation.Configuration;
 public class WindFarmProperties {
 
     private int turbinesNumber = 1;
-    private String totalExportedPowerName;
 }

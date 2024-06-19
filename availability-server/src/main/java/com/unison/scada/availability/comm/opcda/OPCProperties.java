@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -23,6 +24,7 @@ public class OPCProperties {
     @Getter
     @Setter
     public static class Variable{
+        private UUID uuid;
         private String name;
         private String type;
     }

@@ -15,3 +15,25 @@ export const Header = styled.div`
   padding: 10px 10px;
   border-bottom: ${({ theme }) => theme.colors.quaternary} solid 1px;
 `;
+
+export const TopOnTableButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+`;
+
+export const RightHeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const DateContainer = styled.div`
+  margin-right: 30px;
+  font-weight: bold;
+`;
+
+export const ReportTableContainer = styled.div`
+  padding: 10px;
+`;

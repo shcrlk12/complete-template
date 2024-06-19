@@ -20,7 +20,7 @@ type AppAction =
 type AppState = {
   headerTiemVisible: HeaderTiemVisible;
   isLoading: boolean;
-  startOfWarrantyDate: Date;
+  startOfWarrantyDate: string;
 };
 
 const initialState: AppState = {
@@ -30,7 +30,7 @@ const initialState: AppState = {
     logoutBtn: true,
   },
   isLoading: false,
-  startOfWarrantyDate: new Date(),
+  startOfWarrantyDate: new Date().toISOString(),
 };
 
 const appReducer = (state: AppState = initialState, action: AppAction) => {

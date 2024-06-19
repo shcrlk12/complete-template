@@ -22,7 +22,7 @@ public class ReportExcelGenerator implements ExcelGenerator {
     private final XSSFCellStyle bodyXssfCellStyle;
 
     public ReportExcelGenerator(){
-        this("default");
+        this("report");
     }
 
     public ReportExcelGenerator(String sheetName){

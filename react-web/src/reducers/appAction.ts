@@ -12,7 +12,7 @@ export type HeaderTiemVisible = {
 
 export const setStartOfWarrantyDate = (date: Date) => ({
   type: SET_WARRANTY_DATE,
-  payload: date,
+  payload: date.toISOString(),
 });
 
 // action 생성 함수
