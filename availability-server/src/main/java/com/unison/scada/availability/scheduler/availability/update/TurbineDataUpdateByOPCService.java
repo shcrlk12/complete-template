@@ -1,6 +1,8 @@
 package com.unison.scada.availability.scheduler.availability.update;
 
-import com.unison.scada.availability.api.availability.entity.AvailabilityData;
+import com.unison.scada.availability.api.availability.variable.ConstantVariable;
+import com.unison.scada.availability.api.availability.variable.Variable;
+import com.unison.scada.availability.api.availability.variable.VariableRepository;
 import com.unison.scada.availability.api.windfarm.WindFarmProperties;
 import com.unison.scada.availability.comm.opcda.*;
 import com.unison.scada.availability.scheduler.availability.model.AvailabilityStatus;
@@ -11,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -25,26 +26,37 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
     Logger logger = LoggerFactory.getLogger(TurbineDataUpdateByOPCService.class);
 
     private final int DEFAULT_OPC_GROUP_UPDATE_RATE = 500;
-
+    private final String opcGroupName = "WindTurbine";
 
     private final AvailabilityTotalTime availabilityTotalTime;
     private final WindFarmProperties windFarmProperties;
     private final OPCProperties opcProperties;
     private OPCServer opcServer;
+    private final VariableRepository variableRepository;
 
     private boolean initialize = false;
 
     private final String prefix;
 
-    TurbineDataUpdateByOPCService(AvailabilityTotalTime availabilityTotalDatas, WindFarmProperties windFarmProperties, OPCProperties opcProperties){
+    TurbineDataUpdateByOPCService(AvailabilityTotalTime availabilityTotalDatas, WindFarmProperties windFarmProperties, OPCProperties opcProperties, VariableRepository variableRepository){
         this.availabilityTotalTime = availabilityTotalDatas;
         this.windFarmProperties = windFarmProperties;
         this.opcProperties = opcProperties;
+        this.variableRepository = variableRepository;
 
         prefix = opcProperties.getPrefixFormat();
     }
 
     private void initialize() throws OPCException, OPCNotFoundException {
+        /*
+        * Initialize OPC Variables
+        * */
+        List<Variable> variableList = variableRepository.findByIsActiveTrue();
+        ConstantVariable.setOpcVariableName(variableList);
+
+        /*
+        * Configure OPC Server
+        * */
         this.opcServer = new OPCServer(opcProperties.getServerName());
 
         //create opc group names by prefix format
@@ -52,17 +64,12 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
 
         //config opc group name
         for (String prefixName : prefixNames) {
-            for (OPCGroupName opcGroupName : OPCGroupName.getGroupsNames()) {
+            opcServer.addNewGroup(prefixName + opcGroupName, (int) (long) DEFAULT_OPC_GROUP_UPDATE_RATE, 0, true);
 
-                opcServer.addNewGroup(prefixName + opcGroupName.getName(), (int) (long) DEFAULT_OPC_GROUP_UPDATE_RATE, 0, true);
-
-                Map<String, List<OPCProperties.Variable>> groupVariable = opcProperties.getVariable().stream()
-                        .collect(Collectors.groupingBy(OPCProperties.Variable::getType));
-
-                for (OPCProperties.Variable variable : groupVariable.get(opcGroupName.getName())) {
-                    addOPCItem(prefixName + opcGroupName.getName(), prefixName + variable.getName());
-                }
+            for (Variable variable : variableList) {
+                addOPCItem(prefixName + opcGroupName, prefixName + variable.getName());
             }
+
         }
     }
 
@@ -97,37 +104,23 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
         String prefixTurbineId = getPrefixByTurbineId(turbineId);
 
         //get variable of real time opc group
-        OPCGroup realTimeOPCGroup = opcServer.getGroupByName(prefixTurbineId + OPCGroupName.REAL_TIME.getName());
+        OPCGroup realTimeOPCGroup = opcServer.getGroupByName(prefixTurbineId + opcGroupName);
         realTimeOPCGroup.syncRead(OPC.OPC_DS_CACHE);
 
         Map<String, Double> dataMap = new HashMap<>();
 
-        Map<String, List<OPCProperties.Variable>> groupVariable = opcProperties.getVariable().stream()
-                                                                                .collect(Collectors.groupingBy(OPCProperties.Variable::getType));
+        for(ConstantVariable constantVariable : ConstantVariable.values()){
+            String realTimeValue = realTimeOPCGroup.getItemByName(prefixTurbineId + constantVariable.getOpcVariableName()).getValueAsString();
 
-        for(OPCProperties.Variable variable : groupVariable.get(OPCGroupName.REAL_TIME.getName()))
-        {
-            String realTimeValue = realTimeOPCGroup.getItemByName(prefixTurbineId + variable.getName()).getValueAsString();
-
-            dataMap.put(variable.getName(), Double.parseDouble(realTimeValue));
+            dataMap.put(constantVariable.getOpcVariableName(), Double.parseDouble(realTimeValue));
         }
 
-        //get variable of availability opc group
-        OPCGroup availabilityOPCGroup = opcServer.getGroupByName(prefixTurbineId + OPCGroupName.AVAILABILITY.getName());
-        availabilityOPCGroup.syncRead(OPC.OPC_DS_CACHE);
-
-        OPCProperties.Variable variable = groupVariable.get(OPCGroupName.AVAILABILITY.getName())
-                                                                            .stream()
-                                                                            .findFirst()
-                                                                            .get();
-
-        OPCItem availabilityOPCItem = availabilityOPCGroup.getItemByName(prefixTurbineId + variable.getName());
-        String availability = availabilityOPCItem.getValueAsString();
+        Double availabilitySt = dataMap.get(ConstantVariable.TURBINE_MAIN_STATUS.getOpcVariableName());
 
         return Turbine.builder()
                 .turbineId(turbineId)
                 .dataMap(dataMap)
-                .availabilityStatus(AvailabilityStatus.getStatus(Integer.parseInt(availability)))
+                .availabilityStatus(AvailabilityStatus.getStatus(availabilitySt.intValue()))
                 .build();
     }
 

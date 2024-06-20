@@ -23,7 +23,7 @@ public class AvailabilityService {
     private final WindFarmProperties windFarmProperties;
 
     public List<Map<LocalDateTime, List<AvailabilityData>>> getDailyMap(LocalDateTime startTime, LocalDateTime endTime){
-        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, endTime, 1);
+        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, endTime);
 
         Map<Integer, List<AvailabilityData>> listMap = availabilityDataList.stream()
                 .collect(Collectors.groupingBy((data) -> data.getAvailabilityDataId().getTurbineId()));

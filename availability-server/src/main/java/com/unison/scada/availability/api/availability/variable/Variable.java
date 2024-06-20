@@ -1,4 +1,4 @@
-package com.unison.scada.availability.api.availability.entity;
+package com.unison.scada.availability.api.availability.variable;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,19 +7,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name="availability_type")
+@Table(name="variable")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AvailabilityType {
+public class Variable {
     @Id
+    @Column(name="uuid")
     private UUID uuid;
 
     @Column(nullable = false)
@@ -27,9 +27,6 @@ public class AvailabilityType {
 
     @Column(nullable = true)
     private String description;
-
-    @Column(nullable = true, length = 7)
-    private String color;
 
     @Column(nullable = false)
     @ColumnDefault("1")
@@ -40,21 +37,7 @@ public class AvailabilityType {
     private boolean isDelete;
 
     @Column(nullable = false)
-    @ColumnDefault("1")
-    private boolean isSave;
-
-    @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    @ColumnDefault("'System'")
-    private String createdBy;
-
-    @UpdateTimestamp
-    @Column(nullable = true)
-    private LocalDateTime updatedAt;
-
-    @Column(nullable = true)
-    private String updatedBy;
 }

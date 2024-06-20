@@ -5,6 +5,9 @@ import com.unison.scada.availability.api.availability.entity.AvailabilityData;
 import com.unison.scada.availability.api.availability.entity.AvailabilityType;
 import com.unison.scada.availability.api.availability.repository.AvailabilityDataRepository;
 import com.unison.scada.availability.api.availability.repository.AvailabilityTypeRepository;
+import com.unison.scada.availability.api.availability.variable.ConstantVariable;
+import com.unison.scada.availability.api.availability.variable.Variable;
+import com.unison.scada.availability.api.availability.variable.VariableRepository;
 import com.unison.scada.availability.api.memo.Memo;
 import com.unison.scada.availability.api.memo.MemoRepository;
 import com.unison.scada.availability.api.parameter.Parameter;
@@ -44,6 +47,8 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     private final GeneralRepository generalRepository;
     private final OriginalAvailabilityDataRepository originalAvailabilityDataRepository;
     private final AvailabilityService availabilityService;
+    private final VariableRepository variableRepository;
+
     @Override
     public DailyWindFarmDTO.Response getDailyWindFarmGeneralInfo(LocalDateTime searchTime) {
         List<Memo> memos = memoRepository.findAllDataByTimeRange(searchTime, searchTime.plusHours(23).plusMinutes(59));
@@ -349,16 +354,17 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         Duration duration = Duration.between(startTime, endTime);
         long period = duration.toSeconds();
 
+
         List<Turbine> turbineList = windFarm.getTurbines();
-        Optional<AvailabilityType> optionalAvailabilityType = availabilityTypeRepository.findById(UUID.fromString("1c6ab584-ad0c-46a0-acaf-02a10abbe183"));
-        AvailabilityType availabilityType = optionalAvailabilityType.orElseThrow(() ->  new Exception("Not matched total exported power name"));
+        Optional<Variable> optionalVariable = variableRepository.findById(ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid());
+        Variable variable = optionalVariable.orElseThrow(() ->  new Exception("Not matched total exported power name"));
 
         long actualActivePower = 0;
         for(General general : generalList)
         {
             bottom += (general.getRatedPower() * (period / 3600));
-            Optional<Long> endTimeTotalPower = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), endTime);
-            Optional<Long> startTimeTotalPower = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), startTime);
+            Optional<Long> endTimeTotalPower = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), endTime);
+            Optional<Long> startTimeTotalPower = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), startTime);
 
             if(endTimeTotalPower.isEmpty() || startTimeTotalPower.isEmpty())
                 actualActivePower += 0;
@@ -470,7 +476,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     }
 
     private List<Map<LocalDateTime, Avail>> getMap(LocalDateTime startTime){
-        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, startTime.plusYears(1), 1);
+        List<AvailabilityData> availabilityDataList = availabilityDataRepository.findAllDataByTimeRange(startTime, startTime.plusYears(1));
         Map<Integer, List<AvailabilityData>> listMap = availabilityDataList.stream()
                 .collect(Collectors.groupingBy((data) -> data.getAvailabilityDataId().getTurbineId()));
 

@@ -1,5 +1,6 @@
 package com.unison.scada.availability.api.availability.entity;
 
+import com.unison.scada.availability.api.availability.variable.Variable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -25,8 +26,13 @@ public class AvailabilityData {
     @Column(nullable = false)
     private int time;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "availability_type_uuid", nullable = true)
     private AvailabilityType availabilityType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variable_uuid", nullable = true)
+    private Variable variable;
 
     @Column(nullable = false)
     @CreationTimestamp
@@ -62,7 +68,14 @@ public class AvailabilityData {
         private int turbineId;
 
         @Column
-        @GeneratedValue(strategy = GenerationType.UUID)
         private UUID uuid;
+
+        // UUID 자동 생성 로직 추가
+        @PrePersist
+        public void prePersist() {
+            if (uuid == null) {
+                uuid = UUID.randomUUID();
+            }
+        }
     }
 }

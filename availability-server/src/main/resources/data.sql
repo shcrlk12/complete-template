@@ -13,15 +13,13 @@ INSERT INTO memo (timestamp, wind_farm_id, turbine_id, engineer_name, work_time,
 INSERT INTO memo (timestamp, wind_farm_id, turbine_id, engineer_name, work_time, created_at, created_by) VALUES ('2024-04-16T10:00', 0, 0, 'korean9', CURRENT_TIMESTAMP() , CURRENT_TIMESTAMP(), 'korean name5');
 
 -- AvailabilityType Table
-INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES ('6c5032bf-ce14-45a2-a14f-407ece68bfff', 'normal status', 1, '#339D33', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES ('3c0649a9-cc71-426a-849b-d60308ab98a9', 'forced outage', 1, '#D93333', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES ('32b8d402-1a55-4cea-be8d-65e7d0157f54', 'scheduled maintenance', 1, '#D9D633', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES ('195f866d-89e8-49f6-b111-bf50b1b67ff6', 'information unavailable', 1, '#C4D8F0', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES ('176f3039-eafb-4e61-9c73-d692beae94a7', 'requested shutdown', 1, '#33A1DE', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES ('3afb40c9-4949-4ab2-bf35-eda8c5bd3484', 'low temperature', 1, '#33A1AA', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, color, created_at) VALUES ('1decedc5-9594-4a92-8291-f79ffe705089', 'etc', 1, '#D97733', CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, created_at) VALUES ('1c6ab584-ad0c-46a0-acaf-02a10abbe183', 'U136_WTUR_TotWh', 2, CURRENT_TIMESTAMP());
-INSERT INTO availability_type (uuid, name, variable_type, created_at) VALUES ('9d35232c-1971-47c2-ad99-2d511053994f', 'U136_WNAC_WindSpeed1s', 2, CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES ('6c5032bf-ce14-45a2-a14f-407ece68bfff', 'normal status', '#339D33', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES ('3c0649a9-cc71-426a-849b-d60308ab98a9', 'forced outage', '#D93333', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES ('32b8d402-1a55-4cea-be8d-65e7d0157f54', 'scheduled maintenance', '#D9D633', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES ('195f866d-89e8-49f6-b111-bf50b1b67ff6', 'information unavailable', '#C4D8F0', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES ('176f3039-eafb-4e61-9c73-d692beae94a7', 'requested shutdown', '#33A1DE', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES ('3afb40c9-4949-4ab2-bf35-eda8c5bd3484', 'low temperature', '#33A1AA', CURRENT_TIMESTAMP());
+INSERT INTO availability_type (uuid, name, color, created_at) VALUES ('1decedc5-9594-4a92-8291-f79ffe705089', 'etc', '#D97733', CURRENT_TIMESTAMP());
 
 -- Variable Table
 INSERT INTO variable (uuid, name, created_at) VALUES ('307f3d53-bf04-410d-9333-5d9aed5e3133', 'U136_WTUR_TurMainSt', CURRENT_TIMESTAMP());
@@ -3514,29 +3512,29 @@ INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time,
 INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-23T03:00', 0, 2, '6b5dfd9f-377d-4e51-bf60-ff2dcf01e3ca', 2196, '6c5032bf-ce14-45a2-a14f-407ece68bfff', CURRENT_TIMESTAMP());
 
 -- exported power
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 0, 0, '0a5dc96f-70a3-49cd-87f5-1beac111912d', 488, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 0, 1, '770365d4-0157-4d12-9f14-f6069a1d6125', 122, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T21:00', 0, 2, '83ff2124-e5f0-4761-9397-3afa040ae123', 2476, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T22:00', 0, 0, '1ff874a5-e5c5-4deb-a30d-c73d0a47c129', 555, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T22:00', 0, 1, '22fbb3f3-0ef5-4b0a-a300-4ee3a9a8d12e', 888, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T22:00', 0, 2, 'e742e4c5-4416-42f7-b5e5-fcb378e61128', 999, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T23:00', 0, 0, '15cfc683-5fcb-42fa-b93d-e46c759b8123', 666, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T23:00', 0, 1, 'a6822c06-e5f8-4d85-b7b1-7f3b6cc1c125', 1111, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-14T23:00', 0, 2, '2ee1ed79-9080-434c-a319-1bda8df212d6', 1122, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T00:00', 0, 0, '7551359f-a73a-4101-a1cf-cb57d38ae123', 999, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T00:00', 0, 1, '5c0baa88-2d0c-4270-b082-4299f1312bf2', 1223, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T00:00', 0, 2, '922d9110-52b5-48e1-9766-41c4edb0c128', 1566, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2023-07-15T01:00', 0, 0, '4935b2fb-73df-4adf-b3ad-24b91418912c', 1234, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T21:00', 0, 0, '0a5dc96f-70a3-49cd-87f5-1beac111912d', 488, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T21:00', 0, 1, '770365d4-0157-4d12-9f14-f6069a1d6125', 122, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T21:00', 0, 2, '83ff2124-e5f0-4761-9397-3afa040ae123', 2476, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T22:00', 0, 0, '1ff874a5-e5c5-4deb-a30d-c73d0a47c129', 555, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T22:00', 0, 1, '22fbb3f3-0ef5-4b0a-a300-4ee3a9a8d12e', 888, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T22:00', 0, 2, 'e742e4c5-4416-42f7-b5e5-fcb378e61128', 999, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T23:00', 0, 0, '15cfc683-5fcb-42fa-b93d-e46c759b8123', 666, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T23:00', 0, 1, 'a6822c06-e5f8-4d85-b7b1-7f3b6cc1c125', 1111, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-14T23:00', 0, 2, '2ee1ed79-9080-434c-a319-1bda8df212d6', 1122, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-15T00:00', 0, 0, '7551359f-a73a-4101-a1cf-cb57d38ae123', 999, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-15T00:00', 0, 1, '5c0baa88-2d0c-4270-b082-4299f1312bf2', 1223, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-15T00:00', 0, 2, '922d9110-52b5-48e1-9766-41c4edb0c128', 1566, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2023-07-15T01:00', 0, 0, '4935b2fb-73df-4adf-b3ad-24b91418912c', 1234, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
 
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-14T23:00', 0, 0, '2ee1ed79-9080-434c-a319-1bd34df212d6', 3333, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-14T23:00', 0, 1, '7551359f-a73a-4101-a1cf-cb57348ae123', 4444, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-14T23:00', 0, 2, '5c0baa88-2d0c-4270-b082-4299f3412bf2', 5555, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T01:00', 0, 0, '922d9110-52b5-48e1-9766-41c4ed34c128', 4646, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T01:00', 0, 1, '4935b2fb-73df-4adf-b3ad-24b91413412c', 8464, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T01:00', 0, 2, '4935b2fb-73df-4adf-b3ad-24b91418342c', 6764, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T05:00', 0, 0, '922d9110-52b5-48e1-9766-41c4ed34c128', 5874, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T05:00', 0, 1, '4935b2fb-73df-4adf-b3ad-24b91413412c', 10345, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
-INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, availability_type_uuid, created_at) VALUES ('2024-03-15T05:00', 0, 2, '4935b2fb-73df-4adf-b3ad-24b91418342c', 8412, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-14T23:00', 0, 0, '2ee1ed79-9080-434c-a319-1bd34df212d6', 3333, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-14T23:00', 0, 1, '7551359f-a73a-4101-a1cf-cb57348ae123', 4444, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-14T23:00', 0, 2, '5c0baa88-2d0c-4270-b082-4299f3412bf2', 5555, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-15T01:00', 0, 0, '922d9110-52b5-48e1-9766-41c4ed34c128', 4646, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-15T01:00', 0, 1, '4935b2fb-73df-4adf-b3ad-24b91413412c', 8464, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-15T01:00', 0, 2, '4935b2fb-73df-4adf-b3ad-24b91418342c', 6764, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-15T05:00', 0, 0, '922d9110-52b5-48e1-9766-41c4ed34c128', 5874, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-15T05:00', 0, 1, '4935b2fb-73df-4adf-b3ad-24b91413412c', 10345, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
+INSERT INTO availability_data (timestamp, wind_farm_id , turbine_id, uuid, time, variable_uuid, created_at) VALUES ('2024-03-15T05:00', 0, 2, '4935b2fb-73df-4adf-b3ad-24b91418342c', 8412, '1c6ab584-ad0c-46a0-acaf-02a10abbe183', CURRENT_TIMESTAMP());
 
 -- Parameter Table
 INSERT INTO parameter (id, warranty_date) VALUES (UUID(), '2023-02-01 00:00:00');

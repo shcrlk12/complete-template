@@ -14,29 +14,25 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
     @Query("SELECT ad " +
             "FROM AvailabilityData ad " +
             "LEFT JOIN ad.availabilityType at " +
-            "WHERE " +
-            "ad.availabilityDataId.timestamp BETWEEN :startTime" +
-            " AND :endTime" +
-            " AND at.variableType = :type")
-    List<AvailabilityData> findAllDataByTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime, @Param("type") int type);
+            "WHERE ad.availabilityDataId.timestamp BETWEEN :startTime AND :endTime " +
+            "AND ad.availabilityType IS NOT NULL")
+    List<AvailabilityData> findAllDataByTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
-    @Query(value = "SELECT TOP 1 time FROM AVAILABILITY_DATA ad left outer join AVAILABILITY_TYPE at on ad.AVAILABILITY_TYPE_UUID = at.UUID " +
+    @Query(value = "SELECT TOP 1 time FROM AVAILABILITY_DATA ad left outer join VARIABLE v on ad.VARIABLE_UUID = v.UUID " +
             "WHERE turbine_id = :turbineId " +
-            "AND AVAILABILITY_TYPE_UUID = :availabilityTypeUUID " +
+            "AND VARIABLE_UUID = :variableUUID " +
             "AND timestamp > :time " +
-            "AND at.variable_type = 2 " +
             "ORDER BY timestamp " +
             "ASC", nativeQuery = true)
-    Optional<Long> getTimeAfterCertainTimestamp(@Param("turbineId") int turbineId, @Param("availabilityTypeUUID") UUID availabilityTypeUUID, @Param("time") LocalDateTime time);
+    Optional<Long> getTimeAfterCertainTimestamp(@Param("turbineId") int turbineId, @Param("variableUUID") UUID variableUUID, @Param("time") LocalDateTime time);
 
-    @Query(value = "SELECT TOP 1 time FROM AVAILABILITY_DATA ad left outer join AVAILABILITY_TYPE at on ad.AVAILABILITY_TYPE_UUID = at.UUID " +
+    @Query(value = "SELECT TOP 1 time FROM AVAILABILITY_DATA ad left outer join VARIABLE v on ad.VARIABLE_UUID = v.UUID " +
             "WHERE turbine_id = :turbineId " +
-            "AND AVAILABILITY_TYPE_UUID = :availabilityTypeUUID " +
+            "AND VARIABLE_UUID = :variableUUID " +
             "AND timestamp < :time " +
-            "AND at.variable_type = 2 " +
             "ORDER BY timestamp " +
             "DESC", nativeQuery = true)
-    Optional<Long> getTimeBeforeCertainTimestamp(@Param("turbineId") int turbineId, @Param("availabilityTypeUUID") UUID availabilityTypeUUID, @Param("time") LocalDateTime time);
+    Optional<Long> getTimeBeforeCertainTimestamp(@Param("turbineId") int turbineId, @Param("variableUUID") UUID variableUUID, @Param("time") LocalDateTime time);
 
     @Query("SELECT ad " +
             "FROM AvailabilityData ad " +

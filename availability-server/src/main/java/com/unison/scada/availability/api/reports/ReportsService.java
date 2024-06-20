@@ -5,6 +5,9 @@ import com.unison.scada.availability.api.availability.entity.AvailabilityData;
 import com.unison.scada.availability.api.availability.entity.AvailabilityType;
 import com.unison.scada.availability.api.availability.repository.AvailabilityDataRepository;
 import com.unison.scada.availability.api.availability.repository.AvailabilityTypeRepository;
+import com.unison.scada.availability.api.availability.variable.ConstantVariable;
+import com.unison.scada.availability.api.availability.variable.Variable;
+import com.unison.scada.availability.api.availability.variable.VariableRepository;
 import com.unison.scada.availability.api.memo.Memo;
 import com.unison.scada.availability.api.memo.MemoRepository;
 import com.unison.scada.availability.api.reports.daily.DailyReportDTO;
@@ -47,6 +50,7 @@ public class ReportsService implements StaticReportService, MemoReportService, M
     private final ReportDataInMemory reportDataInMemory;
     private final WindFarmProperties windFarmProperties;
     private final AvailabilityService availabilityService;
+    private final VariableRepository variableRepository;
 
     @Override
     public ReportsDTO.Response getStaticReportData(Principal principal,ReportsDTO.Request request) {
@@ -239,8 +243,8 @@ public class ReportsService implements StaticReportService, MemoReportService, M
 
         endTime = endTime.isAfter(LocalDateTime.now()) ? LocalDateTime.now() : endTime;
 
-        Optional<AvailabilityType> optionalAvailabilityType = availabilityTypeRepository.findById(UUID.fromString("1c6ab584-ad0c-46a0-acaf-02a10abbe183"));
-        AvailabilityType availabilityType = optionalAvailabilityType.orElseThrow(() ->  new Exception("Not matched total exported power name"));
+        Optional<Variable> optionalVariable = variableRepository.findById(ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid());
+        Variable variable = optionalVariable.orElseThrow(() ->  new Exception("Not matched total exported power name"));
 
         List<General> generalList = generalRepository.findAll();
 
@@ -253,9 +257,9 @@ public class ReportsService implements StaticReportService, MemoReportService, M
             long dailyActualActivePower;
             long monthlyActualActivePower;
 
-            Optional<Long> dailyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), dailyStartTime);
-            Optional<Long> monthlyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), monthlyStartTime);
-            Optional<Long> totalPowerAtEndTime = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), availabilityType.getUuid(), endTime);
+            Optional<Long> dailyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), dailyStartTime);
+            Optional<Long> monthlyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), monthlyStartTime);
+            Optional<Long> totalPowerAtEndTime = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), endTime);
 
             if(totalPowerAtEndTime.isEmpty() || dailyTotalPowerAtStartTime.isEmpty())
                 dailyActualActivePower = 0;
