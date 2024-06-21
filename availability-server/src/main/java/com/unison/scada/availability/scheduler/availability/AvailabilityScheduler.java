@@ -2,11 +2,9 @@ package com.unison.scada.availability.scheduler.availability;
 
 import com.unison.scada.availability.comm.opcda.OPCException;
 import com.unison.scada.availability.comm.opcda.OPCNotFoundException;
-import com.unison.scada.availability.comm.opcda.OPCServer;
 import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import com.unison.scada.availability.scheduler.availability.model.WindFarm;
 import com.unison.scada.availability.scheduler.availability.save.AvailabilitySaveService;
-import com.unison.scada.availability.scheduler.availability.update.TurbineDataUpdateByOPCService;
 import com.unison.scada.availability.scheduler.availability.update.TurbineDataUpdateService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -14,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
-
-import static java.lang.System.exit;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +29,7 @@ public class AvailabilityScheduler {
     public void run() throws OPCException {
         try{
 
-            List<Turbine> turbines = windFarm.getTurbinesData();
+            windFarm.updateTurbinesData();
 
             //위에서 가져온 데이터를 가지고 availability 계산 +2
             turbineDataUpdateService.updateTotalAvailability(windFarm.getTurbines());

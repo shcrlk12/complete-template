@@ -11,15 +11,15 @@ import java.util.List;
 
 public class ReportExcelGenerator implements ExcelGenerator {
 
-    @Getter
     private final Workbook workbook;
     private final Sheet sheet;
-    private int rowCount;
     private final XSSFFont headerXSSFFont;
     private final XSSFFont bodyXSSFFont;
 
     private final XSSFCellStyle headerXssfCellStyle;
     private final XSSFCellStyle bodyXssfCellStyle;
+    private int rowCount;
+    private int columnCount;
 
     public ReportExcelGenerator(){
         this("report");
@@ -28,7 +28,8 @@ public class ReportExcelGenerator implements ExcelGenerator {
     public ReportExcelGenerator(String sheetName){
         workbook = new XSSFWorkbook();
         sheet = workbook.createSheet(sheetName); // 엑셀 sheet 이름
-        sheet.setDefaultColumnWidth(20); // 디폴트 너비 설정
+        sheet.setDefaultColumnWidth(10); // 디폴트 너비 설정
+
         rowCount = 0;
 
         headerXSSFFont = (XSSFFont) workbook.createFont();
@@ -46,10 +47,12 @@ public class ReportExcelGenerator implements ExcelGenerator {
         headerXssfCellStyle.setBorderBottom(BorderStyle.THIN);
 
         headerXssfCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerXssfCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
         headerXSSFFont.setFamily(FontFamily.MODERN);
         headerXSSFFont.setBold(true);
         headerXssfCellStyle.setFont(headerXSSFFont);
+        headerXssfCellStyle.setWrapText(true);
 
         /*
         * Set Body Border
@@ -60,6 +63,7 @@ public class ReportExcelGenerator implements ExcelGenerator {
         bodyXssfCellStyle.setBorderBottom(BorderStyle.THIN);
 
         bodyXssfCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        bodyXssfCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
     }
     public void setHeaderFontColor(XSSFColor xssfColor){
@@ -88,6 +92,7 @@ public class ReportExcelGenerator implements ExcelGenerator {
         Row headerRow;
         Cell headerCell;
 
+        columnCount = names.size();
         headerRow = sheet.createRow(rowCount++);
 
         for(int i=0; i<names.size(); i++) {
@@ -102,6 +107,8 @@ public class ReportExcelGenerator implements ExcelGenerator {
         Row bodyRow;
         Cell bodyCell;
 
+        columnCount = bodyDatass.size();
+
         for(List<String> bodyDatas : bodyDatass) {
             bodyRow = sheet.createRow(rowCount++);
 
@@ -111,5 +118,12 @@ public class ReportExcelGenerator implements ExcelGenerator {
                 bodyCell.setCellStyle(bodyXssfCellStyle); // 스타일 추가
             }
         }
+    }
+
+    public Workbook getWorkbook() {
+        for (int i = 0; i < columnCount; i++){
+            sheet.autoSizeColumn(i);
+        }
+        return workbook;
     }
 }

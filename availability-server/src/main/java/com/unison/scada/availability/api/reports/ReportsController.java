@@ -2,6 +2,7 @@ package com.unison.scada.availability.api.reports;
 
 import com.unison.scada.availability.api.reports.daily.DailyReportDTO;
 import com.unison.scada.availability.api.reports.memo.MemoReportDTO;
+import com.unison.scada.availability.api.reports.statics.StaticReportDTO;
 import com.unison.scada.availability.api.user.Error;
 import com.unison.scada.availability.api.user.JSONResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,17 +23,17 @@ public class ReportsController {
     private final ReportsService reportsService;
 
     @GetMapping("/static")
-    public ResponseEntity<JSONResponse<ReportsDTO.Response, Error>> getStaticReport(
+    public ResponseEntity<JSONResponse<StaticReportDTO.Response, Error>> getStaticReport(
             Principal principal,
             @ModelAttribute ReportsDTO.Request request
 
-            ) {
+            ) throws Exception {
 
-        ReportsDTO.Response response = reportsService.getStaticReportData(principal, request);
+        StaticReportDTO.Response response = reportsService.getStaticReportData(principal, request);
 
         return ResponseEntity.ok()
                 .body(
-                        JSONResponse.<ReportsDTO.Response, Error>builder()
+                        JSONResponse.<StaticReportDTO.Response, Error>builder()
                                 .data(response)
                                 .build()
                 );    }
@@ -69,6 +70,12 @@ public class ReportsController {
                                 .data(response)
                                 .build()
                 );
+    }
+
+    @GetMapping("/static/download/excel")
+    public void downloadStaticReportExcel(HttpServletResponse response, Principal principal) throws Exception {
+
+        reportsService.generateStaticReportExcel(response, principal);
     }
 
     @GetMapping("/memo/download/excel")

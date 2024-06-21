@@ -2,9 +2,7 @@ package com.unison.scada.availability.api.reports;
 
 import com.unison.scada.availability.api.availability.AvailabilityService;
 import com.unison.scada.availability.api.availability.entity.AvailabilityData;
-import com.unison.scada.availability.api.availability.entity.AvailabilityType;
 import com.unison.scada.availability.api.availability.repository.AvailabilityDataRepository;
-import com.unison.scada.availability.api.availability.repository.AvailabilityTypeRepository;
 import com.unison.scada.availability.api.availability.variable.ConstantVariable;
 import com.unison.scada.availability.api.availability.variable.Variable;
 import com.unison.scada.availability.api.availability.variable.VariableRepository;
@@ -16,16 +14,17 @@ import com.unison.scada.availability.api.reports.daily.DailyReportService;
 import com.unison.scada.availability.api.reports.memo.MemoReportDTO;
 import com.unison.scada.availability.api.reports.memo.MemoReportGenerateService;
 import com.unison.scada.availability.api.reports.memo.MemoReportService;
+import com.unison.scada.availability.api.reports.statics.StaticReportDTO;
+import com.unison.scada.availability.api.reports.statics.StaticReportGenerateService;
+import com.unison.scada.availability.api.reports.statics.StaticReportService;
 import com.unison.scada.availability.api.windfarm.WindFarmOverview;
 import com.unison.scada.availability.api.windfarm.WindFarmOverviewRepository;
 import com.unison.scada.availability.api.windfarm.WindFarmProperties;
 import com.unison.scada.availability.api.windfarm.WindFarmService;
-import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmDTO;
 import com.unison.scada.availability.global.General;
 import com.unison.scada.availability.global.ReportExcelGenerator;
-import com.unison.scada.availability.global.Util;
+import com.unison.scada.availability.global.NullUtil;
 import com.unison.scada.availability.global.filter.GeneralRepository;
-import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -38,12 +37,12 @@ import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ReportsService implements StaticReportService, MemoReportService, MemoReportGenerateService, DailyReportService, DailyReportGenerateService {
+public class ReportsService implements StaticReportService, StaticReportGenerateService, MemoReportService, MemoReportGenerateService, DailyReportService, DailyReportGenerateService {
     private final AvailabilityDataRepository availabilityDataRepository;
-    private final AvailabilityTypeRepository availabilityTypeRepository;
     private final WindFarmOverviewRepository windFarmOverviewRepository;
     private final GeneralRepository generalRepository;
     private final MemoRepository memoRepository;
@@ -51,58 +50,81 @@ public class ReportsService implements StaticReportService, MemoReportService, M
     private final WindFarmProperties windFarmProperties;
     private final AvailabilityService availabilityService;
     private final VariableRepository variableRepository;
+    private final ReportsMapper reportsMapper;
 
     @Override
-    public ReportsDTO.Response getStaticReportData(Principal principal,ReportsDTO.Request request) {
-        return null;
+    public StaticReportDTO.Response getStaticReportData(Principal principal, ReportsDTO.Request request) throws Exception {
+        StaticReportDTO.Response response;
+
+        LocalDateTime startTime = createLocalDateTime(request.getStartDate());
+        LocalDateTime endTime = createLocalDateTime(request.getEndDate()).plusDays(1);
+
+        checkStartTimeAndEndTime(startTime, endTime);
+
+        /*
+         * Turbine Information Inquiry
+         * */
+        String windFarmName = request.getWindFarmName();
+        WindFarmOverview windFarmOverview = windFarmOverviewRepository.findFirstByName(windFarmName.toLowerCase());
+
+        Integer windFarmId = windFarmOverview.getWindFarmId();
+        Integer turbineId = request.getTurbineId();
+        List<AvailabilityData> availabilityDataList;
+
+        // 특정 turbine 데이터만 조회
+        if(request.getDeviceType().equalsIgnoreCase("wind farm")){
+            availabilityDataList = availabilityDataRepository.findByWindFarmIdAndTimeBetween(windFarmId, startTime, endTime);
+        }
+        //wind farm 데이터 조회
+        else if(request.getDeviceType().equalsIgnoreCase("wind turbine")){
+            availabilityDataList = availabilityDataRepository.findByWindFarmIdAndTurbineIdAndTimeBetween(windFarmId, turbineId, startTime, endTime);
+        }
+        else {
+            availabilityDataList = new ArrayList<>();
+        }
+
+        response = reportsMapper.toStaticReportDTOResponse(availabilityDataList);
+
+        /*
+         * Save Static data to create excel
+         * */
+        reportDataInMemory.getReportDataMap().put(principal.getName(), response);
+
+        return response;
     }
 
     @Override
     public MemoReportDTO.Response getMemoReportData(Principal principal, ReportsDTO.Request request) throws Exception {
         MemoReportDTO.Response response;
 
-        String[] startDateSplits = request.getStartDate().split("_");
-        String[] endDateSplits = request.getEndDate().split("_");
+        LocalDateTime startTime = createLocalDateTime(request.getStartDate());
+        LocalDateTime endTime = createLocalDateTime(request.getEndDate()).plusDays(1);
 
-        LocalDateTime startTime = LocalDateTime.of(
-                Integer.parseInt(startDateSplits[0]),
-                Integer.parseInt(startDateSplits[1]),
-                Integer.parseInt(startDateSplits[2]),
-                0,
-                0);
+        checkStartTimeAndEndTime(startTime, endTime);
 
-        LocalDateTime endTime = LocalDateTime.of(
-                Integer.parseInt(endDateSplits[0]),
-                Integer.parseInt(endDateSplits[1]),
-                Integer.parseInt(endDateSplits[2]),
-                23,
-                59);
-
-        if(endTime.isBefore(startTime)){
-            throw new Exception("종료 시간이 시작 시간보다 이전입니다. 올바른 시간을 입력하세요.");
-        }
-
+        /*
+        * Turbine Information Inquiry
+        * */
         String windFarmName = request.getWindFarmName();
         WindFarmOverview windFarmOverview = windFarmOverviewRepository.findFirstByName(windFarmName.toLowerCase());
 
         Integer windFarmId = windFarmOverview.getWindFarmId();
         Integer turbineId = request.getTurbineId();
         List<Memo> memoList;
+
         // 특정 turbine 데이터만 조회
         if(request.getDeviceType().equalsIgnoreCase("wind farm")){
             memoList = memoRepository.findByMemoIdWindFarmIdAndMemoIdTimestampBetween(windFarmId, startTime, endTime);
-            System.out.println(memoList);
         }
         //wind farm 데이터 조회
         else if(request.getDeviceType().equalsIgnoreCase("wind turbine")){
             memoList = memoRepository.findByIdBetween(windFarmId, turbineId, startTime, endTime);
-            System.out.println(memoList);
         }
         else {
             memoList = new ArrayList<>();
         }
 
-        response = ReportsMapper.memoToReportsDTOResponse(memoList);
+        response = reportsMapper.memoToReportsDTOResponse(memoList);
 
         /*
          * Save memo data to create excel
@@ -112,107 +134,6 @@ public class ReportsService implements StaticReportService, MemoReportService, M
         return response;
     }
 
-    @Override
-    public void generateMemoReportExcel(HttpServletResponse response, Principal principal) throws IOException {
-        ReportExcelGenerator reportExcelGenerator = new ReportExcelGenerator();
-
-        reportExcelGenerator.setHeaderCellBackgroundColor(new XSSFColor(new byte[]{(byte) 66, (byte) 125, (byte) 158}));
-
-        /*
-        * make header and body datas
-        * */
-
-        MemoReportDTO.Response memoDto = (MemoReportDTO.Response) reportDataInMemory.getReportDataMap().get(principal.getName());
-        reportExcelGenerator.setHeaderNames(memoDto.getHeaderList());
-
-        List<List<String>> bodyDatass = new ArrayList<>();
-        List<MemoReportDTO.Response.MemoData> memoDataList = memoDto.getTableData();
-
-        for(MemoReportDTO.Response.MemoData memoData : memoDataList){
-            bodyDatass.add(new ArrayList<>(Arrays.asList(
-                    Util.ifNullToEmptyString(memoData.getTimeStamp()),
-                    Util.ifNullToEmptyString(memoData.getDeviceName()),
-                    Util.ifNullToEmptyString(memoData.getEngineerName()),
-                    Util.ifNullToEmptyString(memoData.getWorkTime()),
-                    Util.ifNullToEmptyString(memoData.getMaterial()),
-                    Util.ifNullToEmptyString(memoData.getQuantity()),
-                    Util.ifNullToEmptyString(memoData.getWorkType()),
-                    Util.ifNullToEmptyString(memoData.getInspection()),
-                    Util.ifNullToEmptyString(memoData.getEtc())
-            )));
-        }
-        reportExcelGenerator.setBodyDatas(bodyDatass);
-
-        /**
-         * download
-         */
-        Workbook workbook = reportExcelGenerator.getWorkbook();
-
-        String fileName = "Memo Report";
-
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-        ServletOutputStream servletOutputStream = response.getOutputStream();
-
-        workbook.write(servletOutputStream);
-        workbook.close();
-        servletOutputStream.flush();
-        servletOutputStream.close();
-    }
-
-    @Override
-    public void generateDailyReportExcel(HttpServletResponse response, Principal principal) throws IOException {
-
-        DailyReportDTO.Response dailyReportDto = (DailyReportDTO.Response) reportDataInMemory.getReportDataMap().get(principal.getName());
-
-        /*
-        * Set sheet name
-        * */
-        LocalDateTime dailyReportDate = dailyReportDto.getDate();
-        String sheetName = String.format("%d.%d.%d", dailyReportDate.getYear(), dailyReportDate.getMonthValue(), dailyReportDate.getDayOfMonth());
-
-        ReportExcelGenerator reportExcelGenerator = new ReportExcelGenerator(sheetName);
-
-        reportExcelGenerator.setHeaderCellBackgroundColor(new XSSFColor(new byte[]{(byte) 66, (byte) 125, (byte) 158}));
-
-        /*
-         * make header and body datas
-         * */
-
-        reportExcelGenerator.setHeaderNames(dailyReportDto.getHeaderList());
-
-        List<List<String>> bodyDatass = new ArrayList<>();
-        List<DailyReportDTO.Response.DailyData> dailyDataList = dailyReportDto.getTableData();
-
-        for(DailyReportDTO.Response.DailyData dailyData : dailyDataList){
-            bodyDatass.add(new ArrayList<>(Arrays.asList(
-                    Util.ifNullToEmptyString(dailyData.getDeviceName()),
-                    Util.ifNullToEmptyString(dailyData.getDailyProduction()),
-                    Util.ifNullToEmptyString(dailyData.getDailyAvailability()),
-                    Util.ifNullToEmptyString(dailyData.getDailyCapacityFactor()),
-                    Util.ifNullToEmptyString(dailyData.getMonthlyProduction()),
-                    Util.ifNullToEmptyString(dailyData.getMonthlyCapacityFactor()),
-                    Util.ifNullToEmptyString(dailyData.getMonthlyAvailability())
-            )));
-        }
-        reportExcelGenerator.setBodyDatas(bodyDatass);
-
-        /**
-         * download
-         */
-        Workbook workbook = reportExcelGenerator.getWorkbook();
-
-        String fileName = "Daily Report";
-
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-        ServletOutputStream servletOutputStream = response.getOutputStream();
-
-        workbook.write(servletOutputStream);
-        workbook.close();
-        servletOutputStream.flush();
-        servletOutputStream.close();
-    }
 
     @Override
     public DailyReportDTO.Response getDailyReportData(Principal principal, DailyReportDTO.Request request) throws Exception {
@@ -287,8 +208,8 @@ public class ReportsService implements StaticReportService, MemoReportService, M
 
 
         /*
-        * Set DTO Response
-        * */
+         * Set DTO Response
+         * */
 
         List<String> headerList = new ArrayList<>();
 
@@ -302,8 +223,8 @@ public class ReportsService implements StaticReportService, MemoReportService, M
 
 
         /*
-        * Set total turbine data of table
-        * */
+         * Set total turbine data of table
+         * */
         List<DailyReportDTO.Response.DailyData> dailyDataList = new ArrayList<>();
 
         dailyDataList.add(DailyReportDTO.Response.DailyData.builder()
@@ -322,8 +243,8 @@ public class ReportsService implements StaticReportService, MemoReportService, M
         List<Double> monthlyCapacityFactorList =  getCapacityFactor(monthlyStartTime, endTime, dailyActualActivePowerList);
 
         /*
-        * Set each turbine data of table
-        * */
+         * Set each turbine data of table
+         * */
         for(int turbineId = 0; turbineId < windFarmProperties.getTurbinesNumber(); turbineId++)
         {
             DailyReportDTO.Response.DailyData turbineDailyData = DailyReportDTO.Response.DailyData.builder()
@@ -344,13 +265,163 @@ public class ReportsService implements StaticReportService, MemoReportService, M
         response.setDate(dailyStartTime);
 
         /*
-        * Save daily report data to create excel
-        * */
+         * Save daily report data to create excel
+         * */
         reportDataInMemory.getReportDataMap().put(principal.getName(), response);
 
         return response;
     }
 
+    @Override
+    public void generateStaticReportExcel(HttpServletResponse response, Principal principal) throws IOException {
+        StaticReportDTO.Response staticReportDto = (StaticReportDTO.Response) reportDataInMemory.getReportDataMap().get(principal.getName());
+
+        ReportExcelGenerator reportExcelGenerator = new ReportExcelGenerator();
+        reportExcelGenerator.setHeaderCellBackgroundColor(new XSSFColor(new byte[]{(byte) 66, (byte) 125, (byte) 158}));
+
+        /*
+         * make header of table data
+         * */
+        List<String> headerNames = staticReportDto.getTableHeader().stream()
+                                                                    .map(data ->
+                                                                         data.getUnit() == null ?
+                                                                                data.getName() :
+                                                                                String.format("%s\n[%s]", data.getName(), data.getUnit())
+                                                                    )
+                                                                    .collect(Collectors.toList());
+
+        reportExcelGenerator.setHeaderNames(headerNames);
+
+        /*
+        * make body of table data
+        * */
+        List<List<String>> bodyDatass = staticReportDto.getTableData().getRow()
+                .stream()
+                .map(
+                        StaticReportDTO.Response.TableDataRow.TableDataItem::getValue
+                )
+                .toList();
+
+        reportExcelGenerator.setBodyDatas(bodyDatass);
+
+        /*
+         * Download excel of static report
+         */
+        Workbook workbook = reportExcelGenerator.getWorkbook();
+
+        String fileName = "Static Report";
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+        ServletOutputStream servletOutputStream = response.getOutputStream();
+
+        workbook.write(servletOutputStream);
+        workbook.close();
+        servletOutputStream.flush();
+        servletOutputStream.close();
+
+    }
+    @Override
+    public void generateDailyReportExcel(HttpServletResponse response, Principal principal) throws IOException {
+
+        DailyReportDTO.Response dailyReportDto = (DailyReportDTO.Response) reportDataInMemory.getReportDataMap().get(principal.getName());
+
+        /*
+        * Set sheet name
+        * */
+        LocalDateTime dailyReportDate = dailyReportDto.getDate();
+        String sheetName = String.format("%d.%d.%d", dailyReportDate.getYear(), dailyReportDate.getMonthValue(), dailyReportDate.getDayOfMonth());
+
+        ReportExcelGenerator reportExcelGenerator = new ReportExcelGenerator(sheetName);
+
+        reportExcelGenerator.setHeaderCellBackgroundColor(new XSSFColor(new byte[]{(byte) 66, (byte) 125, (byte) 158}));
+
+        /*
+         * make header and body datas
+         * */
+
+        reportExcelGenerator.setHeaderNames(dailyReportDto.getHeaderList());
+
+        List<List<String>> bodyDatass = new ArrayList<>();
+        List<DailyReportDTO.Response.DailyData> dailyDataList = dailyReportDto.getTableData();
+
+        for(DailyReportDTO.Response.DailyData dailyData : dailyDataList){
+            bodyDatass.add(new ArrayList<>(Arrays.asList(
+                    NullUtil.ifNullEmptyString(dailyData.getDeviceName()),
+                    NullUtil.ifNullEmptyString(dailyData.getDailyProduction()),
+                    NullUtil.ifNullEmptyString(dailyData.getDailyAvailability()),
+                    NullUtil.ifNullEmptyString(dailyData.getDailyCapacityFactor()),
+                    NullUtil.ifNullEmptyString(dailyData.getMonthlyProduction()),
+                    NullUtil.ifNullEmptyString(dailyData.getMonthlyCapacityFactor()),
+                    NullUtil.ifNullEmptyString(dailyData.getMonthlyAvailability())
+            )));
+        }
+        reportExcelGenerator.setBodyDatas(bodyDatass);
+
+        /**
+         * download
+         */
+        Workbook workbook = reportExcelGenerator.getWorkbook();
+
+        String fileName = "Daily Report";
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+        ServletOutputStream servletOutputStream = response.getOutputStream();
+
+        workbook.write(servletOutputStream);
+        workbook.close();
+        servletOutputStream.flush();
+        servletOutputStream.close();
+    }
+
+    @Override
+    public void generateMemoReportExcel(HttpServletResponse response, Principal principal) throws IOException {
+        ReportExcelGenerator reportExcelGenerator = new ReportExcelGenerator();
+
+        reportExcelGenerator.setHeaderCellBackgroundColor(new XSSFColor(new byte[]{(byte) 66, (byte) 125, (byte) 158}));
+
+        /*
+         * make header and body datas
+         * */
+
+        MemoReportDTO.Response memoDto = (MemoReportDTO.Response) reportDataInMemory.getReportDataMap().get(principal.getName());
+        reportExcelGenerator.setHeaderNames(memoDto.getHeaderList());
+
+        List<List<String>> bodyDatass = new ArrayList<>();
+        List<MemoReportDTO.Response.MemoData> memoDataList = memoDto.getTableData();
+
+        for(MemoReportDTO.Response.MemoData memoData : memoDataList){
+            bodyDatass.add(new ArrayList<>(Arrays.asList(
+                    NullUtil.ifNullEmptyString(memoData.getTimeStamp()),
+                    NullUtil.ifNullEmptyString(memoData.getDeviceName()),
+                    NullUtil.ifNullEmptyString(memoData.getEngineerName()),
+                    NullUtil.ifNullEmptyString(memoData.getWorkTime()),
+                    NullUtil.ifNullEmptyString(memoData.getMaterial()),
+                    NullUtil.ifNullEmptyString(memoData.getQuantity()),
+                    NullUtil.ifNullEmptyString(memoData.getWorkType()),
+                    NullUtil.ifNullEmptyString(memoData.getInspection()),
+                    NullUtil.ifNullEmptyString(memoData.getEtc())
+            )));
+        }
+        reportExcelGenerator.setBodyDatas(bodyDatass);
+
+        /**
+         * download
+         */
+        Workbook workbook = reportExcelGenerator.getWorkbook();
+
+        String fileName = "Memo Report";
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+        ServletOutputStream servletOutputStream = response.getOutputStream();
+
+        workbook.write(servletOutputStream);
+        workbook.close();
+        servletOutputStream.flush();
+        servletOutputStream.close();
+    }
     private List<Double> getCapacityFactor(LocalDateTime startTime, LocalDateTime endTime, List<Long> actualActivePowerList) throws Exception {
         List<Double> results = new ArrayList<>();
         List<General> generalList = generalRepository.findAll();
@@ -365,6 +436,7 @@ public class ReportsService implements StaticReportService, MemoReportService, M
         }
         return results;
     }
+
     private double getTotalCapacityFactor(LocalDateTime startTime, LocalDateTime endTime, List<Long> actualActivePowerList) throws Exception {
         List<General> generalList = generalRepository.findAll();
         long durationSeconds = Duration.between(startTime, endTime).toSeconds();
@@ -379,4 +451,23 @@ public class ReportsService implements StaticReportService, MemoReportService, M
 
         return (actualActivePower / potentialActivePower) * 100;
     }
+
+    private LocalDateTime createLocalDateTime(String time){
+        String[] splitTime = time.split("_");
+
+        return LocalDateTime.of(
+                Integer.parseInt(splitTime[0]),
+                Integer.parseInt(splitTime[1]),
+                Integer.parseInt(splitTime[2]),
+                0,
+                0);
+    }
+
+    private void checkStartTimeAndEndTime(LocalDateTime startTime, LocalDateTime endTime) throws Exception {
+        if(endTime.isBefore(startTime)){
+            throw new Exception("종료 시간이 시작 시간보다 이전입니다. 올바른 시간을 입력하세요.");
+        }
+    }
+
+
 }

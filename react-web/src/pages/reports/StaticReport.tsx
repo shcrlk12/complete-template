@@ -1,14 +1,41 @@
 import useInits from "@src/hooks/useInits";
 import React, { ChangeEvent, MouseEvent, useEffect, useState } from "react";
-import { Header, ReportContainer, ReportInner } from "./Reports.styled";
+import {
+  DateContainer,
+  Header,
+  ReportContainer,
+  ReportInner,
+  ReportTableContainer,
+  RightHeaderContainer,
+  TopOnTableButtonContainer,
+} from "./Reports.styled";
 import Button from "./../../components/Button/Button";
 import { ButtonContainer } from "@pages/Common.styled";
-import DeviceType from "./../../components/Report/DeviceType";
+import DeviceType, { DeviceTypeSettingProps, initDeviceTypeSettingProps } from "./../../components/Report/DeviceType";
 import Period from "./../../components/Report/Period";
 import ReportType from "./../../components/Report/ReportType";
 import ReportTable, { ReportTableProps } from "@components/Report/Table/ReportTable";
 import { backendServerIp } from "@src/Config";
 import { fetchData, statusOk } from "@src/util/fetch";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import useFetchData from "@src/hooks/useFetchData";
+import useDownloadFile from "@src/hooks/useDownloadFile";
+import { convertJsonToTableProps } from "./Report";
+
+export type StaticTableRow = {
+  deviceName: string;
+  time: string;
+  windSpeed: string;
+  energyProduction: string;
+  availability: string;
+  capacityFactor: string;
+  forcedOutage: string;
+};
+
+export type StaticReportDataTableProps = {
+  headerList: string[];
+  tableData: StaticTableRow[];
+};
 
 export type StaticReportSelectionData = {
   selectedDeviceType: string;
@@ -16,91 +43,56 @@ export type StaticReportSelectionData = {
 };
 
 const StaticReport = () => {
-  const { dispatch, navigate } = useInits();
-  const [deviceType, setDeviceType] = useState<StaticReportSelectionData>({
-    selectedDeviceType: "Wind farm",
-    selectedTurbine: "WTG01",
-  });
+  const [deviceType, setDeviceType] = useState<DeviceTypeSettingProps>(initDeviceTypeSettingProps());
   const [startDate, setStartDate] = useState<Date>(new Date(Date.now()));
   const [endDate, setEndDate] = useState<Date>(new Date(Date.now()));
   const [reportType, setReportType] = useState<string>("Hourly");
-  const [staticTableData, setStaticTableData] = useState<ReportTableProps[]>();
+  const [staticTableData, setStaticTableData] = useState<ReportTableProps | null>(null);
 
-  const createStaticData = (): ReportTableProps => {
-    let newArr: ReportTableProps = {
-      tableHeader: [
-        { name: "Device Name", unit: null },
-        { name: "Time", unit: null },
-        { name: "Wind Speed", unit: "m/s" },
-        { name: "Energy Production", unit: "Mwh" },
-        { name: "Availability", unit: "%" },
-        { name: "Capacity Factor", unit: "%" },
-        { name: "Forced Outage", unit: "min" },
-        { name: "Scheduled Maintenance", unit: "min" },
-        { name: "Requested Shutdown", unit: "min" },
-        { name: "Normal Status", unit: "min" },
-        { name: "Information Unavailable", unit: "min" },
-      ],
-      tableData: {
-        row: [
-          { value: ["WTG01", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG02", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG03", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG04", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG05", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG06", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG07", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG08", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG09", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG10", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG11", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-          { value: ["WTG12", "2024-11-05", "10.5", "81153", "66.8", "23.8", "500", "400", "300", "200", "100"] },
-        ],
+  const fetchData = useFetchData();
+  const downloadFile = useDownloadFile();
+
+  const fetchReportTableData = async () => {
+    const data = await fetchData<ReportTableProps>(
+      `http://${backendServerIp}/api/reports/static?startDate=${startDate.getFullYear()}_${startDate.getMonth() + 1}_${startDate.getDate()}&endDate=${endDate.getFullYear()}_${endDate.getMonth() + 1}_${endDate.getDate()}&deviceType=${deviceType.selectedDeviceType}&windFarmName=${deviceType.selectedWindFarm}&turbineId=${deviceType.selectedTurbine}`,
+      {
+        mode: "cors",
+        method: "GET",
+        credentials: "include",
       },
-    };
-    return newArr;
+    );
+    setStaticTableData(data);
+    console.log(data);
   };
 
-  const { tableHeader, tableData } = createStaticData();
-  const createData = () => {
-    setStaticTableData([]);
-
-    fetchData(dispatch, navigate, async () => {
-      const response = await fetch(
-        `http://${backendServerIp}/api/reports/static?startDate=${startDate}&endDate=${endDate}`,
-        {
-          mode: "cors",
-          method: "GET",
-          credentials: "include",
-        },
-      );
-
-      await statusOk(response);
-
-      const json = await response.json();
+  const downloadExcel = () => {
+    downloadFile(`http://${backendServerIp}/api/reports/static/download/excel`, {
+      mode: "cors",
+      method: "GET",
+      credentials: "include",
     });
   };
+
+  const changeDeviceType = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    if (event.target instanceof HTMLInputElement) {
+      setDeviceType((current) => ({
+        ...current,
+        selectedDeviceType: event.target.value,
+      }));
+    } else if (event.target instanceof HTMLSelectElement) {
+      setDeviceType((current) => ({
+        ...current,
+        selectedTurbine: event.target.value,
+      }));
+    }
+  };
+
   return (
     <ReportContainer>
-      {staticTableData === undefined ? (
+      {staticTableData === null ? (
         <ReportInner>
           <Header>Static Report</Header>
-          <DeviceType
-            props={deviceType}
-            onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-              if (event.target instanceof HTMLInputElement) {
-                setDeviceType({
-                  ...deviceType,
-                  selectedDeviceType: event.target.value,
-                });
-              } else if (event.target instanceof HTMLSelectElement) {
-                setDeviceType({
-                  ...deviceType,
-                  selectedTurbine: event.target.value,
-                });
-              }
-            }}
-          />
+          <DeviceType props={deviceType} onChange={changeDeviceType} />
           <Period
             startDate={startDate}
             endDate={endDate}
@@ -141,11 +133,32 @@ const StaticReport = () => {
             }}
           />
           <ButtonContainer>
-            <Button type="submit" isPrimary={true} text="Craet data" width="100%" onClick={createData} />
+            <Button type="submit" isPrimary={true} text="Craet data" width="100%" onClick={fetchReportTableData} />
           </ButtonContainer>
         </ReportInner>
       ) : (
-        <ReportTable tableHeader={tableHeader} tableData={tableData} />
+        <ReportTableContainer>
+          <TopOnTableButtonContainer>
+            <Button
+              text={
+                <>
+                  <ArrowBackIcon />
+                </>
+              }
+              width="30px"
+              height="25px"
+              radius="5px"
+              padding="0px"
+              onClick={() => {
+                setStaticTableData(null);
+              }}
+            />
+            <RightHeaderContainer>
+              <Button text="Download" height="25px" radius="5px" onClick={downloadExcel} />
+            </RightHeaderContainer>
+          </TopOnTableButtonContainer>
+          <ReportTable tableHeader={staticTableData.tableHeader} tableData={staticTableData.tableData} />
+        </ReportTableContainer>
       )}
     </ReportContainer>
   );

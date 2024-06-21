@@ -1,13 +1,13 @@
 package com.unison.scada.availability.global;
 
-public class Util {
-    public static String ifNullToEmptyString(Object o){
+public class NullUtil {
+    public static String ifNullEmptyString(Object o){
         if(o == null)
             return "";
         return o.toString();
     }
 
-    public static boolean isEmpty(Object o){
+    public static boolean ifNullIsEmpty(Object o){
         if(o == null){
             return true;
         }

@@ -41,4 +41,22 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
             "ad.availabilityDataId.timestamp = :timestamp " +
             "AND ad.availabilityDataId.turbineId = :turbineId")
     List<AvailabilityData> findByIdWithoutUUID(@Param("timestamp") LocalDateTime timestamp, @Param("turbineId") int turbineId);
+
+    @Query("SELECT ad " +
+            "FROM AvailabilityData ad " +
+            "LEFT JOIN ad.availabilityType at " +
+            "LEFT JOIN ad.variable v  " +
+            "WHERE ad.availabilityDataId.timestamp BETWEEN :startTime AND :endTime " +
+            "AND ad.availabilityDataId.windFarmId = :windFarmId")
+    List<AvailabilityData> findByWindFarmIdAndTimeBetween(@Param("windFarmId") Integer windFarmId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+
+
+    @Query("SELECT ad " +
+            "FROM AvailabilityData ad " +
+            "LEFT JOIN ad.availabilityType at " +
+            "LEFT JOIN ad.variable v  " +
+            "WHERE ad.availabilityDataId.timestamp BETWEEN :startTime AND :endTime " +
+            "AND ad.availabilityDataId.windFarmId = :windFarmId " +
+            "AND ad.availabilityDataId.turbineId = :turbineId")
+    List<AvailabilityData> findByWindFarmIdAndTurbineIdAndTimeBetween(@Param("windFarmId") Integer windFarmId, @Param("turbineId") Integer turbineId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 }

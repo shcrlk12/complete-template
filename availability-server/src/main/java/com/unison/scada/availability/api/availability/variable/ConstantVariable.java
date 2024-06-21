@@ -3,7 +3,6 @@ package com.unison.scada.availability.api.availability.variable;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,16 +20,22 @@ public enum ConstantVariable {
 
     @Getter
     private String opcVariableName;
+
+    @Getter
+    @Setter
+    private boolean isSave;
+
     ConstantVariable(String uuid){
         this.uuid = uuid;
     }
 
-    public static void setOpcVariableName(List<Variable> variableList){
+    public static void initializeConstant(List<Variable> variableList){
 
-        Map<String, String> variableMap = variableList.stream().collect(Collectors.toMap(value -> value.getUuid().toString(), Variable::getName));
+        Map<String, Variable> variableMap = variableList.stream().collect(Collectors.toMap(value -> value.getUuid().toString(), value -> value));
 
         for(ConstantVariable constantVariable : ConstantVariable.values()){
-            constantVariable.opcVariableName = variableMap.get(constantVariable.getUuid().toString());
+            constantVariable.opcVariableName = variableMap.get(constantVariable.getUuid().toString()).getName();
+            constantVariable.isSave = variableMap.get(constantVariable.getUuid().toString()).isSave();
         }
     }
 

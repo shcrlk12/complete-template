@@ -1,9 +1,6 @@
 package com.unison.scada.availability.scheduler.availability.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
@@ -17,8 +14,15 @@ public class Turbine {
 
     int turbineId;
     AvailabilityStatus availabilityStatus;
-    Map<String, Double> dataMap;
+    Map<String, Data> dataMap;
 
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class Data{
+        Double value;
+        boolean isSave;
+    }
     public Turbine(int turbineId){
         this.turbineId = turbineId;
     }

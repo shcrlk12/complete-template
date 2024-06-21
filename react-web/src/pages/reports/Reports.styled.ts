@@ -1,5 +1,6 @@
 import { flexCenter } from "@components/style/Common";
 import styled from "styled-components";
+import DeviceType from "./../../components/Report/DeviceType";
 
 export const ReportContainer = styled.div`
   ${flexCenter};

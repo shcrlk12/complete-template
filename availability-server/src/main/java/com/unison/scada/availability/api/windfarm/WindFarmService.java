@@ -33,7 +33,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -131,7 +130,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         }
 
         //get availability type list
-        List<AvailabilityType> availabilityTypes = availabilityTypeRepository.findByActive(true);
+        List<AvailabilityType> availabilityTypes = availabilityTypeRepository.findByIsActiveTrue();
 
         List<DailyWindFarmDTO.Response.AvailabilityStatus> availabilityStatus = new ArrayList<>();
 
@@ -201,7 +200,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
             //find
             List<AvailabilityData> availabilityDataList = availabilityDataRepository.findByIdWithoutUUID(turbine.getTimestamp().plusHours(9), turbine.getTurbineId());
-            List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByActive(true);
+            List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByIsActiveTrue();
 
             for(DailyWindFarmDTO.Availability availability : availabilityList){
 
@@ -389,7 +388,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         List<RealTimeDTO.Response.RealTime> dataList = new ArrayList<>();
 
         for(Turbine turbine : windFarm.getTurbines()){
-            Map<String, Double> turbineDataMap = turbine.getDataMap();
+            Map<String, Turbine.Data> turbineDataMap = turbine.getDataMap();
 
             for(String valueName : turbineDataMap.keySet())
             {
@@ -398,12 +397,12 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 if(optionalRealTime.isEmpty()) {
                     dataList.add(RealTimeDTO.Response.RealTime.builder()
                             .name(valueName)
-                            .value(turbineDataMap.get(valueName))
+                            .value(turbineDataMap.get(valueName).getValue())
                             .base(1)
                             .build());
                 }else {
                     RealTimeDTO.Response.RealTime realTime = optionalRealTime.get();
-                    realTime.setValue(realTime.getValue() + turbineDataMap.get(valueName));
+                    realTime.setValue(realTime.getValue() + turbineDataMap.get(valueName).getValue());
                     realTime.setBase(realTime.getBase() + 1);
                 }
             }
@@ -539,4 +538,8 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 source.getMinute(),
                 source.getSecond());
     }
+
+//    private getAvailability(LocalDateTime startTime, LocalDateTime endTime){
+//
+//    }
 }

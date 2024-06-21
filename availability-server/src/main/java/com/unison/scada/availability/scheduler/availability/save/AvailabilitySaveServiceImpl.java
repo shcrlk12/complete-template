@@ -30,7 +30,7 @@ public class AvailabilitySaveServiceImpl implements AvailabilitySaveService {
     @Override
     public void save1HourAvailabilityTotalTime(int turbinesNumber) {
         List<AvailabilityData> availabilityDataList = new ArrayList<>();
-        List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByActive(true);
+        List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByIsActiveTrue();
 
         for(int turbineId = 0; turbineId < turbinesNumber; turbineId++){
 
@@ -63,19 +63,21 @@ public class AvailabilitySaveServiceImpl implements AvailabilitySaveService {
 
         for(Turbine turbine : turbineList){
 
-            Map<String, Double> dataMap = turbine.getDataMap();
+            Map<String, Turbine.Data> dataMap = turbine.getDataMap();
 
             for(Variable variable : variableList)
             {
                 if(dataMap.containsKey(variable.getName())){
-                    Double value = dataMap.get(variable.getName());
+                    Turbine.Data value = dataMap.get(variable.getName());
 
-                    availabilityDataList.add(AvailabilityData.builder()
-                            .availabilityDataId(new AvailabilityData.AvailabilityDataId(now, 0, turbine.getTurbineId(), UUID.randomUUID()))
-                            .variable(variable)
-                            .time(value.intValue())
-                            .createdAt(LocalDateTime.now())
-                            .build());
+                    if(value.isSave()) {
+                        availabilityDataList.add(AvailabilityData.builder()
+                                .availabilityDataId(new AvailabilityData.AvailabilityDataId(now, 0, turbine.getTurbineId(), UUID.randomUUID()))
+                                .variable(variable)
+                                .time(value.getValue().intValue())
+                                .createdAt(LocalDateTime.now())
+                                .build());
+                    }
                 }
             }
         }

@@ -11,9 +11,7 @@ import java.util.UUID;
 
 public interface AvailabilityTypeRepository extends JpaRepository<AvailabilityType, UUID> {
 
-    @Query("SELECT t FROM AvailabilityType t " +
-            "WHERE t.isActive = :isActive")
-    List<AvailabilityType> findByActive(@Param("isActive") boolean isActive);
+    List<AvailabilityType> findByIsActiveTrue();
 
     @Query("SELECT t FROM AvailabilityType t WHERE t.name = :name")
     Optional<AvailabilityType> findByName(@Param("name") String name);

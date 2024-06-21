@@ -52,7 +52,7 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
         * Initialize OPC Variables
         * */
         List<Variable> variableList = variableRepository.findByIsActiveTrue();
-        ConstantVariable.setOpcVariableName(variableList);
+        ConstantVariable.initializeConstant(variableList);
 
         /*
         * Configure OPC Server
@@ -107,20 +107,22 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
         OPCGroup realTimeOPCGroup = opcServer.getGroupByName(prefixTurbineId + opcGroupName);
         realTimeOPCGroup.syncRead(OPC.OPC_DS_CACHE);
 
-        Map<String, Double> dataMap = new HashMap<>();
+        Map<String, Turbine.Data> dataMap = new HashMap<>();
+
 
         for(ConstantVariable constantVariable : ConstantVariable.values()){
             String realTimeValue = realTimeOPCGroup.getItemByName(prefixTurbineId + constantVariable.getOpcVariableName()).getValueAsString();
 
-            dataMap.put(constantVariable.getOpcVariableName(), Double.parseDouble(realTimeValue));
+
+            dataMap.put(constantVariable.getOpcVariableName(), new Turbine.Data(Double.parseDouble(realTimeValue), constantVariable.isSave()));
         }
 
-        Double availabilitySt = dataMap.get(ConstantVariable.TURBINE_MAIN_STATUS.getOpcVariableName());
+        Turbine.Data availabilitySt = dataMap.get(ConstantVariable.TURBINE_MAIN_STATUS.getOpcVariableName());
 
         return Turbine.builder()
                 .turbineId(turbineId)
                 .dataMap(dataMap)
-                .availabilityStatus(AvailabilityStatus.getStatus(availabilitySt.intValue()))
+                .availabilityStatus(AvailabilityStatus.getStatus(availabilitySt.getValue().intValue()))
                 .build();
     }
 

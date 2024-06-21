@@ -1,17 +1,27 @@
 package com.unison.scada.availability.api.reports;
 
 
+import com.unison.scada.availability.api.availability.entity.AvailabilityData;
+import com.unison.scada.availability.api.availability.entity.AvailabilityType;
+import com.unison.scada.availability.api.availability.repository.AvailabilityTypeRepository;
 import com.unison.scada.availability.api.memo.Memo;
-import com.unison.scada.availability.api.reports.daily.DailyReportDTO;
 import com.unison.scada.availability.api.reports.memo.MemoReportDTO;
+import com.unison.scada.availability.api.reports.statics.StaticReportDTO;
+import com.unison.scada.availability.global.DateTimeUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
+@Component
 public class ReportsMapper {
 
-    public static MemoReportDTO.Response.MemoData memoToReportsDTOResponse(Memo memo){
+    private final AvailabilityTypeRepository availabilityTypeRepository;
+
+    public MemoReportDTO.Response.MemoData memoToReportsDTOResponse(Memo memo){
 
         MemoReportDTO.Response.MemoData response;
 
@@ -28,10 +38,10 @@ public class ReportsMapper {
                 .build();
     }
 
-    public static MemoReportDTO.Response memoToReportsDTOResponse(List<Memo> memo){
+    public MemoReportDTO.Response memoToReportsDTOResponse(List<Memo> memo){
 
         List<MemoReportDTO.Response.MemoData> memoDataList = memo.stream()
-                .map(ReportsMapper::memoToReportsDTOResponse)
+                .map(this::memoToReportsDTOResponse)
                 .collect(Collectors.toList());
 
         List<String> headerList = new ArrayList<>();
@@ -53,29 +63,90 @@ public class ReportsMapper {
     }
 
 
-    public static DailyReportDTO.Response toDailyReport(){
+    public StaticReportDTO.Response toStaticReportDTOResponse(List<AvailabilityData> availabilityDataList){
 
-        DailyReportDTO.Response response = new DailyReportDTO.Response();
+        StaticReportDTO.Response response = new StaticReportDTO.Response();
 
-        List<String> headerList = new ArrayList<>();
+        /*
+        * Set Header Data
+        * */
+        List<StaticReportDTO.Response.TableHeader> headerList = new ArrayList<>();
 
-        headerList.add("호기");
-        headerList.add("발전량 [kWh]");
-        headerList.add("가동률 [%]");
-        headerList.add("이용률 [%]");
-        headerList.add("월 누적 발전량 [kWh]");
-        headerList.add("월 누적 이용률 [%]");
-        headerList.add("월 누적 가동률 [%]");
+        /*
+        * Fixed header
+        * */
+        headerList.add(new StaticReportDTO.Response.TableHeader("Time", null));
+        headerList.add(new StaticReportDTO.Response.TableHeader("Device Name", null));
+        headerList.add(new StaticReportDTO.Response.TableHeader("Wind Speed", "m/s"));
+        headerList.add(new StaticReportDTO.Response.TableHeader("Energy Production", "MWh"));
+        headerList.add(new StaticReportDTO.Response.TableHeader("Availability", "%"));
+        headerList.add(new StaticReportDTO.Response.TableHeader("Capacity Factor", "%"));
 
-        DailyReportDTO.Response.DailyData dailyData = DailyReportDTO.Response.DailyData.builder()
-                .deviceName("TOTAL")
 
+        List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByIsActiveTrue();
+
+        for(AvailabilityType availabilityType : availabilityTypeList ){
+            headerList.add(new StaticReportDTO.Response.TableHeader(availabilityType.getName(), "min"));
+        }
+
+        /*
+         * Set Body Data
+         * */
+        Map<LocalDateTime, Map<Integer, Map<String, List<AvailabilityData>>>> groupedData =
+                availabilityDataList.stream()
+                        .filter(data -> data.getAvailabilityType() != null)
+                        .collect(Collectors.groupingBy(
+                                data -> data.getAvailabilityDataId().getTimestamp(),
+                                LinkedHashMap::new, // 외부 맵에 LinkedHashMap을 사용하여 순서 유지
+                                Collectors.groupingBy(
+                                        data -> data.getAvailabilityDataId().getTurbineId(),
+                                        LinkedHashMap::new,
+                                        Collectors.groupingBy(data -> data.getAvailabilityType().getName())
+                                )
+                        ));
+
+        List<StaticReportDTO.Response.TableDataRow.TableDataItem> tableDataItemList = new ArrayList<>();
+
+        for(LocalDateTime localDateTime : groupedData.keySet()){
+            Map<Integer, Map<String, List<AvailabilityData>>> availabilityDataList2 = groupedData.get(localDateTime);
+
+            for(Integer turbineId : availabilityDataList2.keySet()) {
+                Map<String, List<AvailabilityData>> aaa2 = availabilityDataList2.get(turbineId);
+                List<String> tableDataList = new ArrayList<>();
+
+                for (AvailabilityType availabilityType : availabilityTypeList) {
+
+                    /*
+                     * First set time of table
+                     * */
+                    if (tableDataList.isEmpty()) {
+                        tableDataList.add(DateTimeUtil.formatToYearMonthDayHourMinute(localDateTime));
+                        tableDataList.add(String.format("WTG%02d", turbineId + 1));
+                        tableDataList.add("0"); // Wind Speed
+                        tableDataList.add("0"); // Energy Production
+                        tableDataList.add("0"); // Availability
+                        tableDataList.add("0"); // Capacity Factor
+                    }
+                    if (aaa2.containsKey(availabilityType.getName())) {
+                        AvailabilityData availabilityData = aaa2.get(availabilityType.getName()).get(0);
+
+                        tableDataList.add(String.valueOf(availabilityData.getTime()));
+                    } else {
+                        tableDataList.add("0");
+                    }
+                }
+                tableDataItemList.add(StaticReportDTO.Response.TableDataRow.TableDataItem.builder()
+                        .value(tableDataList)
+                        .build());
+            }
+        }
+
+        StaticReportDTO.Response.TableDataRow tableDataRow = StaticReportDTO.Response.TableDataRow.builder()
+                .row(tableDataItemList)
                 .build();
 
-        List<DailyReportDTO.Response.DailyData> dailyDataList = new ArrayList<>();
-
-        response.setHeaderList(headerList);
-        response.setTableData(dailyDataList);
+        response.setTableHeader(headerList);
+        response.setTableData(tableDataRow);
 
         return response;
     }

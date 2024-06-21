@@ -17,12 +17,25 @@ const WindTurbineContainer = styled.div`
   display: flex;
 `;
 
+export type DeviceTypeSettingProps = {
+  selectedDeviceType: string;
+  selectedTurbine: string;
+  selectedWindFarm: string;
+};
+
 type DeviceTypeProps = {
   onClick?: any;
   onChange?: any;
   props: StaticReportSelectionData;
 };
 
+export const initDeviceTypeSettingProps = (): DeviceTypeSettingProps => {
+  return {
+    selectedDeviceType: "Wind farm",
+    selectedTurbine: "0",
+    selectedWindFarm: "JEONG AM",
+  };
+};
 const DeviceType = ({ onClick, onChange, props }: DeviceTypeProps) => {
   return (
     <StyledDeviceType>

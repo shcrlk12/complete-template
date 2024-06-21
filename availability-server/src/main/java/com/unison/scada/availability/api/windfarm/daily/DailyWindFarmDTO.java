@@ -1,6 +1,6 @@
 package com.unison.scada.availability.api.windfarm.daily;
 
-import com.unison.scada.availability.global.Util;
+import com.unison.scada.availability.global.NullUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -78,13 +78,13 @@ public class DailyWindFarmDTO {
         private String etc;
 
         public boolean isEmpty(){
-            return Util.isEmpty(engineerName)
-                    & Util.isEmpty(workTime)
-                    & Util.isEmpty(material)
-                    & Util.isEmpty(quantity)
-                    & Util.isEmpty(workType)
-                    & Util.isEmpty(inspection)
-                    & Util.isEmpty(etc);
+            return NullUtil.ifNullIsEmpty(engineerName)
+                    & NullUtil.ifNullIsEmpty(workTime)
+                    & NullUtil.ifNullIsEmpty(material)
+                    & NullUtil.ifNullIsEmpty(quantity)
+                    & NullUtil.ifNullIsEmpty(workType)
+                    & NullUtil.ifNullIsEmpty(inspection)
+                    & NullUtil.ifNullIsEmpty(etc);
         }
     }
 

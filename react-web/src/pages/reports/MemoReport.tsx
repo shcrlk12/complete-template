@@ -8,7 +8,7 @@ import {
 } from "./Reports.styled";
 import Button from "./../../components/Button/Button";
 import { ButtonContainer } from "@pages/Common.styled";
-import DeviceType from "./../../components/Report/DeviceType";
+import DeviceType, { DeviceTypeSettingProps, initDeviceTypeSettingProps } from "./../../components/Report/DeviceType";
 import Period from "./../../components/Report/Period";
 import useInits from "@src/hooks/useInits";
 import { fetchData, statusOk } from "@src/util/fetch";
@@ -38,19 +38,9 @@ export type MemoReportDataTableProps = {
   tableData: MemoTableRow[];
 };
 
-export type MemoReportSelectionData = {
-  selectedDeviceType: string;
-  selectedTurbine: string;
-  selectedWindFarm: string;
-};
-
 const MemoReport = () => {
   const { dispatch, navigate } = useInits();
-  const [deviceType, setDeviceType] = useState<MemoReportSelectionData>({
-    selectedDeviceType: "Wind farm",
-    selectedTurbine: "0",
-    selectedWindFarm: "JEONG AM",
-  });
+  const [deviceType, setDeviceType] = useState<DeviceTypeSettingProps>(initDeviceTypeSettingProps());
 
   const [startDate, setStartDate] = useState<Date>(new Date(Date.now()));
   const [endDate, setEndDate] = useState<Date>(new Date(Date.now()));

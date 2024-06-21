@@ -33,7 +33,7 @@ public class WindFarm {
                 .collect(Collectors.toList());
     }
 
-    public List<Turbine> getTurbinesData() throws OPCException, OPCNotFoundException {
+    public List<Turbine> updateTurbinesData() throws OPCException, OPCNotFoundException {
 
         List<Turbine> turbineList = new ArrayList<>();
 
