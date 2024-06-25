@@ -18,10 +18,10 @@ public class MemoReportDTO {
         @Builder
         @Getter
         public static class MemoData{
-            private LocalDateTime timeStamp;
+            private String timeStamp;
             private String deviceName;
             private String engineerName;
-            private LocalDateTime workTime;
+            private String workTime;
             private String material;
             private Integer quantity;
             private String workType;

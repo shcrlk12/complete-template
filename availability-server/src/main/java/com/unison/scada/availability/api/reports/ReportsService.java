@@ -85,7 +85,6 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
 
         response = reportsMapper.toStaticReportDTOResponse(availabilityDataList, request.getReportType());
 
-
         /*
          * Save Static data to create excel
          * */
@@ -114,14 +113,17 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
         List<Memo> memoList;
 
         // 특정 turbine 데이터만 조회
-        if(request.getDeviceType().equalsIgnoreCase("wind farm")){
-            memoList = memoRepository.findByMemoIdWindFarmIdAndMemoIdTimestampBetween(windFarmId, startTime, endTime);
+        if(request.getDeviceType().equalsIgnoreCase("wind farm"))
+        {
+            memoList = memoRepository.findByMemoIdWindFarmIdAndMemoIdTimestampBetweenOrderByMemoIdTimestampAsc(windFarmId, startTime, endTime);
         }
         //wind farm 데이터 조회
-        else if(request.getDeviceType().equalsIgnoreCase("wind turbine")){
+        else if(request.getDeviceType().equalsIgnoreCase("wind turbine"))
+        {
             memoList = memoRepository.findByIdBetween(windFarmId, turbineId, startTime, endTime);
         }
-        else {
+        else
+        {
             memoList = new ArrayList<>();
         }
 
@@ -171,25 +173,25 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
         List<General> generalList = generalRepository.findAll();
 
 
-        List<Long> dailyActualActivePowerList = new ArrayList<>();
-        List<Long> monthlyActualActivePowerList = new ArrayList<>();
+        List<Double> dailyActualActivePowerList = new ArrayList<>();
+        List<Double> monthlyActualActivePowerList = new ArrayList<>();
 
         for(General general : generalList)
         {
-            long dailyActualActivePower;
-            long monthlyActualActivePower;
+            double dailyActualActivePower;
+            double monthlyActualActivePower;
 
-            Optional<Long> dailyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), dailyStartTime);
-            Optional<Long> monthlyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), monthlyStartTime);
-            Optional<Long> totalPowerAtEndTime = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), endTime);
+            Optional<Double> dailyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), dailyStartTime, endTime);
+            Optional<Double> monthlyTotalPowerAtStartTime = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), monthlyStartTime, endTime);
+            Optional<Double> totalPowerAtEndTime = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), endTime, dailyStartTime);
 
             if(totalPowerAtEndTime.isEmpty() || dailyTotalPowerAtStartTime.isEmpty())
-                dailyActualActivePower = 0;
+                dailyActualActivePower = 0d;
             else
                 dailyActualActivePower = totalPowerAtEndTime.get() - dailyTotalPowerAtStartTime.get();
 
             if(totalPowerAtEndTime.isEmpty() || monthlyTotalPowerAtStartTime.isEmpty())
-                monthlyActualActivePower = 0;
+                monthlyActualActivePower = 0d;
             else
                 monthlyActualActivePower = totalPowerAtEndTime.get() - monthlyTotalPowerAtStartTime.get();
 
@@ -230,18 +232,18 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
 
         dailyDataList.add(DailyReportDTO.Response.DailyData.builder()
                 .deviceName("TOTAL")
-                .dailyProduction(String.valueOf(dailyActualActivePowerList.stream().mapToLong(Long::intValue).sum()))
-                .dailyAvailability(String.valueOf(WindFarmService.Avail.average(dailyAvailabilityList)))
-                .dailyCapacityFactor(String.valueOf(getTotalCapacityFactor(dailyStartTime, endTime, dailyActualActivePowerList)))
-                .monthlyProduction(String.valueOf(monthlyActualActivePowerList.stream().mapToLong(Long::intValue).sum()))
-                .monthlyAvailability(String.valueOf(WindFarmService.Avail.average(monthlyAvailabilityList)))
-                .monthlyCapacityFactor(String.valueOf(getTotalCapacityFactor(monthlyStartTime, endTime, monthlyActualActivePowerList)))
+                .dailyProduction(String.format("%.02f",dailyActualActivePowerList.stream().mapToDouble(Double::doubleValue).sum() * 1000d))
+                .dailyAvailability(String.format("%.02f", WindFarmService.Avail.average(dailyAvailabilityList)))
+                .dailyCapacityFactor(String.format("%.02f", getTotalCapacityFactor(dailyStartTime, endTime, dailyActualActivePowerList)))
+                .monthlyProduction(String.format("%.02f",monthlyActualActivePowerList.stream().mapToDouble(Double::doubleValue).sum() * 1000d))
+                .monthlyAvailability(String.format("%.02f", WindFarmService.Avail.average(monthlyAvailabilityList)))
+                .monthlyCapacityFactor(String.format("%.02f", getTotalCapacityFactor(monthlyStartTime, endTime, monthlyActualActivePowerList)))
                 .build());
 
 
 
         List<Double> dailyCapacityFactorList = getCapacityFactor(dailyStartTime, endTime, dailyActualActivePowerList);
-        List<Double> monthlyCapacityFactorList =  getCapacityFactor(monthlyStartTime, endTime, dailyActualActivePowerList);
+        List<Double> monthlyCapacityFactorList =  getCapacityFactor(monthlyStartTime, endTime, monthlyActualActivePowerList);
 
         /*
          * Set each turbine data of table
@@ -250,12 +252,12 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
         {
             DailyReportDTO.Response.DailyData turbineDailyData = DailyReportDTO.Response.DailyData.builder()
                     .deviceName(String.format("WTG%02d", turbineId + 1))
-                    .dailyProduction(String.valueOf(dailyActualActivePowerList.get(turbineId)))
-                    .dailyAvailability(String.valueOf(dailyAvailabilityList.get(turbineId).getAvail()))
-                    .dailyCapacityFactor(String.valueOf(dailyCapacityFactorList.get(turbineId)))
-                    .monthlyProduction(String.valueOf(monthlyActualActivePowerList.get(turbineId)))
-                    .monthlyAvailability(String.valueOf(monthlyAvailabilityList.get(turbineId).getAvail()))
-                    .monthlyCapacityFactor(String.valueOf(monthlyCapacityFactorList.get(turbineId)))
+                    .dailyProduction(String.format("%.02f", dailyActualActivePowerList.get(turbineId) * 1000))
+                    .dailyAvailability(String.format("%.02f", dailyAvailabilityList.get(turbineId).getAvail()))
+                    .dailyCapacityFactor(String.format("%.02f", dailyCapacityFactorList.get(turbineId)))
+                    .monthlyProduction(String.format("%.02f", monthlyActualActivePowerList.get(turbineId) * 1000))
+                    .monthlyAvailability(String.format("%.02f", monthlyAvailabilityList.get(turbineId).getAvail()))
+                    .monthlyCapacityFactor(String.format("%.02f",monthlyCapacityFactorList.get(turbineId)))
                     .build();
 
             dailyDataList.add(turbineDailyData);
@@ -423,7 +425,7 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
         servletOutputStream.flush();
         servletOutputStream.close();
     }
-    private List<Double> getCapacityFactor(LocalDateTime startTime, LocalDateTime endTime, List<Long> actualActivePowerList) throws Exception {
+    private List<Double> getCapacityFactor(LocalDateTime startTime, LocalDateTime endTime, List<Double> actualActivePowerList) throws Exception {
         List<Double> results = new ArrayList<>();
         List<General> generalList = generalRepository.findAll();
 
@@ -438,7 +440,7 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
         return results;
     }
 
-    private double getTotalCapacityFactor(LocalDateTime startTime, LocalDateTime endTime, List<Long> actualActivePowerList) throws Exception {
+    private double getTotalCapacityFactor(LocalDateTime startTime, LocalDateTime endTime, List<Double> actualActivePowerList) throws Exception {
         List<General> generalList = generalRepository.findAll();
         long durationSeconds = Duration.between(startTime, endTime).toSeconds();
 
@@ -447,7 +449,7 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
                 .sum();
 
         double actualActivePower = actualActivePowerList.stream()
-                .mapToLong(Long::intValue)
+                .mapToDouble(Double::doubleValue)
                 .sum();
 
         return (actualActivePower / potentialActivePower) * 100;

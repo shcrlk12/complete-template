@@ -2,10 +2,7 @@ package com.unison.scada.availability.api.user;
 
 import com.unison.scada.availability.global.config.security.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -32,6 +29,10 @@ public class Users {
 
     @Column(nullable = false, length = 30)
     private String name;
+
+    @Column(nullable = true)
+    @Setter
+    private LocalDateTime lastLoginTime;
 
     @Column(nullable = false)
     @ColumnDefault("1")

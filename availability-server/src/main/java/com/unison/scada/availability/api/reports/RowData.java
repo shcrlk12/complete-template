@@ -49,7 +49,7 @@ public class RowData {
                         String uuid = availabilityData.getVariable().getUuid().toString();
 
                         if(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid().equalsIgnoreCase(uuid)){
-                            dataMap.put(uuid, new DataSet(availabilityData.getTime(), RowDataMethod.POINT));
+                            dataMap.put(uuid, new DataSet(availabilityData.getTime(), RowDataMethod.GROWTH));
                         }else if(ConstantVariable.WIND_SPEED.getStringUuid().equalsIgnoreCase(uuid)){
                             dataMap.put(uuid, new DataSet(availabilityData.getTime(), RowDataMethod.AVERAGE));
                         }
@@ -125,7 +125,7 @@ public class RowData {
     public Map<String, Map<Integer, Double>> getEnergyProduction() {
         Map<String, Map<Integer, Double>> result = new LinkedHashMap<>();
 
-        Iterator<String> iterator = rowDataMap.keySet().iterator();
+        Iterator<String> iterator = modifiedDataMap.keySet().iterator();
         String beforeTime = null;
 
         if (iterator.hasNext())
@@ -167,7 +167,7 @@ public class RowData {
         for(String localDateTime : energyProductionMap.keySet()){
             Map<Integer, Double> turbines = new LinkedHashMap<>();
 
-            String nextKey = getNextKey(energyProductionMap, localDateTime);
+            String nextKey = (String)getNextKey(energyProductionMap, localDateTime);
 
                 for(Integer turbineId : energyProductionMap.get(localDateTime).keySet()){
                     Double energyProduction = energyProductionMap.get(localDateTime).get(turbineId);
@@ -235,8 +235,8 @@ public class RowData {
         return 0d;
     }
 
-    private static String getNextKey(Map<String, Map<Integer, Double>> map, String key) {
-        List<String> keys = new ArrayList<>(map.keySet());
+    private static Object getNextKey(Map<Object, Object> map, String key) {
+        List<Object> keys = new ArrayList<>(map.keySet());
         int index = keys.indexOf(key);
 
         if (index != -1 && index < keys.size() - 1) {
@@ -329,8 +329,7 @@ public class RowData {
     @NoArgsConstructor
     public static class DataSet{
         Double value = null;
-        @Setter
-        Double lastValue = null;
+        Double baseValue = null;
         RowDataMethod method;
         int baseIndex;
 
@@ -350,7 +349,9 @@ public class RowData {
             else if(method == RowDataMethod.AVERAGE){
                 return value / baseIndex;
             }
-            else
+            else if(method == RowDataMethod.GROWTH){
+                return value - baseValue;
+            }else
                 return value;
         }
 
@@ -362,8 +363,13 @@ public class RowData {
                 this.value += value;
                 this.baseIndex++;
             }
-            else if(method == RowDataMethod.SUM)
+            else if(method == RowDataMethod.SUM){
                 this.value += value;
+            }
+            else if(method == RowDataMethod.GROWTH){
+                if(baseValue == null)
+                    this.baseValue = value;
+            }
         }
     }
 }

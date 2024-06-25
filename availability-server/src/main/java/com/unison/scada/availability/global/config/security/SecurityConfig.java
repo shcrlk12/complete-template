@@ -33,6 +33,7 @@ public class SecurityConfig{
 
     private final UserDetailsService userDetailsService;
     private final CorsProperties corsProperties;
+
     @Bean
     public AuthenticationSuccessHandler appAuthenticationSuccessHandler(){
         return new AppAuthenticationSuccessHandler();

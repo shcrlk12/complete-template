@@ -30,7 +30,7 @@ const ReportType = ({ selectedValue, onClick }: ReportTypeProps) => {
         <CheckBox checked={selectedValue === "Monthly"} type="radio" text="Monthly" width="150px" name="report-type" />
       </Item>
       <Item>
-        <CheckBox checked={selectedValue === "Quater"} type="radio" text="Quater" width="150px" name="report-type" />
+        <CheckBox checked={selectedValue === "Quarter"} type="radio" text="Quarter" width="150px" name="report-type" />
       </Item>
       <Item>
         <CheckBox

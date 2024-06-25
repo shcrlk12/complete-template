@@ -21,18 +21,18 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
     @Query(value = "SELECT TOP 1 time FROM AVAILABILITY_DATA ad left outer join VARIABLE v on ad.VARIABLE_UUID = v.UUID " +
             "WHERE turbine_id = :turbineId " +
             "AND VARIABLE_UUID = :variableUUID " +
-            "AND timestamp >= :time " +
+            "AND timestamp >= :time AND timestamp <= :endTime " +
             "ORDER BY timestamp " +
             "ASC", nativeQuery = true)
-    Optional<Long> getTimeAfterCertainTimestamp(@Param("turbineId") int turbineId, @Param("variableUUID") UUID variableUUID, @Param("time") LocalDateTime time);
+    Optional<Double> getTimeAfterCertainTimestamp(@Param("turbineId") int turbineId, @Param("variableUUID") UUID variableUUID, @Param("time") LocalDateTime time, @Param("endTime") LocalDateTime endTime);
 
     @Query(value = "SELECT TOP 1 time FROM AVAILABILITY_DATA ad left outer join VARIABLE v on ad.VARIABLE_UUID = v.UUID " +
             "WHERE turbine_id = :turbineId " +
             "AND VARIABLE_UUID = :variableUUID " +
-            "AND timestamp <= :time " +
+            "AND timestamp <= :time AND timestamp >= :startTime " +
             "ORDER BY timestamp " +
             "DESC", nativeQuery = true)
-    Optional<Long> getTimeBeforeCertainTimestamp(@Param("turbineId") int turbineId, @Param("variableUUID") UUID variableUUID, @Param("time") LocalDateTime time);
+    Optional<Double> getTimeBeforeCertainTimestamp(@Param("turbineId") int turbineId, @Param("variableUUID") UUID variableUUID, @Param("time") LocalDateTime time, @Param("startTime") LocalDateTime startTime);
 
     @Query("SELECT ad " +
             "FROM AvailabilityData ad " +

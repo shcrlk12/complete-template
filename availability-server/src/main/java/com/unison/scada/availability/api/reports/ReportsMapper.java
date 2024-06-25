@@ -23,17 +23,14 @@ import java.util.stream.Collectors;
 public class ReportsMapper {
 
     private final AvailabilityTypeRepository availabilityTypeRepository;
-    private final WindFarmService windFarmService;
 
     public MemoReportDTO.Response.MemoData memoToReportsDTOResponse(Memo memo){
 
-        MemoReportDTO.Response.MemoData response;
-
         return MemoReportDTO.Response.MemoData.builder()
-                .timeStamp(memo.getMemoId().getTimestamp())
+                .timeStamp(DateTimeUtil.formatToYearMonthDayHourMinute(memo.getMemoId().getTimestamp()))
                 .deviceName(String.format("WTG%02d", memo.getMemoId().getTurbineId() + 1))
                 .engineerName(memo.getEngineerName())
-                .workTime(memo.getWorkTime())
+                .workTime(DateTimeUtil.formatToYearMonthDayHourMinute(memo.getWorkTime()))
                 .material(memo.getMaterial())
                 .quantity(memo.getQuantity())
                 .workType(memo.getWorkType())
@@ -85,7 +82,6 @@ public class ReportsMapper {
         headerList.add(new StaticReportDTO.Response.TableHeader("Energy Production", "MWh"));
         headerList.add(new StaticReportDTO.Response.TableHeader("Availability", "%"));
         headerList.add(new StaticReportDTO.Response.TableHeader("Capacity Factor", "%"));
-
 
         List<AvailabilityType> availabilityTypeList = availabilityTypeRepository.findByIsActiveTrue();
 

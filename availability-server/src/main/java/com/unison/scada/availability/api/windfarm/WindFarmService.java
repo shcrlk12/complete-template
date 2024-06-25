@@ -353,12 +353,12 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         Duration duration = Duration.between(startTime, endTime);
         long period = duration.toSeconds();
 
-        long actualActivePower = 0;
+        double actualActivePower = 0;
         for(General general : generalList)
         {
             bottom += (general.getRatedPower() * ((double) period / 3600));
-            Optional<Long> endTimeTotalPower = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid(), endTime);
-            Optional<Long> startTimeTotalPower = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid(), startTime);
+            Optional<Double> endTimeTotalPower = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid(), endTime, startTime);
+            Optional<Double> startTimeTotalPower = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid(), startTime, endTime);
 
             if(endTimeTotalPower.isEmpty() || startTimeTotalPower.isEmpty())
                 actualActivePower += 0;

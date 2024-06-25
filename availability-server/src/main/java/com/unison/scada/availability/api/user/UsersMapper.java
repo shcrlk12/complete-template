@@ -1,6 +1,7 @@
 package com.unison.scada.availability.api.user;
 
 import com.unison.scada.availability.api.login.LoginDTO;
+import com.unison.scada.availability.global.DateTimeUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -22,13 +23,9 @@ public class UsersMapper {
     }
 
     public UserDTO.Response toUserDTO(Users users){
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-        String formattedDateTime = now.format(formatter);
-
         return Optional.ofNullable(users)
-                .map(u -> new UserDTO.Response(u.getId(), u.getName(), u.getRole().name() , formattedDateTime))
-                .orElse(new UserDTO.Response("", "", "", formattedDateTime));
+                .map(u -> new UserDTO.Response(u.getId(), u.getName(), u.getRole().name() , u.getLastLoginTime() == null ? "-" : DateTimeUtil.formatToYearMonthDayHourMinuteSecond(u.getLastLoginTime())))
+                .orElse(new UserDTO.Response("", "", "", "-"));
     }
     public List<UserDTO.Response> toUserDTO(List<Users> users){
         List<UserDTO.Response> result = new ArrayList<>();

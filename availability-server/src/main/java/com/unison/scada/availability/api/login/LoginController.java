@@ -19,8 +19,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/")
-    public LoginDTO.Response login(LoginDTO.Request request){
-        System.out.println(request.getUsername() + " kjwon" + request.getPassword());
+    public LoginDTO.Response login(LoginDTO.Request request) throws Exception {
         return loginService.login(request);
     }
 

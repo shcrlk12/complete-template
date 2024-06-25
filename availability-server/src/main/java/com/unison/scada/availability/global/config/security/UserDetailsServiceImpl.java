@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -19,8 +20,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Users> optionalUsers = usersRepository.findById(username);
 
-        Users users = optionalUsers.orElse(null);
+        Users users = optionalUsers.orElseThrow(() -> new UsernameNotFoundException(String.format("not found user [%s]", username)));
 
-        return new UserDetailImpl(optionalUsers.orElse(null));
+        users.setLastLoginTime(LocalDateTime.now());
+        usersRepository.save(users);
+
+        return new UserDetailImpl(users);
     }
 }
