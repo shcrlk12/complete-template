@@ -198,7 +198,7 @@ export default function UserManagementTable() {
                   {row.role.substring(5)}
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 100 }} align="center">
-                  {row.lastLoginTime && getStringDate(new Date(row.lastLoginTime))}
+                  {row.lastLoginTime}
                 </StyledTableCell>
                 <StyledTableCell style={{ width: 122 }} align="center">
                   <Button
