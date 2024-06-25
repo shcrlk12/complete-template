@@ -12,6 +12,7 @@ import com.unison.scada.availability.api.memo.Memo;
 import com.unison.scada.availability.api.memo.MemoRepository;
 import com.unison.scada.availability.api.parameter.Parameter;
 import com.unison.scada.availability.api.parameter.ParameterRepository;
+import com.unison.scada.availability.api.reports.RowData;
 import com.unison.scada.availability.api.windfarm.annually.AnnuallyWindFarmDTO;
 import com.unison.scada.availability.api.windfarm.annually.AnnuallyWindFarmService;
 import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmDTO;
@@ -345,7 +346,6 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
     private double getCapacityFactor(LocalDateTime startTime) throws Exception {
         List<General> generalList = generalRepository.findAll();
 
-        int turbineNumber = generalList.size();
         double bottom = 0;
 
         LocalDateTime endTime = getMaximumTime(startTime, LocalDateTime.now());
@@ -353,17 +353,12 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
         Duration duration = Duration.between(startTime, endTime);
         long period = duration.toSeconds();
 
-
-        List<Turbine> turbineList = windFarm.getTurbines();
-        Optional<Variable> optionalVariable = variableRepository.findById(ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid());
-        Variable variable = optionalVariable.orElseThrow(() ->  new Exception("Not matched total exported power name"));
-
         long actualActivePower = 0;
         for(General general : generalList)
         {
-            bottom += (general.getRatedPower() * (period / 3600));
-            Optional<Long> endTimeTotalPower = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), endTime);
-            Optional<Long> startTimeTotalPower = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), variable.getUuid(), startTime);
+            bottom += (general.getRatedPower() * ((double) period / 3600));
+            Optional<Long> endTimeTotalPower = availabilityDataRepository.getTimeBeforeCertainTimestamp(general.getGeneralId().getTurbineId(), ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid(), endTime);
+            Optional<Long> startTimeTotalPower = availabilityDataRepository.getTimeAfterCertainTimestamp(general.getGeneralId().getTurbineId(), ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid(), startTime);
 
             if(endTimeTotalPower.isEmpty() || startTimeTotalPower.isEmpty())
                 actualActivePower += 0;
@@ -449,29 +444,51 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
         public void calcAvailability(AvailabilityData availabilityData){
 
-            if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.NORMAL_TYPE)){
-            }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE))
-            {
-                numerator += availabilityData.getTime();
-            }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE))
-            {
-                denominator += availabilityData.getTime();
-            }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE))
-            {
+            if(availabilityData.getAvailabilityType() != null) {
+                if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.NORMAL_TYPE)) {
+                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE)) {
+                    numerator += availabilityData.getTime();
+                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE)) {
+                    denominator += availabilityData.getTime();
+                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE)) {
 
+                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)) {
+                } else {
+                }
+                etcTime += availabilityData.getTime();
             }
-            else if(availabilityData.getAvailabilityType().getName().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
-            {
-            }
-            else
-            {
-            }
-            etcTime += availabilityData.getTime();
         }
 
+        public void calcAvailability(String uuid, Double time){
+
+            if (uuid.equalsIgnoreCase(AvailabilityStatus.NORMAL_TYPE)) {
+            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE)) {
+                numerator += time;
+            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE)) {
+                denominator += time;
+            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE)) {
+
+            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)) {
+            } else {
+            }
+            etcTime += time;
+        }
+
+        public double getAvailability(List<AvailabilityData> availabilityDataList){
+            for(AvailabilityData availabilityData : availabilityDataList){
+                calcAvailability(availabilityData);
+            }
+
+            return getAvail();
+        }
+
+        public double getAvailability(Map<String, RowData.DataSet> availabilityDataList){
+            for(String uuid : availabilityDataList.keySet()){
+                calcAvailability(uuid, availabilityDataList.get(uuid).getValue());
+            }
+
+            return getAvail();
+        }
     }
 
     private List<Map<LocalDateTime, Avail>> getMap(LocalDateTime startTime){
@@ -539,7 +556,80 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                 source.getSecond());
     }
 
-//    private getAvailability(LocalDateTime startTime, LocalDateTime endTime){
-//
-//    }
+    public Map<LocalDateTime, Map<Integer, Double>> getCapacityFactor2(List<AvailabilityData> availabilityDataList){
+        Map<LocalDateTime, Map<Integer, Double>> result = new LinkedHashMap<>();
+
+        Map<LocalDateTime, Map<Integer, List<AvailabilityData>>> availabilityDataMap = availabilityDataList.stream()
+                .collect(Collectors.groupingBy(
+                        data -> data.getAvailabilityDataId().getTimestamp(),
+                        LinkedHashMap::new,
+                        Collectors.groupingBy(data -> data.getAvailabilityDataId().getTurbineId())));
+
+        for(LocalDateTime time : availabilityDataMap.keySet()){
+            Map<Integer, Double> availabilityMap = new LinkedHashMap<>();
+
+            for(Integer turbineId : availabilityDataMap.get(time).keySet())
+            {
+                for(AvailabilityData availabilityData : availabilityDataMap.get(time).get(turbineId)){
+                    if(availabilityData.getVariable() != null && availabilityData.getVariable().getUuid().toString().equalsIgnoreCase(ConstantVariable.TOTAL_PRODUCTION_POWER.getUuid().toString()))
+                        availabilityMap.put(turbineId, availabilityData.getTime().doubleValue());
+                }
+            }
+            result.put(time, availabilityMap);
+
+        }
+        return result;
+    }
+    public Map<LocalDateTime, Map<Integer, Object>> test(List<AvailabilityData> availabilityDataList, String uuid) {
+
+        Map<LocalDateTime, Map<Integer, Object>> result = new LinkedHashMap<>();
+
+        Map<LocalDateTime, Map<Integer, List<AvailabilityData>>> availabilityDataMap = availabilityDataList.stream()
+                .collect(Collectors.groupingBy(
+                        data -> data.getAvailabilityDataId().getTimestamp(),
+                        LinkedHashMap::new,
+                        Collectors.groupingBy(data -> data.getAvailabilityDataId().getTurbineId())));
+
+        Avail a = new Avail();
+
+        for(LocalDateTime time : availabilityDataMap.keySet()){
+            Map<Integer, Object> availabilityMap = new LinkedHashMap<>();
+
+            for(Integer turbineId : availabilityDataMap.get(time).keySet())
+            {
+                double availability = a.getAvailability(availabilityDataMap.get(time).get(turbineId));
+                availabilityMap.put(turbineId, availability);
+            }
+            result.put(time, availabilityMap);
+        }
+
+        return result;
+    }
+    public Map<LocalDateTime, Map<Integer, Double>> getAvailability(List<AvailabilityData> availabilityDataList){
+        Map<LocalDateTime, Map<Integer, Double>> result = new LinkedHashMap<>();
+
+        Map<LocalDateTime, Map<Integer, List<AvailabilityData>>> availabilityDataMap = availabilityDataList.stream()
+                .collect(Collectors.groupingBy(
+                        data -> data.getAvailabilityDataId().getTimestamp(),
+                        LinkedHashMap::new,
+                        Collectors.groupingBy(data -> data.getAvailabilityDataId().getTurbineId())));
+
+        Avail a = new Avail();
+
+        for(LocalDateTime time : availabilityDataMap.keySet()){
+            Map<Integer, Double> availabilityMap = new LinkedHashMap<>();
+
+            for(Integer turbineId : availabilityDataMap.get(time).keySet())
+            {
+                double availability = a.getAvailability(availabilityDataMap.get(time).get(turbineId));
+                availabilityMap.put(turbineId, availability);
+            }
+            result.put(time, availabilityMap);
+        }
+
+        RowData test = new RowData();
+        test.setData(availabilityDataList);
+        test.getAvailability();
+        return result;
+    }
 }

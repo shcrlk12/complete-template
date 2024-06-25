@@ -76,7 +76,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   };
 
   return (
-    <Box style={{ width: "100%" }}>
+    <Box style={{ width: "auto", display: "flex" }}>
       <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page">
         <FirstPageIcon />
       </IconButton>
@@ -186,7 +186,7 @@ const ReportTable = ({ tableHeader, tableData }: ReportTableProps) => {
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[10, 25, 50]}
-                  colSpan={6}
+                  colSpan={0}
                   count={tableData.row.length}
                   rowsPerPage={rowsPerPage}
                   page={page}

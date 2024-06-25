@@ -42,4 +42,8 @@ public enum ConstantVariable {
     public UUID getUuid(){
         return UUID.fromString(uuid);
     }
+
+    public String getStringUuid(){
+        return uuid;
+    }
 }

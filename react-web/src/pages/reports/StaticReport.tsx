@@ -54,7 +54,7 @@ const StaticReport = () => {
 
   const fetchReportTableData = async () => {
     const data = await fetchData<ReportTableProps>(
-      `http://${backendServerIp}/api/reports/static?startDate=${startDate.getFullYear()}_${startDate.getMonth() + 1}_${startDate.getDate()}&endDate=${endDate.getFullYear()}_${endDate.getMonth() + 1}_${endDate.getDate()}&deviceType=${deviceType.selectedDeviceType}&windFarmName=${deviceType.selectedWindFarm}&turbineId=${deviceType.selectedTurbine}`,
+      `http://${backendServerIp}/api/reports/static?startDate=${startDate.getFullYear()}_${startDate.getMonth() + 1}_${startDate.getDate()}&endDate=${endDate.getFullYear()}_${endDate.getMonth() + 1}_${endDate.getDate()}&deviceType=${deviceType.selectedDeviceType}&windFarmName=${deviceType.selectedWindFarm}&turbineId=${deviceType.selectedTurbine}&reportType=${reportType}`,
       {
         mode: "cors",
         method: "GET",

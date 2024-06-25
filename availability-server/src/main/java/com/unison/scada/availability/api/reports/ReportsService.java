@@ -83,7 +83,8 @@ public class ReportsService implements StaticReportService, StaticReportGenerate
             availabilityDataList = new ArrayList<>();
         }
 
-        response = reportsMapper.toStaticReportDTOResponse(availabilityDataList);
+        response = reportsMapper.toStaticReportDTOResponse(availabilityDataList, request.getReportType());
+
 
         /*
          * Save Static data to create excel

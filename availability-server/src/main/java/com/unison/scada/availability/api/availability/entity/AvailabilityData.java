@@ -24,7 +24,7 @@ public class AvailabilityData {
 
     @Setter
     @Column(nullable = false)
-    private int time;
+    private Double time;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "availability_type_uuid", nullable = true)

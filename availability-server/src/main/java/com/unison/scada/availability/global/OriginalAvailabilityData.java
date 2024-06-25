@@ -22,7 +22,7 @@ public class OriginalAvailabilityData {
 
     @Setter
     @Column(nullable = false)
-    private int time;
+    private double time;
 
     @ManyToOne
     private AvailabilityType availabilityType;

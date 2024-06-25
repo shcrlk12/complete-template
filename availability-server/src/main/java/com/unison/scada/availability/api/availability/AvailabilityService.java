@@ -41,6 +41,7 @@ public class AvailabilityService {
 
                 for(AvailabilityData availabilityData : availabilityDataList1)
                 {
+                    System.out.println(availabilityData.getAvailabilityType().getUuid());
                     LocalDateTime hour = availabilityData.getAvailabilityDataId().getTimestamp();
 
                     if(!data.containsKey(hour)){
@@ -75,10 +76,11 @@ public class AvailabilityService {
                     availabilityDataList1.add(
                             AvailabilityData.builder()
                                     .availabilityDataId(new AvailabilityData.AvailabilityDataId(startTime, 0, turbineId, null))
-                                    .time(3600)
+                                    .time(3600d)
                                     .availabilityType(informationUnavailableType.orElse(
                                             AvailabilityType.builder()
-                                                    .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
+                                                    .uuid(UUID.fromString(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
+                                                    .name("information unavailable")
                                                     .description("")
                                                     .color("#C4D8F0")
                                                     .build()
@@ -155,9 +157,10 @@ public class AvailabilityService {
     private AvailabilityData returnInformationUnavailable(LocalDateTime timestamp, int turbineId){
         return AvailabilityData.builder()
                 .availabilityDataId(new AvailabilityData.AvailabilityDataId(timestamp, 0, turbineId, null))
-                .time(3600)
+                .time(3600d)
                 .availabilityType(AvailabilityType.builder()
-                        .name(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)
+                        .uuid(UUID.fromString(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE))
+                        .name("information unavailable")
                         .description("")
                         .color("#C4D8F0")
                         .build())

@@ -92,6 +92,6 @@ public class DailyWindFarmDTO {
     @Builder
     public static class Availability {
         private final String name;
-        private final int time;
+        private final double time;
     }
 }

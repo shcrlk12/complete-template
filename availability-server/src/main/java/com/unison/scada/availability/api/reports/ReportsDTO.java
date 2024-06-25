@@ -29,7 +29,7 @@ public class ReportsDTO {
         private Integer turbineId;
         private String startDate;
         private String endDate;
-        private Integer reportType;
+        private String reportType;
     }
 
 }

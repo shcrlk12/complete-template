@@ -4,10 +4,13 @@ package com.unison.scada.availability.api.reports;
 import com.unison.scada.availability.api.availability.entity.AvailabilityData;
 import com.unison.scada.availability.api.availability.entity.AvailabilityType;
 import com.unison.scada.availability.api.availability.repository.AvailabilityTypeRepository;
+import com.unison.scada.availability.api.availability.variable.ConstantVariable;
 import com.unison.scada.availability.api.memo.Memo;
 import com.unison.scada.availability.api.reports.memo.MemoReportDTO;
 import com.unison.scada.availability.api.reports.statics.StaticReportDTO;
+import com.unison.scada.availability.api.windfarm.WindFarmService;
 import com.unison.scada.availability.global.DateTimeUtil;
+import com.unison.scada.availability.global.NullUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 public class ReportsMapper {
 
     private final AvailabilityTypeRepository availabilityTypeRepository;
+    private final WindFarmService windFarmService;
 
     public MemoReportDTO.Response.MemoData memoToReportsDTOResponse(Memo memo){
 
@@ -63,7 +67,7 @@ public class ReportsMapper {
     }
 
 
-    public StaticReportDTO.Response toStaticReportDTOResponse(List<AvailabilityData> availabilityDataList){
+    public StaticReportDTO.Response toStaticReportDTOResponse(List<AvailabilityData> availabilityDataList, String reportType){
 
         StaticReportDTO.Response response = new StaticReportDTO.Response();
 
@@ -107,30 +111,38 @@ public class ReportsMapper {
 
         List<StaticReportDTO.Response.TableDataRow.TableDataItem> tableDataItemList = new ArrayList<>();
 
-        for(LocalDateTime localDateTime : groupedData.keySet()){
-            Map<Integer, Map<String, List<AvailabilityData>>> availabilityDataList2 = groupedData.get(localDateTime);
+        availabilityDataList.forEach(data -> System.out.println(data.getVariable()));
+        /*
+        * Get turbines availability data
+        * */
+
+        RowData test = new RowData();
+        test.setData(availabilityDataList);
+        test.clacValue(reportType);
+
+        Map<String, Map<Integer, Map<String, RowData.DataSet>>> test00 = test.getModifiedDataMap();
+
+        for(String localDateTime : test00.keySet()){
+            Map<Integer, Map<String, RowData.DataSet>> availabilityDataList2 = test00.get(localDateTime);
 
             for(Integer turbineId : availabilityDataList2.keySet()) {
-                Map<String, List<AvailabilityData>> aaa2 = availabilityDataList2.get(turbineId);
+                Map<String, RowData.DataSet> aaa2 = availabilityDataList2.get(turbineId);
                 List<String> tableDataList = new ArrayList<>();
 
                 for (AvailabilityType availabilityType : availabilityTypeList) {
-
                     /*
                      * First set time of table
                      * */
                     if (tableDataList.isEmpty()) {
-                        tableDataList.add(DateTimeUtil.formatToYearMonthDayHourMinute(localDateTime));
+                        tableDataList.add(localDateTime);
                         tableDataList.add(String.format("WTG%02d", turbineId + 1));
-                        tableDataList.add("0"); // Wind Speed
-                        tableDataList.add("0"); // Energy Production
-                        tableDataList.add("0"); // Availability
-                        tableDataList.add("0"); // Capacity Factor
+                        tableDataList.add(NullUtil.formatIfNullZero(test.getRowData(ConstantVariable.WIND_SPEED.getStringUuid(), localDateTime, turbineId), "%.2f")); // Wind Speed
+                        tableDataList.add(NullUtil.formatIfNullZero(test.getEnergyProduction(localDateTime, turbineId), "%.2f")); // Energy Production
+                        tableDataList.add(NullUtil.formatIfNullZero(test.getAvailability(localDateTime, turbineId), "%.2f")); // Availability
+                        tableDataList.add(NullUtil.formatIfNullZero(test.getCapacityFactorMap(localDateTime, turbineId), "%.2f")); // Capacity Factor
                     }
-                    if (aaa2.containsKey(availabilityType.getName())) {
-                        AvailabilityData availabilityData = aaa2.get(availabilityType.getName()).get(0);
-
-                        tableDataList.add(String.valueOf(availabilityData.getTime()));
+                    if (aaa2.containsKey(availabilityType.getUuid().toString())) {
+                        tableDataList.add(String.valueOf(aaa2.get(availabilityType.getUuid().toString()).convertValue().intValue()));
                     } else {
                         tableDataList.add("0");
                     }
