@@ -16,9 +16,6 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<?> handleAuthenticationException(Exception ex) {
 
-        System.out.println("test1234");
-
-
         return null;
     }
 }

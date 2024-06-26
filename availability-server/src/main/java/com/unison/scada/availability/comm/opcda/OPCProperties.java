@@ -18,14 +18,4 @@ import java.util.stream.Collectors;
 public class OPCProperties {
     private String serverName;
     private String prefixFormat;
-
-    private List<Variable> variable;
-
-    @Getter
-    @Setter
-    public static class Variable{
-        private UUID uuid;
-        private String name;
-        private String type;
-    }
 }

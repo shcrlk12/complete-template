@@ -69,7 +69,6 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
             for (Variable variable : variableList) {
                 addOPCItem(prefixName + opcGroupName, prefixName + variable.getName());
             }
-
         }
     }
 

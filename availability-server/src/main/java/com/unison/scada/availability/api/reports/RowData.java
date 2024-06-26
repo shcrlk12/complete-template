@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class RowData {
     public void setData(List<AvailabilityData> availabilityDataList) {
         Map<String, Map<Integer, List<AvailabilityData>>> availabilityDataMap = availabilityDataList.stream()
                 .collect(Collectors.groupingBy(
-                        data -> DateTimeUtil.formatToYearMonthDayHour(data.getAvailabilityDataId().getTimestamp()),
+                        data -> DateTimeUtil.formatToYearMonthDayHourMinute(data.getAvailabilityDataId().getTimestamp()),
                         LinkedHashMap::new,
                         Collectors.groupingBy(data -> data.getAvailabilityDataId().getTurbineId())));
 
@@ -62,7 +63,7 @@ public class RowData {
     }
 
 
-    public void clacValue(String reportType){
+    public void clacValue(String reportType) throws Exception {
         this.reportType = reportType;
 
         if(reportType.equalsIgnoreCase("Hourly")){
@@ -125,74 +126,130 @@ public class RowData {
     public Map<String, Map<Integer, Double>> getEnergyProduction() {
         Map<String, Map<Integer, Double>> result = new LinkedHashMap<>();
 
-        Iterator<String> iterator = modifiedDataMap.keySet().iterator();
-        String beforeTime = null;
+        for(String localDateTime : modifiedDataMap.keySet()) {
+            String nextKey = getNextKey(modifiedDataMap, localDateTime);
 
-        if (iterator.hasNext())
-            beforeTime = iterator.next();
-
-        while (iterator.hasNext()) {
-            String time = iterator.next();
-            Map<Integer, Map<String, DataSet>> maps = modifiedDataMap.get(time);
-
-            Map<Integer, Double> result12 = new LinkedHashMap<>();
+            Map<Integer, Double> energyProductionMap = new LinkedHashMap<>();
+            Map<Integer, Map<String, DataSet>> maps = modifiedDataMap.get(localDateTime);
 
             /*
              * Set Turbine data
              * */
             for (Integer turbineId : maps.keySet()) {
-                WindFarmService.Avail avail = new WindFarmService.Avail();
 
-                Map<String, DataSet> mapss = maps.get(turbineId);
-                if (mapss.containsKey(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid())
-                        && modifiedDataMap.get(beforeTime).containsKey(turbineId)
-                        && modifiedDataMap.get(beforeTime).get(turbineId).containsKey(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid())) {
-                    double v = mapss.get(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid()).getValue()
-                            - modifiedDataMap.get(beforeTime).get(turbineId).get(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid()).getValue();
-                    result12.put(turbineId, v);
+                Map<String, DataSet> uuidMap = maps.get(turbineId);
+                double energyProduction;
+                if (uuidMap.containsKey(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid())
+                        && nextKey != null
+                        && modifiedDataMap.get(nextKey).containsKey(turbineId)
+                        && modifiedDataMap.get(nextKey).get(turbineId).containsKey(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid())) {
+                    energyProduction = modifiedDataMap.get(nextKey).get(turbineId).get(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid()).getValue()
+                                        - uuidMap.get(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid()).getValue();
                 }
+                else if(uuidMap.containsKey(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid())){
+                    energyProduction = uuidMap.get(ConstantVariable.TOTAL_PRODUCTION_POWER.getStringUuid()).convertValue();
+                }
+                else {
+                    energyProduction = 0;
+                }
+                energyProductionMap.put(turbineId, energyProduction);
             }
-
-            if (!result12.isEmpty())
-                result.put(beforeTime, result12);
-
-            beforeTime = time;
+            result.put(localDateTime, energyProductionMap);
         }
+
         return result;
     }
 
-    private Map<String, Map<Integer, Double>> getCapacityFactorMap(){
+    private Map<String, Map<Integer, Double>> getCapacityFactorMap() throws Exception {
         Map<String, Map<Integer, Double>> result = new LinkedHashMap<>();
 
         for(String localDateTime : energyProductionMap.keySet()){
             Map<Integer, Double> turbines = new LinkedHashMap<>();
 
-            String nextKey = (String)getNextKey(energyProductionMap, localDateTime);
+            for(Integer turbineId : energyProductionMap.get(localDateTime).keySet()){
+                Double energyProduction = energyProductionMap.get(localDateTime).get(turbineId);
 
-                for(Integer turbineId : energyProductionMap.get(localDateTime).keySet()){
-                    Double energyProduction = energyProductionMap.get(localDateTime).get(turbineId);
+                double period = getPeriod(localDateTime);
 
-                    double period;
-                    if(nextKey != null)
-                    {
-                        Duration duration = Duration.between(
-                                Objects.requireNonNull(DateTimeUtil.parseLocalDateTimeSeconds(localDateTime))
-                                , DateTimeUtil.parseLocalDateTimeSeconds(nextKey));
-
-                        period = duration.toSeconds();
-                    }else{  // Last time
-                        period = 3600;
-
-                    }
-                    turbines.put(turbineId, TurbineCalcUtil.getCapacityFactor(energyProduction, 2.3, period));
-                }
+                turbines.put(turbineId, TurbineCalcUtil.getCapacityFactor(energyProduction, 2.3, period));
+            }
 
             result.put(localDateTime, turbines);
         }
         return result;
     }
 
+    private static <K, V> K getLastKey(Map<K, V> map) {
+        K lastKey = null;
+        for (K key : map.keySet()) {
+            lastKey = key;
+        }
+        return lastKey;
+    }
 
+    private double getPeriod(String time) throws Exception {
+
+        String lastKey = getLastKey(rowDataMap);
+        LocalDateTime lastTime = DateTimeUtil.parseLocalDateTimeSeconds(lastKey);
+        LocalDateTime localDateTime = null;
+        LocalDateTime endTime = null;
+
+        double period = 0d;
+
+        if(reportType.equalsIgnoreCase("Hourly"))
+        {
+            return 3600d;
+        }
+        else if(reportType.equalsIgnoreCase("Daily"))
+        {
+            localDateTime = Objects.requireNonNull(DateTimeUtil.parseLocalDateTimeSeconds(time));
+
+            endTime = localDateTime.plusDays(1);
+
+        }
+        else if(reportType.equalsIgnoreCase("Weekly"))
+        {
+            localDateTime = Objects.requireNonNull(DateTimeUtil.getWeeklyTime(time));
+
+            endTime = localDateTime.plusWeeks(1);
+        }
+        else if(reportType.equalsIgnoreCase("Monthly"))
+        {
+            localDateTime = Objects.requireNonNull(DateTimeUtil.parseLocalDateTimeSeconds(time));
+
+            endTime = localDateTime.plusMonths(1);
+
+        }
+        else if(reportType.equalsIgnoreCase("Quarter"))
+        {
+            localDateTime = Objects.requireNonNull(DateTimeUtil.getQuarterTime(time));
+
+            endTime = localDateTime.plusMonths(3);
+        }
+        else if(reportType.equalsIgnoreCase("Annually"))
+        {
+            localDateTime = Objects.requireNonNull(DateTimeUtil.parseLocalDateTimeSeconds(time));
+
+            endTime = localDateTime.plusYears(1);
+        }
+
+        if(endTime == null)
+        {
+            throw new Exception("not correct report type [" + reportType + "]" );
+        }
+
+        if(endTime.isAfter(lastTime)){
+            endTime = lastTime;
+        }
+
+        Duration duration = Duration.between(
+                localDateTime
+                , endTime);
+
+        period = duration.toSeconds();
+
+        return period;
+    }
     public Double getEnergyProduction(String localDateTime, Integer turbineId) {
          return getMapData(energyProductionMap, localDateTime, turbineId);
 
@@ -235,8 +292,8 @@ public class RowData {
         return 0d;
     }
 
-    private static Object getNextKey(Map<Object, Object> map, String key) {
-        List<Object> keys = new ArrayList<>(map.keySet());
+    private static <K> K getNextKey(Map<K, ?> map, K key) {
+        List<K> keys = new ArrayList<>(map.keySet());
         int index = keys.indexOf(key);
 
         if (index != -1 && index < keys.size() - 1) {
@@ -326,21 +383,21 @@ public class RowData {
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class DataSet{
-        Double value = null;
-        Double baseValue = null;
+        Double value;
+        Double baseValue;
         RowDataMethod method;
         int baseIndex;
 
-
-        public DataSet(double value){
-            this(value, null, RowDataMethod.POINT, 1);
+        public DataSet(RowDataMethod method){
+            this(null, null, method, 0);
         }
 
-        public DataSet(double value, RowDataMethod method){
-            this(value, null, method, 1);
+        public DataSet(Double value, RowDataMethod method) {
+            this(value, value, method, 1);
+
         }
+
 
         public Double convertValue(){
             if(method == RowDataMethod.POINT) {
@@ -350,23 +407,29 @@ public class RowData {
                 return value / baseIndex;
             }
             else if(method == RowDataMethod.GROWTH){
-                return value - baseValue;
+                if(baseIndex == 1)
+                    return 0d;
+                else
+                    return value - baseValue;
             }else
                 return value;
         }
 
         public void setValue(double value){
+            this.baseIndex++;
+
             if(method == RowDataMethod.POINT && this.value == null) {
                 this.value = value;
             }
             else if(method == RowDataMethod.AVERAGE){
                 this.value += value;
-                this.baseIndex++;
             }
             else if(method == RowDataMethod.SUM){
                 this.value += value;
             }
             else if(method == RowDataMethod.GROWTH){
+                this.value = value;
+
                 if(baseValue == null)
                     this.baseValue = value;
             }

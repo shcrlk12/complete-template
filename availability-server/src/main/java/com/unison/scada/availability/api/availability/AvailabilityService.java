@@ -41,7 +41,6 @@ public class AvailabilityService {
 
                 for(AvailabilityData availabilityData : availabilityDataList1)
                 {
-                    System.out.println(availabilityData.getAvailabilityType().getUuid());
                     LocalDateTime hour = availabilityData.getAvailabilityDataId().getTimestamp();
 
                     if(!data.containsKey(hour)){

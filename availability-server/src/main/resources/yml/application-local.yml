@@ -44,16 +44,3 @@ wind-farm:
 opc:
   server-name: BACHMANN.OPCStandardServer
   prefix-format: WindFarm.WTG%02d.
-
-  variable:
-    - uuid: 307f3d53-bf04-410d-9333-5d9aed5e3133
-      name: U136_WTUR_TurMainSt
-      type: availability
-
-    - uuid: 9d35232c-1971-47c2-ad99-2d511053994f
-      name: U136_WNAC_WindSpeed1s
-      type: realTime
-
-    - uuid: 1c6ab584-ad0c-46a0-acaf-02a10abbe183
-      name: U136_WTUR_TotWh
-      type: realTime

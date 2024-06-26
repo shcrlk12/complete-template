@@ -3,6 +3,7 @@ export const SET_LOADING = "SET_LOADING" as const;
 export const RESET_LOADING = "RESET_LOADING" as const;
 export const HEADER_ITEM_VISIBLE = "HEADER_ITEM_VISIBLE" as const;
 export const SET_WARRANTY_DATE = "SET_WARRANTY_DATE" as const;
+export const SET_TURBINE_NUMBER = "SET_TURBINE_NUMBER" as const;
 
 export type HeaderTiemVisible = {
   left: boolean;
@@ -27,4 +28,9 @@ export const resetLoading = () => ({
 export const headerTiemVisible = (headerTiemVisible: HeaderTiemVisible) => ({
   type: SET_LOADING,
   payload: headerTiemVisible,
+});
+
+export const setTurbineNumber = (turbineNumber: number) => ({
+  type: SET_TURBINE_NUMBER,
+  payload: turbineNumber,
 });

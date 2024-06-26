@@ -1,7 +1,5 @@
-import useInits from "@src/hooks/useInits";
-import React, { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, MouseEvent, useState } from "react";
 import {
-  DateContainer,
   Header,
   ReportContainer,
   ReportInner,
@@ -16,11 +14,11 @@ import Period from "./../../components/Report/Period";
 import ReportType from "./../../components/Report/ReportType";
 import ReportTable, { ReportTableProps } from "@components/Report/Table/ReportTable";
 import { backendServerIp } from "@src/Config";
-import { fetchData, statusOk } from "@src/util/fetch";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import useFetchData from "@src/hooks/useFetchData";
 import useDownloadFile from "@src/hooks/useDownloadFile";
-import { convertJsonToTableProps } from "./Report";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/index";
 
 export type StaticTableRow = {
   deviceName: string;

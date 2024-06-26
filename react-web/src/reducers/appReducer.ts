@@ -7,6 +7,8 @@ import {
   HeaderTiemVisible,
   setStartOfWarrantyDate,
   SET_WARRANTY_DATE,
+  setTurbineNumber,
+  SET_TURBINE_NUMBER,
 } from "./appAction";
 
 //Action Type
@@ -14,13 +16,15 @@ type AppAction =
   | ReturnType<typeof setLoading>
   | ReturnType<typeof resetLoading>
   | ReturnType<typeof headerTiemVisible>
-  | ReturnType<typeof setStartOfWarrantyDate>;
+  | ReturnType<typeof setStartOfWarrantyDate>
+  | ReturnType<typeof setTurbineNumber>;
 
 //State type
 type AppState = {
   headerTiemVisible: HeaderTiemVisible;
   isLoading: boolean;
   startOfWarrantyDate: string;
+  turbineNumber: number;
 };
 
 const initialState: AppState = {
@@ -31,6 +35,7 @@ const initialState: AppState = {
   },
   isLoading: false,
   startOfWarrantyDate: new Date().toISOString(),
+  turbineNumber: 0,
 };
 
 const appReducer = (state: AppState = initialState, action: AppAction) => {
@@ -49,6 +54,11 @@ const appReducer = (state: AppState = initialState, action: AppAction) => {
       return {
         ...state,
         startOfWarrantyDate: action.payload,
+      };
+    case SET_TURBINE_NUMBER:
+      return {
+        ...state,
+        turbineNumber: action.payload,
       };
     default:
       return state;

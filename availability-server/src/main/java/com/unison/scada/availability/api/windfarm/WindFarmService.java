@@ -509,7 +509,6 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                     LocalDateTime day = availabilityData.getAvailabilityDataId().getTimestamp().withHour(0).withMinute(0).withSecond(0);
 
                     if (!data.containsKey(day)) {
-                        System.out.println(index++);
                         Avail a = new Avail();
                         a.calcAvailability(availabilityData);
 

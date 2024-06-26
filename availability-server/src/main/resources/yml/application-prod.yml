@@ -51,11 +51,3 @@ wind-farm:
 opc:
   server-name: BACHMANN.OPCEnterpriseServer
   prefix-format: WindFarm.WTG%02d.
-
-  variable:
-    - name: U88_WTUR_sviAvlBehaviorSt
-      type: availability
-    - name: U88_WNAC_sviWindSpeed1s
-      type: realTime
-    - name: U88_WTUR_sviTotWh
-      type: realTime

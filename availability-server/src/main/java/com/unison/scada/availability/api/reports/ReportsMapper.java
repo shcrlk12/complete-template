@@ -64,7 +64,7 @@ public class ReportsMapper {
     }
 
 
-    public StaticReportDTO.Response toStaticReportDTOResponse(List<AvailabilityData> availabilityDataList, String reportType){
+    public StaticReportDTO.Response toStaticReportDTOResponse(List<AvailabilityData> availabilityDataList, String reportType) throws Exception {
 
         StaticReportDTO.Response response = new StaticReportDTO.Response();
 
@@ -107,7 +107,6 @@ public class ReportsMapper {
 
         List<StaticReportDTO.Response.TableDataRow.TableDataItem> tableDataItemList = new ArrayList<>();
 
-        availabilityDataList.forEach(data -> System.out.println(data.getVariable()));
         /*
         * Get turbines availability data
         * */

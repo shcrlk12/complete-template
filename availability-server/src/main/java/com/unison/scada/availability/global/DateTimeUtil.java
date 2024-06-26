@@ -1,8 +1,12 @@
 package com.unison.scada.availability.global;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 
 public class DateTimeUtil {
 
@@ -22,19 +26,44 @@ public class DateTimeUtil {
         }
         else if(localDateTime.length() == "yyyy-MM-dd".length())
         {
-            return LocalDateTime.parse(localDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            localDateTime += " 00:00:00";
+            return LocalDateTime.parse(localDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
         else if(localDateTime.length() == "yyyy-MM".length())
         {
-            return LocalDateTime.parse(localDateTime, DateTimeFormatter.ofPattern("yyyy-MM"));
+            localDateTime += "-01 00:00:00";
+            return LocalDateTime.parse(localDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
         else if(localDateTime.length() == "yyyy".length())
         {
-            return LocalDateTime.parse(localDateTime, DateTimeFormatter.ofPattern("yyyy"));
+            localDateTime += "-01-01 00:00:00";
+            return LocalDateTime.parse(localDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
 
         return null;
+    }
 
+    public static LocalDateTime getWeeklyTime(String time){
+        String[] timeSplits = time.split("-");
+
+        // 2024년의 첫 번째 월요일을 기준으로 2주차 날짜 범위를 계산합니다.
+        LocalDateTime date = LocalDateTime.of(Integer.parseInt(timeSplits[0]), 1, 1, 0, 0);
+
+        return date.plusWeeks(Integer.parseInt(timeSplits[1]) - 1);
+    }
+
+    public static LocalDateTime getQuarterTime(String time){
+        String[] timeSplits = time.split("-");
+        if(timeSplits[1].equalsIgnoreCase("1")){
+            return LocalDateTime.of(Integer.parseInt(timeSplits[0]), 1, 1, 0, 0);
+        }else if(timeSplits[1].equalsIgnoreCase("2")) {
+            return LocalDateTime.of(Integer.parseInt(timeSplits[0]), 4, 1, 0, 0);
+        }else if(timeSplits[1].equalsIgnoreCase("3")) {
+            return LocalDateTime.of(Integer.parseInt(timeSplits[0]), 7, 1, 0, 0);
+        }else if(timeSplits[1].equalsIgnoreCase("4")) {
+            return LocalDateTime.of(Integer.parseInt(timeSplits[0]), 10, 1, 0, 0);
+        }
+        return null;
     }
     public static String formatToYearMonthDayHourMinuteSecond(LocalDateTime localDateTime){
         return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
