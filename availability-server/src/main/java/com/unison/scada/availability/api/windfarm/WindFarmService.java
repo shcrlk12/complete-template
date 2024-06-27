@@ -19,6 +19,7 @@ import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmDTO;
 import com.unison.scada.availability.api.windfarm.daily.DailyWindFarmService;
 import com.unison.scada.availability.api.windfarm.realtime.RealTimeDTO;
 import com.unison.scada.availability.api.windfarm.realtime.RealTimeService;
+import com.unison.scada.availability.comm.opcda.OPCServer;
 import com.unison.scada.availability.global.General;
 import com.unison.scada.availability.global.OriginalAvailabilityData;
 import com.unison.scada.availability.global.filter.GeneralRepository;
@@ -27,6 +28,8 @@ import com.unison.scada.availability.scheduler.availability.model.AvailabilitySt
 import com.unison.scada.availability.scheduler.availability.model.Turbine;
 import com.unison.scada.availability.scheduler.availability.model.WindFarm;
 import lombok.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -38,6 +41,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmService, RealTimeService {
+    static Logger logger = LoggerFactory.getLogger(WindFarmService.class);
+
     private final ParameterRepository parameterRepository;
     private final WindFarmProperties windFarmProperties;
     private final AvailabilityDataRepository availabilityDataRepository;
@@ -103,6 +108,12 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                             .time(availabilityData.getTime())
                             .build());
                 }
+                availabilities.sort(new Comparator<DailyWindFarmDTO.Availability>() {
+                    @Override
+                    public int compare(DailyWindFarmDTO.Availability a1, DailyWindFarmDTO.Availability a2) {
+                        return a1.getName().compareTo(a2.getName());
+                    }
+                });
                 DailyWindFarmDTO.Memo memo = null;
                 Optional<Memo> optionalMemo = Optional.ofNullable(data22.get(i).get(key));
 
@@ -110,6 +121,8 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
                     Memo memo1 = optionalMemo.get();
                     memo = new DailyWindFarmDTO.Memo(memo1.getEngineerName(), memo1.getWorkTime(), memo1.getMaterial(), memo1.getQuantity(), memo1.getWorkType(), memo1.getInspection(), memo1.getEtc());
                 }
+
+
                 dataList.add(DailyWindFarmDTO.Response.Data.builder()
                         .time(key)
                         .memo(memo)
@@ -365,7 +378,7 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             else
                 actualActivePower += endTimeTotalPower.get() - startTimeTotalPower.get();
         }
-        return actualActivePower / bottom;
+        return actualActivePower / bottom * 100;
     }
 
     private LocalDateTime getMaximumTime(LocalDateTime time, LocalDateTime max){
@@ -446,39 +459,63 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
 
             if(availabilityData.getAvailabilityType() != null) {
                 if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.NORMAL_TYPE)) {
-                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE)) {
-                    numerator += availabilityData.getTime();
-                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE)) {
-                    denominator += availabilityData.getTime();
-                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE)) {
-
-                } else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)) {
-                } else {
+                    etcTime += availabilityData.getTime();
                 }
-                etcTime += availabilityData.getTime();
+                else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE)) {
+                    numerator += availabilityData.getTime();
+                    etcTime += availabilityData.getTime();
+                }
+                else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE)) {
+                    etcTime += availabilityData.getTime();
+                }
+                else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE)) {
+                    denominator += availabilityData.getTime();
+                    etcTime += availabilityData.getTime();
+                }
+                else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)) {
+                    etcTime += availabilityData.getTime();
+                }
+                else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.LOW_TEMPERATURE_TYPE)) {
+                    etcTime += availabilityData.getTime();
+                }
+                else if (availabilityData.getAvailabilityType().getUuid().toString().equalsIgnoreCase(AvailabilityStatus.ETC_TYPE)) {
+                    etcTime += availabilityData.getTime();
+                }
             }
         }
 
         public void calcAvailability(String uuid, Double time){
 
             if (uuid.equalsIgnoreCase(AvailabilityStatus.NORMAL_TYPE)) {
-            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE)) {
-                numerator += time;
-            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE)) {
-                denominator += time;
-            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE)) {
-
-            } else if (uuid.equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)) {
-            } else {
+                etcTime += time;
             }
-            etcTime += time;
+            else if (uuid.equalsIgnoreCase(AvailabilityStatus.FORCED_OUTAGE_TYPE)) {
+                numerator += time;
+                etcTime += time;
+            }
+            else if (uuid.equalsIgnoreCase(AvailabilityStatus.REQUESTED_SHUTDOWN_TYPE)) {
+                etcTime += time;
+            }
+            else if (uuid.equalsIgnoreCase(AvailabilityStatus.SCHEDULED_MAINTENANCE_TYPE)) {
+                denominator += time;
+                etcTime += time;
+            }
+            else if (uuid.equalsIgnoreCase(AvailabilityStatus.INFORMATION_UNAVAILABLE_TYPE)) {
+                etcTime += time;
+            }
+            else if (uuid.equalsIgnoreCase(AvailabilityStatus.LOW_TEMPERATURE_TYPE)) {
+                etcTime += time;
+            }
+            else if (uuid.equalsIgnoreCase(AvailabilityStatus.ETC_TYPE)) {
+                etcTime += time;
+            }
         }
 
         public double getAvailability(List<AvailabilityData> availabilityDataList){
             for(AvailabilityData availabilityData : availabilityDataList){
                 calcAvailability(availabilityData);
-            }
 
+            }
             return getAvail();
         }
 
@@ -486,7 +523,6 @@ public class WindFarmService implements DailyWindFarmService, AnnuallyWindFarmSe
             for(String uuid : availabilityDataList.keySet()){
                 calcAvailability(uuid, availabilityDataList.get(uuid).getValue());
             }
-
             return getAvail();
         }
     }

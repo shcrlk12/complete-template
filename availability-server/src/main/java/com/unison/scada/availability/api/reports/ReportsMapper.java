@@ -137,7 +137,7 @@ public class ReportsMapper {
                         tableDataList.add(NullUtil.formatIfNullZero(test.getCapacityFactorMap(localDateTime, turbineId), "%.2f")); // Capacity Factor
                     }
                     if (aaa2.containsKey(availabilityType.getUuid().toString())) {
-                        tableDataList.add(String.valueOf(aaa2.get(availabilityType.getUuid().toString()).convertValue().intValue()));
+                        tableDataList.add(String.format("%.02f", aaa2.get(availabilityType.getUuid().toString()).convertValue().intValue() / 60.0));
                     } else {
                         tableDataList.add("0");
                     }

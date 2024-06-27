@@ -14,7 +14,7 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
     @Query("SELECT ad " +
             "FROM AvailabilityData ad " +
             "LEFT JOIN ad.availabilityType at " +
-            "WHERE ad.availabilityDataId.timestamp BETWEEN :startTime AND :endTime " +
+            "WHERE ad.availabilityDataId.timestamp >= :startTime AND ad.availabilityDataId.timestamp < :endTime " +
             "AND ad.availabilityType IS NOT NULL")
     List<AvailabilityData> findAllDataByTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
@@ -46,7 +46,7 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
             "FROM AvailabilityData ad " +
             "LEFT JOIN ad.availabilityType at " +
             "LEFT JOIN ad.variable v  " +
-            "WHERE ad.availabilityDataId.timestamp BETWEEN :startTime AND :endTime " +
+            "WHERE ad.availabilityDataId.timestamp >= :startTime AND ad.availabilityDataId.timestamp < :endTime " +
             "AND ad.availabilityDataId.windFarmId = :windFarmId " +
             "ORDER BY ad.availabilityDataId.timestamp ASC")
     List<AvailabilityData> findByWindFarmIdAndTimeBetween(@Param("windFarmId") Integer windFarmId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
@@ -56,7 +56,7 @@ public interface AvailabilityDataRepository extends JpaRepository<AvailabilityDa
             "FROM AvailabilityData ad " +
             "LEFT JOIN ad.availabilityType at " +
             "LEFT JOIN ad.variable v  " +
-            "WHERE ad.availabilityDataId.timestamp BETWEEN :startTime AND :endTime " +
+            "WHERE ad.availabilityDataId.timestamp >= :startTime AND ad.availabilityDataId.timestamp < :endTime " +
             "AND ad.availabilityDataId.windFarmId = :windFarmId " +
             "AND ad.availabilityDataId.turbineId = :turbineId " +
             "ORDER BY ad.availabilityDataId.timestamp ASC")

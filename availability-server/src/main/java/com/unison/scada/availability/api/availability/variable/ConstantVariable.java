@@ -14,7 +14,7 @@ public enum ConstantVariable {
 
     TURBINE_MAIN_STATUS("307f3d53-bf04-410d-9333-5d9aed5e3133"),
     WIND_SPEED("9d35232c-1971-47c2-ad99-2d511053994f"),
-    TOTAL_PRODUCTION_POWER("1c6ab584-ad0c-46a0-acaf-02a10abbe183");
+    TOTAL_PRODUCTION_POWER("a6822c06-e5f8-4d85-b7b1-7f3b6cc1cab5");
 
     private final String uuid;
 

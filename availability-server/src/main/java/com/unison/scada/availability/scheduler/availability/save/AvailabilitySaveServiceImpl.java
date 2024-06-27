@@ -88,7 +88,7 @@ public class AvailabilitySaveServiceImpl implements AvailabilitySaveService {
 
     private AvailabilityType findAvailabilityTypeByName(String name, List<AvailabilityType> availabilityTypes){
         for(AvailabilityType availabilityType : availabilityTypes) {
-            if(availabilityType.getName().equalsIgnoreCase(name))
+            if(availabilityType.getUuid().toString().equalsIgnoreCase(name))
                 return availabilityType;
         }
         return null;

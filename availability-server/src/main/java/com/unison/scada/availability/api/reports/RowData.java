@@ -187,12 +187,17 @@ public class RowData {
         return lastKey;
     }
 
+    private static <K, V> K getFirstKey(Map<K, V> map) {
+        for (K key : map.keySet()) {
+            return key;
+        }
+        return null;
+    }
     private double getPeriod(String time) throws Exception {
 
-        String lastKey = getLastKey(rowDataMap);
-        LocalDateTime lastTime = DateTimeUtil.parseLocalDateTimeSeconds(lastKey);
         LocalDateTime localDateTime = null;
         LocalDateTime endTime = null;
+        LocalDateTime firstKey = DateTimeUtil.parseLocalDateTimeSeconds(Objects.requireNonNull(getFirstKey(rowDataMap)));
 
         double period = 0d;
 
@@ -233,13 +238,18 @@ public class RowData {
             endTime = localDateTime.plusYears(1);
         }
 
+        if(localDateTime.isBefore(firstKey))
+        {
+            localDateTime = firstKey;
+        }
+
         if(endTime == null)
         {
             throw new Exception("not correct report type [" + reportType + "]" );
         }
 
-        if(endTime.isAfter(lastTime)){
-            endTime = lastTime;
+        if(endTime.isAfter(LocalDateTime.now())){
+            endTime = LocalDateTime.now();
         }
 
         Duration duration = Duration.between(

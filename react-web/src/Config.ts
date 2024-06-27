@@ -37,8 +37,8 @@ export type ProjectVersion = typeof TYPE1_VERSION | typeof TYPE2_VERSION | typeo
 
 export const projectVersion: ProjectVersion = TYPE2_VERSION;
 
-export let backendServerIp = "localhost:6789";
-export let windSpeedName = "U136_WNAC_WindSpeed1s";
+export let backendServerIp = "182.208.91.171:6789";
+export let windSpeedName = "U88_WNAC_sviWindSpeed1s";
 
 //config settings
 export const Paths: PathType = {
