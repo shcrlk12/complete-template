@@ -14,7 +14,7 @@ import useInits from "@src/hooks/useInits";
 import { fetchData, statusOk } from "@src/util/fetch";
 import { loginSuccess } from "@reducers/userActions";
 import { useParams } from "react-router";
-import { backendServerIp, windSpeedName } from "@src/Config";
+import { backendServerIp } from "@src/Config";
 
 type DataOfDay = {
   time: Date;
@@ -110,7 +110,8 @@ const AvailabilityManagementAnnually = () => {
   const getWindSpeed = () => {
     if (realTime !== undefined) {
       for (const data of realTime.dataList) {
-        if (data.name === windSpeedName) return (data.value / data.base).toFixed(1);
+        if (data.name.toLowerCase() === "9d35232c-1971-47c2-ad99-2d511053994f")
+          return (data.value / data.base).toFixed(1);
       }
     }
   };

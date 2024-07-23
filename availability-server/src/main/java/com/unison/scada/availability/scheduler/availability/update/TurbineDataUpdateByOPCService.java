@@ -113,10 +113,10 @@ public class TurbineDataUpdateByOPCService implements TurbineDataUpdateService {
             String realTimeValue = realTimeOPCGroup.getItemByName(prefixTurbineId + constantVariable.getOpcVariableName()).getValueAsString();
 
 
-            dataMap.put(constantVariable.getOpcVariableName(), new Turbine.Data(Double.parseDouble(realTimeValue), constantVariable.isSave()));
+            dataMap.put(constantVariable.getStringUuid(), new Turbine.Data(Double.parseDouble(realTimeValue), constantVariable.isSave()));
         }
 
-        Turbine.Data availabilitySt = dataMap.get(ConstantVariable.TURBINE_MAIN_STATUS.getOpcVariableName());
+        Turbine.Data availabilitySt = dataMap.get(ConstantVariable.TURBINE_MAIN_STATUS.getStringUuid());
 
         return Turbine.builder()
                 .turbineId(turbineId)

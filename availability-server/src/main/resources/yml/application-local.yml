@@ -1,6 +1,10 @@
 # local 테스트 용
 
 spring:
+  config:
+    activate:
+      on-profile: local # 환경 이름 설정
+
   security:
     debug: true
   datasource:
